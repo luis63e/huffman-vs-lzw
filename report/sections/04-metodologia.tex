@@ -1,0 +1,346 @@
+% ---------------------------------------------------------------------
+%  4. Metodología — C (general), A y B (implementación y pruebas propias)
+% ---------------------------------------------------------------------
+\section{Metodología}
+\label{sec:metodologia}
+
+\subsection{Proceso de comparación}
+\label{sec:proceso}
+\begin{aporte}{C}
+La \cref{fig:metodologia} resume los pasos de la comparación. Se parte de conjuntos de datos
+elegidos para aislar cada tipo de redundancia; ambos algoritmos se implementan detrás de una
+misma interfaz y se validan antes de medir; cada configuración se mide tras calentar el
+compilador JIT, con repeticiones cronometradas y resúmenes estadísticos robustos; finalmente,
+la tasa de crecimiento estimada y la tasa de compresión se contrastan con las hipótesis
+H1--H4 derivadas del análisis teórico. El diseño sigue las pautas de la algoritmia
+experimental~\cite{johnson2002,mcgeoch2012} y de la evaluación de rendimiento en
+Java~\cite{georges2007}.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      node distance=0.55cm and 0.62cm,
+      paso/.style={rectangle, rounded corners=3pt, draw=memberC, fill=memberC!7,
+                   text width=2.7cm, minimum height=1.5cm, align=center, font=\footnotesize},
+      datos/.style={cylinder, shape border rotate=90, aspect=0.2, draw=memberC,
+                    fill=memberC!14, text width=2.35cm, minimum height=1.7cm, align=center,
+                    font=\footnotesize},
+      flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=memberC!85!black},
+      fase/.style={draw=gray!55, dashed, rounded corners=5pt, inner sep=5pt},
+      etiq/.style={font=\scriptsize\bfseries\sffamily, text=gray!65!black}]
+    \node[datos] (d) {Conjuntos de datos: sintéticos, texto real, corpus};
+    \node[paso, right=of d] (i) {Implementación (\texttt{Codec}): Huffman y LZW};
+    \node[paso, right=of i] (v) {Validación: 43 pruebas JUnit e ida y vuelta};
+    \node[paso, right=of v] (w) {Calentamiento global y por configuración ($W$)};
+    \node[paso, below=1.5cm of w] (r) {$R$ ejecuciones cronometradas: codificar y decodificar};
+    \node[paso, left=of r] (s) {Estadística: mediana e IC 95\,\% (t de Student)};
+    \node[paso, left=of s] (f) {Ajuste log--log: pendiente y $R^2$; bpb frente a $H_0$};
+    \node[paso, left=of f, fill=memberC!20] (c) {Contraste con la teoría: H1--H4};
+    \draw[flecha] (d) -- (i);
+    \draw[flecha] (i) -- (v);
+    \draw[flecha] (v) -- (w);
+    \draw[flecha] (w) -- (r);
+    \draw[flecha] (r) -- (s);
+    \draw[flecha] (s) -- (f);
+    \draw[flecha] (f) -- (c);
+    \draw[flecha, dashed] (v.north) -- ++(0,0.45) -| node[pos=0.25, above, font=\scriptsize]
+      {falla: corregir} (i.north);
+    \node[fase, fit=(d)(i)(v)($(v.north)+(0,0.75)$),
+          label={[anchor=south west, etiq]north west:PREPARACIÓN}] {};
+    \node[fase, fit=(w)(r)($(w.north)+(0,0.75)$),
+          label={[anchor=south west, etiq]north west:MEDICIÓN}] {};
+    \node[fase, fit=(c)(f)(s),
+          label={[anchor=north west, etiq]south west:ANÁLISIS}] {};
+  \end{tikzpicture}
+  \caption{Metodología de la comparación entre Huffman y LZW.}
+  \label{fig:metodologia}
+\end{figure}
+\end{aporte}
+
+\subsection{Implementación}
+\label{sec:implementacion}
+\begin{aporte}{C}
+\paragraph{Arquitectura.} El código es un proyecto NetBeans de tipo \emph{Java with Ant}
+compilado para Java~17 y ejecutado con el JDK~21. Todos los algoritmos implementan la interfaz
+\texttt{Codec} (métodos \texttt{name}, \texttt{encode} y \texttt{decode}), que exige que
+\texttt{decode(encode(x))} sea igual a \texttt{x} y que los datos corruptos se rechacen con
+\texttt{IllegalArgumentException}. Gracias a esa interfaz, el arnés de medición trata por igual
+a Huffman, a LZW y a la referencia DEFLATE. La \cref{tab:paquetes} describe los paquetes.
+
+\begin{table}[H]
+  \centering
+  \caption{Paquetes del proyecto (\texttt{pe.edu.ulima.compression}).}
+  \label{tab:paquetes}
+  \small
+  \begin{tabular}{@{}l l p{7.6cm}@{}}
+    \toprule
+    Paquete & Clases & Responsabilidad \\
+    \midrule
+    (raíz) & \texttt{Codec} & Interfaz común de los algoritmos. \\
+    \texttt{io} & \texttt{BitWriter}, \texttt{BitReader} & E/S de campos de bits de ancho variable, bit más significativo primero, con acumulador de 64 bits. \\
+    \texttt{huffman} & \texttt{HuffmanCodec} & Longitudes con montículo, códigos canónicos y decodificación canónica. \\
+    \texttt{lzw} & \texttt{LzwCodec} & Códigos de 9 a 16 bits, diccionario con tabla hash y reinicio con \texttt{CLEAR}. \\
+    \texttt{bench} & \texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter} & Experimentos E1--E4, estadística, generación de datos, referencia DEFLATE (\texttt{java.util.zip}, nivel 6) y escritura de CSV y macros \LaTeX. \\
+    \texttt{app} & \texttt{Main} & Interfaz de línea de comandos (\texttt{compress}, \texttt{decompress}, \texttt{stats}, \texttt{demo}). \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{aporte}
+
+\begin{aporte}{A}
+\paragraph{Núcleo de Huffman.} El \cref{lst:huffman} muestra el bucle principal de
+\texttt{HuffmanCodec.codeLengths}. Los nodos internos reciben índices crecientes a partir de
+256, de modo que un padre siempre tiene un índice mayor que sus hijos y basta un recorrido
+descendente para asignar profundidades sin recursión. El montículo es un
+\texttt{PriorityQueue} que desempata por índice, lo que hace el código determinista.
+
+\begin{lstlisting}[caption={Fusión de nodos y cálculo de profundidades en \texttt{HuffmanCodec.codeLengths}.},label={lst:huffman}]
+int next = ALPHABET; // internal nodes get indices 256, 257, ...
+while (heap.size() > 1) {
+    int a = heap.poll();
+    int b = heap.poll();
+    weight[next] = weight[a] + weight[b];
+    parent[a] = next;
+    parent[b] = next;
+    heap.add(next++);
+}
+
+// Parents always have larger indices than children, so one descending pass assigns depths.
+int root = next - 1;
+int[] depth = new int[maxNodes];
+for (int node = root - 1; node >= ALPHABET; node--) {
+    depth[node] = depth[parent[node]] + 1;
+}
+\end{lstlisting}
+\end{aporte}
+
+\begin{aporte}{B}
+\paragraph{Núcleo de LZW.} El \cref{lst:lzw} reproduce \texttt{LzwCodec.compress}. La clave de
+la tabla hash concatena el código de la frase y el byte siguiente en un entero; una búsqueda
+exitosa extiende la frase, y una fallida emite el código y deja preparada la ranura
+(\texttt{slot}) donde se inserta la nueva entrada, sin una segunda búsqueda. El destino de los
+códigos (\texttt{CodeSink}) es el \texttt{BitWriter} al comprimir, o un arreglo al trazar los
+códigos en las pruebas.
+
+\begin{lstlisting}[caption={Bucle de codificación de \texttt{LzwCodec.compress}.},label={lst:lzw}]
+private void compress(byte[] input, CodeSink sink) {
+    if (input.length == 0) {
+        return;
+    }
+    int maxSize = 1 << maxBits;
+    PhraseTable table = new PhraseTable(maxBits);
+    int size = FIRST_FREE;
+    int phrase = input[0] & 0xFF;
+    for (int i = 1; i < input.length; i++) {
+        int next = input[i] & 0xFF;
+        int key = (phrase << 8) | next;
+        int slot = table.find(key);
+        if (table.isOccupied(slot)) {
+            phrase = table.valueAt(slot); // extend the current phrase
+            continue;
+        }
+        sink.put(phrase, width(size));
+        if (size < maxSize) {
+            table.insert(slot, key, size++);
+        } else {
+            sink.put(CLEAR, width(size));
+            table.clear();
+            size = FIRST_FREE;
+        }
+        phrase = next;
+    }
+    sink.put(phrase, width(size));
+}
+\end{lstlisting}
+\end{aporte}
+
+\subsection{Validación de la corrección}
+\label{sec:pruebas}
+\begin{aporte}{C}
+Antes de medir, la corrección se verifica en dos niveles. El primero es una batería de 43
+pruebas JUnit~4 que se ejecuta con \texttt{ant test}. El segundo está incorporado en el arnés:
+cada configuración medida se codifica y decodifica una vez y, si el resultado no es idéntico
+a la entrada, la campaña se detiene con un error. Así, ningún tiempo reportado corresponde a
+una ejecución incorrecta. La \cref{tab:pruebas} resume la batería por clase.
+\end{aporte}
+
+\begin{table}[H]
+  \centering
+  \caption{Batería de pruebas JUnit (43 pruebas).}
+  \label{tab:pruebas}
+  \small
+  \begin{tabular}{@{}l c p{9.4cm}@{}}
+    \toprule
+    Clase de prueba & Pruebas & Aspectos verificados \\
+    \midrule
+    \textcolor{memberA}{\texttt{HuffmanCodecTest}} & \textcolor{memberA}{11} & \textcolor{memberA}{Ida y vuelta (vacío, un byte, un solo símbolo repetido con 1 bit por símbolo, los 256 valores, datos aleatorios y sesgados, texto); longitudes óptimas del ejemplo de libro; igualdad de Kraft; códigos canónicos libres de prefijo y ordenados por longitud; rechazo de entradas corruptas; nombre del algoritmo.} \\
+    \textcolor{memberA}{\texttt{BitStreamTest}} & \textcolor{memberA}{5} & \textcolor{memberA}{Orden MSB primero y relleno con ceros; anchos aleatorios hasta 64 bits; desplazamiento inicial; lectura más allá del final; anchos inválidos.} \\
+    \textcolor{memberB}{\texttt{LzwCodecTest}} & \textcolor{memberB}{8} & \textcolor{memberB}{Secuencia del ejemplo de Welch; vacío y un byte; caso $KwKwK$; todos los anchos de 9 a 16 bits con reinicios del diccionario; los 256 valores; compresión de datos repetitivos; configuración inválida y datos corruptos; ancho registrado en la cabecera.} \\
+    \textcolor{memberC}{\texttt{StatsTest}} & \textcolor{memberC}{6} & \textcolor{memberC}{Resumen de muestras, mediana con cantidad par, cuantil normal para muestras grandes, rechazo de muestras insuficientes, exponente de la ley de potencia en escala log--log, entropía de orden cero.} \\
+    \textcolor{memberC}{\texttt{DataGeneratorTest}} & \textcolor{memberC}{3} & \textcolor{memberC}{Determinismo por semilla, entropía esperada de cada fuente, uso exacto de $k$ símbolos.} \\
+    \textcolor{memberC}{\texttt{BenchmarkRunnerTest}} & \textcolor{memberC}{4} & \textcolor{memberC}{Una corrida rápida escribe todos los archivos de resultados; \texttt{--only e2} escribe solo el barrido; argumentos desconocidos o incompletos.} \\
+    \textcolor{memberC}{\texttt{MainTest}} & \textcolor{memberC}{6} & \textcolor{memberC}{Compresión y descompresión de archivos con ambos algoritmos; comando \texttt{stats}; algoritmo y comando desconocidos (código de salida 2); archivo corrupto (código 1); demostración sin argumentos.} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Conjuntos de datos}
+\label{sec:datos}
+\begin{aporte}{C}
+Para separar el efecto del algoritmo del efecto del tipo de redundancia se combinan fuentes
+sintéticas, cuyas propiedades se conocen por construcción, con texto real y con los corpus
+estándar de evaluación de compresores (\cref{tab:datos}). Las fuentes sintéticas se generan
+con \texttt{java.util.Random} y semilla fija 2026, por lo que son reproducibles.
+
+\begin{table}[H]
+  \centering
+  \caption{Conjuntos de datos.}
+  \label{tab:datos}
+  \small
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}>{\raggedright}p{2.3cm} >{\raggedright}p{5.6cm} >{\raggedright}p{4.2cm} >{\raggedright\arraybackslash}p{1.6cm}@{}}
+    \toprule
+    Conjunto & Construcción & Redundancia que contiene & Uso \\
+    \midrule
+    \texttt{uniform} & Bytes i.i.d. uniformes en $\{0,\dots,255\}$ & Ninguna ($H_0 \approx 8$) & E1 \\
+    \texttt{skewed} & Símbolos i.i.d. geométricos con $p = 0.15$, truncados a 255 & Frecuencias sesgadas, sin frases & E1 \\
+    \texttt{synthtext} & Palabras de un vocabulario de 2000 (2 a 9 letras con frecuencias del inglés) elegidas con ley de Zipf de exponente 1.1, separadas por espacios y saltos de línea & Frases repetidas y frecuencias sesgadas & E1 \\
+    \texttt{dickens} & Prefijos del archivo \texttt{dickens} de Silesia (texto en inglés) & Texto natural & E1, E4 \\
+    Alfabetos $k$ & Símbolos i.i.d. uniformes en $\{0,\dots,k-1\}$, $k = 2, 4, \dots, 256$, $n = 2^{23}$ & Entropía controlada $H_0 = \log_2 k$ & E2 \\
+    Canterbury~\cite{arnold1997} & 11 archivos del corpus estándar y 3 del corpus grande (\texttt{E.coli}, \texttt{bible.txt}, \texttt{world192.txt}) & Texto, código, binarios, ADN & E3, E4 \\
+    Silesia~\cite{deorowicz2003} & 12 archivos de tipos diversos (texto, XML, bases de datos, ejecutables, imágenes médicas) & Mezcla realista & E3, E4 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Los corpus se descargan con \texttt{data/download-corpora.sh}, que verifica sumas SHA-256 antes
+de extraerlos.
+\end{aporte}
+
+\subsection{Métricas}
+\label{sec:metricas}
+\begin{aporte}{C}
+\begin{itemize}
+  \item \emph{Tiempo:} mediana, en milisegundos, de $R$ ejecuciones de codificación y de
+        decodificación, medidas por separado con \texttt{System.nanoTime}.
+  \item \emph{Dispersión:} semiancho del intervalo de confianza del 95\,\% de la media,
+        $t_{0.975,\,R-1}\, s/\sqrt{R}$, con la tabla de cuantiles de Student para hasta 30 grados
+        de libertad y $1.96$ por encima.
+  \item \emph{Costo por byte:} $\text{ns/byte} = 10^6 \cdot \text{mediana [ms]}/n$; a
+        complejidad lineal, esta métrica debe ser aproximadamente constante en $n$. En el corpus
+        se reporta el rendimiento en MB/s, $n/10^6$ dividido entre la mediana en segundos.
+  \item \emph{Compresión:} bits por byte según la \cref{eq:metricas}, incluida la cabecera, y su
+        comparación con $H_0$ de la \cref{eq:entropia}.
+  \item \emph{Tasa de crecimiento:} pendiente $\hat{k}$ y $R^2$ del ajuste por mínimos cuadrados
+        de $\ln t = \hat{k}\ln n + c$; para un algoritmo $\Theta(n^k)$ la pendiente tiende a
+        $k$~\cite{mcgeoch2012}. El ajuste usa los tamaños $n \ge 2^{16}$, para que los costos
+        fijos no dominen.
+\end{itemize}
+\end{aporte}
+
+\subsection{Protocolo de medición}
+\label{sec:protocolo}
+\begin{aporte}{C}
+El protocolo implementado en \texttt{BenchmarkRunner} responde a los riesgos que Georges et
+al.~\cite{georges2007} identifican en la medición de programas Java ---compilación JIT,
+recolección de basura y eliminación de código muerto--- y a las recomendaciones de
+reproducibilidad de Johnson~\cite{johnson2002} y McGeoch~\cite{mcgeoch2012}:
+\begin{enumerate}[leftmargin=*]
+  \item \emph{Calentamiento global:} antes del primer experimento, cada códec (Huffman, LZW de
+        16 bits y DEFLATE) codifica y decodifica tres veces 4~MiB de cada fuente sintética, para
+        que los primeros puntos no se midan en el intérprete.
+  \item \emph{Preparación de cada configuración:} se invoca \texttt{System.gc()}, se codifica una
+        vez, se registra el tamaño comprimido y se verifica la ida y vuelta.
+  \item \emph{Calentamiento local y repeticiones:} se ejecutan $W$ iteraciones no medidas y luego
+        $R$ iteraciones medidas, según el tamaño: $W = 5$, $R = 21$ para $n \le 1$~MiB;
+        $W = 3$, $R = 11$ para $n \le 16$~MiB; y $W = 1$, $R = 7$ por encima.
+  \item \emph{Sumidero:} las salidas se acumulan en un campo \texttt{volatile}
+        (\texttt{blackhole}) para impedir que el JIT elimine el trabajo medido.
+  \item \emph{Reproducibilidad:} semilla fija, parámetros de la JVM fijos
+        (\texttt{-Xms3g -Xmx3g -XX:+UseParallelGC}) y escritura automática de los resultados en
+        CSV y en macros \LaTeX{} que este informe importa sin transcripción manual.
+\end{enumerate}
+\end{aporte}
+
+\subsection{Diseño experimental}
+\label{sec:experimentos}
+\begin{aporte}{C}
+La \cref{tab:experimentos} relaciona cada experimento con la variable que manipula, los
+parámetros fijos, las salidas medidas y la hipótesis que contrasta.
+
+\begin{table}[H]
+  \centering
+  \caption{Experimentos.}
+  \label{tab:experimentos}
+  \small
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}>{\raggedright}p{0.6cm} >{\raggedright}p{3.0cm} >{\raggedright}p{3.9cm} >{\raggedright}p{4.0cm} >{\raggedright\arraybackslash}p{2.0cm}@{}}
+    \toprule
+    Exp. & Variable & Parámetros fijos & Salidas & Hipótesis \\
+    \midrule
+    E1 & $n = 2^{14},\dots,2^{24}$ (\texttt{dickens}: hasta $2^{23}$) &
+      LZW con $b = 16$; fuentes \texttt{uniform}, \texttt{skewed}, \texttt{synthtext}, \texttt{dickens} &
+      Tiempos (mediana, IC), ns/byte, bpb, pendiente y $R^2$ & H1 (y H2, H3) \\
+    E2 & $k = 2, 4, \dots, 256$ ($H_0 = \log_2 k$) &
+      $n = 2^{23}$; fuente i.i.d. uniforme en $k$ símbolos; LZW con $b = 16$ &
+      bpb, tiempos de codificación y decodificación & H2, H4 (y H3) \\
+    E3 & Archivo del corpus &
+      Canterbury y Silesia completos; LZW con $b = 16$; DEFLATE nivel 6 como referencia &
+      bpb, MB/s, archivos donde gana LZW & H3 (y H2) \\
+    E4 & $b = 9, \dots, 16$ &
+      \texttt{dickens} y \texttt{xml} (Silesia), \texttt{E.coli} (Canterbury) &
+      bpb y tiempos de LZW & RQ3 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{aporte}
+
+\subsection{Entorno de ejecución}
+\label{sec:entorno}
+\begin{aporte}{C}
+Todas las mediciones se realizaron en una misma máquina, cuyos datos registra
+automáticamente el arnés (\cref{tab:entorno}).
+
+\begin{table}[H]
+  \centering
+  \caption{Entorno de ejecución (generado por \texttt{BenchmarkRunner}).}
+  \label{tab:entorno}
+  \small
+  \begin{tabular}{@{}l l@{}}
+    \toprule
+    Elemento & Valor \\
+    \midrule
+    Procesador & \resCpu \\
+    Núcleos lógicos disponibles & \resCores \\
+    Máquina virtual Java & \resJvm \\
+    Memoria máxima del montículo & \resHeap~MiB \\
+    Opciones de la JVM & \texttt{-Xms3g -Xmx3g -XX:+UseParallelGC} \\
+    Compilación & Java~17 (\texttt{javac.source}), Apache Ant, JUnit 4.13.2 \\
+    Fecha de la campaña & \resDate \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{aporte}
+
+\subsection{Amenazas a la validez}
+\label{sec:amenazas}
+\begin{aporte}{C}
+\begin{itemize}
+  \item \emph{Ruido de JIT y GC.} Aunque el calentamiento, las repeticiones y la mediana mitigan
+        la variabilidad~\cite{georges2007}, las pausas del recolector o la recompilación pueden
+        afectar mediciones individuales; los intervalos de confianza lo hacen visible.
+  \item \emph{Una sola máquina.} Los valores absolutos dependen del procesador, la jerarquía de
+        caché y la JVM; las conclusiones se basan en tendencias (pendientes, ns/byte relativos)
+        más que en tiempos absolutos.
+  \item \emph{Datos sintéticos frente a reales.} Las fuentes sintéticas aíslan propiedades,
+        pero no representan todos los datos reales; por eso se complementan con texto real y
+        con los corpus Canterbury y Silesia.
+  \item \emph{Calidad de la implementación.} Los tiempos reflejan estas implementaciones
+        concretas (por ejemplo, la decodificación de Huffman bit a bit, sin tablas de búsqueda),
+        no el límite de cada algoritmo; las optimizaciones conocidas se discuten en la
+        literatura~\cite{moffat1997,moffat2019}.
+  \item \emph{DEFLATE solo como referencia.} Se usa la biblioteca zlib del JDK, implementada en
+        código nativo; sus tiempos no son comparables con implementaciones en Java y solo su
+        tasa de compresión se usa como referencia.
+\end{itemize}
+\end{aporte}

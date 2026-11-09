@@ -1,0 +1,107 @@
+% ---------------------------------------------------------------------
+%  1. Introducción — Integrante D
+% ---------------------------------------------------------------------
+\section{Introducción}
+\label{sec:introduccion}
+
+\subsection{Contexto}
+\begin{aporte}{D}
+El volumen de datos que se almacena y transmite crece de forma sostenida, y con él el costo
+de discos, memoria y ancho de banda. La compresión de datos reduce ese costo representando la
+misma información con menos bits. Cuando la reconstrucción debe ser exacta ---texto, código
+fuente, ejecutables, registros científicos o bases de datos---, solo son aceptables los
+métodos \emph{sin pérdida}, en los que la descompresión devuelve bit a bit la entrada
+original~\cite{sayood2017,salomon2010}. La teoría de la información establece el límite de lo
+alcanzable: ningún código puede representar una fuente con menos bits por símbolo que su
+entropía~\cite{shannon1948}.
+
+Dos algoritmos ocupan un lugar central en la historia y en la práctica de la compresión sin
+pérdida. La codificación de Huffman~\cite{huffman1952} construye un código prefijo óptimo a
+partir de las frecuencias de los símbolos, y el algoritmo Lempel--Ziv--Welch
+(LZW)~\cite{welch1984}, derivado de LZ78~\cite{ziv1978}, sustituye frases repetidas por
+referencias a un diccionario que se construye durante la lectura. Ambos siguen vigentes: la
+codificación de Huffman forma parte de DEFLATE~\cite{rfc1951} y de numerosos formatos, y LZW
+se emplea en formatos de imagen y de archivo, y es una referencia habitual en dispositivos con
+recursos limitados~\cite{jambek2014,bjaras2019}. Comparar ambos enfoques permite entender dos
+formas complementarias de explotar la redundancia: la estadística de los símbolos aislados y la
+repetición de secuencias~\cite{bell1989,jayasankar2021}.
+\end{aporte}
+
+\subsection{Problema}
+\begin{aporte}{D}
+Los estudios comparativos de Huffman y LZW disponibles suelen limitarse a un único dominio de
+datos o a archivos de pocos tamaños, reportan tiempos de una sola ejecución y no contrastan
+las mediciones con la complejidad teórica de los
+algoritmos~\cite{jambek2014,fauzan2022,btoush2008}. En consecuencia, no queda claro en qué
+condiciones cada algoritmo comprime mejor, si sus tiempos crecen realmente de forma lineal con
+el tamaño de la entrada, ni cómo influyen la entropía de la fuente o el tamaño del diccionario.
+El problema que aborda este trabajo es, por tanto: \emph{¿cómo se comparan Huffman y LZW, en
+tiempo de ejecución y en tasa de compresión, sobre una gran cantidad de datos de naturaleza
+diversa, y en qué medida el comportamiento observado coincide con el análisis teórico?}
+\end{aporte}
+
+\subsection{Objetivos}
+\begin{aporte}{D}
+\paragraph{Objetivo general.} Comparar teórica y experimentalmente la codificación de Huffman y
+el algoritmo LZW en tiempo de compresión, tiempo de descompresión y tasa de compresión,
+contrastando las mediciones con el análisis de complejidad de cada algoritmo.
+
+\paragraph{Objetivos específicos.}
+\begin{enumerate}[label=\textbf{OE\arabic*.}, leftmargin=*]
+  \item Implementar en Java ambos algoritmos (Huffman canónico y LZW de ancho variable de 9 a
+        16 bits) y verificar su corrección con una batería de pruebas unitarias que incluya
+        ida y vuelta (\emph{round trip}) sin pérdida en el 100\,\% de los casos.
+  \item Derivar la complejidad temporal y espacial de codificación y decodificación de cada
+        algoritmo y formular hipótesis contrastables a partir de ella.
+  \item Medir el tiempo de ejecución en función del tamaño de la entrada desde
+        16~KiB ($2^{14}$ bytes) hasta 16~MiB ($2^{24}$ bytes) en cuatro escenarios de datos (hasta 8~MiB en el texto real) y estimar
+        el exponente de crecimiento mediante regresión log--log con su coeficiente $R^2$.
+  \item Medir la tasa de compresión (bits por byte) frente a la entropía de orden cero en un
+        barrido controlado de alfabetos y en los corpus estándar Canterbury y Silesia.
+  \item Cuantificar el efecto del tamaño máximo del diccionario de LZW (de 9 a 16 bits) sobre la
+        tasa de compresión y el tiempo.
+\end{enumerate}
+\end{aporte}
+
+\subsection{Preguntas de investigación}
+\begin{aporte}{D}
+\begin{enumerate}[label=\textbf{RQ\arabic*.}, leftmargin=*]
+  \item ¿El tiempo de codificación y decodificación de Huffman y de LZW crece con el tamaño de
+        la entrada según lo que predice su análisis de complejidad?
+  \item ¿Cómo se relaciona la tasa de compresión de cada algoritmo con la entropía de orden cero
+        y con el tipo de dato (fuentes sin memoria frente a datos con frases repetidas)?
+  \item ¿Qué efecto tiene el tamaño máximo del diccionario de LZW sobre la tasa de compresión y
+        el tiempo de ejecución?
+\end{enumerate}
+\end{aporte}
+
+\subsection{Contribuciones}
+\begin{aporte}{D}
+\begin{itemize}
+  \item Dos implementaciones documentadas y probadas con una interfaz común
+        (\texttt{Codec}): Huffman canónico estático y LZW de ancho variable con reinicio del
+        diccionario.
+  \item Un análisis de complejidad de ambos algoritmos ligado a las decisiones concretas de
+        implementación (montículo binario, decodificación canónica, tabla hash de
+        direccionamiento abierto).
+  \item Un protocolo experimental reproducible, con calentamiento del JIT, repeticiones,
+        medianas e intervalos de confianza~\cite{georges2007}, y ajuste de pendientes log--log
+        para validar la complejidad~\cite{mcgeoch2012}.
+  \item Una evaluación sobre datos sintéticos controlados y sobre los corpus de referencia
+        Canterbury~\cite{arnold1997} y Silesia~\cite{deorowicz2003}, con DEFLATE como punto de
+        comparación externo.
+\end{itemize}
+\end{aporte}
+
+\subsection{Organización del documento}
+\begin{aporte}{D}
+La \cref{sec:estado-arte} revisa críticamente el estado del arte: los fundamentos teóricos del
+problema, las familias de algoritmos que lo resuelven y los estudios comparativos previos. La
+\cref{sec:marco-teorico} presenta el marco teórico: definiciones, ambos algoritmos con su
+pseudocódigo, ejemplos resueltos, el análisis de complejidad y las hipótesis H1--H4. La
+\cref{sec:metodologia} describe gráficamente la metodología, la implementación, los conjuntos
+de datos y el protocolo de medición. La \cref{sec:resultados} reporta los resultados de los
+experimentos E1--E4, y la \cref{sec:discusion} los contrasta con la teoría. La
+\cref{sec:conclusiones} responde las preguntas de investigación y plantea el trabajo futuro.
+Los anexos detallan cómo reproducir el estudio y el aporte individual de cada integrante.
+\end{aporte}

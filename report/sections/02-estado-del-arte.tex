@@ -1,0 +1,177 @@
+% ---------------------------------------------------------------------
+%  2. Estado del arte — Integrante D
+% ---------------------------------------------------------------------
+\section{Estado del arte}
+\label{sec:estado-arte}
+
+\subsection{El problema: teoría de la información y codificación sin pérdida}
+\label{sec:ea-problema}
+\begin{aporte}{D}
+El punto de partida de toda la disciplina es el trabajo de Shannon~\cite{shannon1948}, que
+modela una fuente como un proceso aleatorio y define su entropía como el número mínimo
+promedio de bits por símbolo con que puede representarse sin pérdida. El teorema de
+codificación de fuente convierte la compresión en un problema bien planteado: existe un límite
+inferior y la calidad de un compresor se mide por su distancia a él. Sin embargo, la entropía
+depende del \emph{modelo} de la fuente: un modelo de orden cero, que trata cada byte como
+independiente, ignora la redundancia contenida en secuencias repetidas, mientras que modelos
+con contexto capturan dependencias entre símbolos consecutivos~\cite{bell1989}.
+
+Bell, Witten y Cleary~\cite{bell1989} propusieron una distinción que sigue organizando el campo:
+todo compresor combina un \emph{modelo} que asigna probabilidades o identifica repeticiones y
+un \emph{codificador} que traduce esa información en bits. Bajo esa óptica, los métodos se
+agrupan en \emph{estadísticos}, que codifican símbolos según su probabilidad, y \emph{de
+diccionario}, que sustituyen secuencias por referencias. Los textos de referencia de
+Sayood~\cite{sayood2017} y de Salomon y Motta~\cite{salomon2010} adoptan esta misma taxonomía, y
+la revisión de Jayasankar et al.~\cite{jayasankar2021} la amplía al clasificar las técnicas por
+calidad de reconstrucción, esquema de codificación, tipo de dato y aplicación. Una conclusión
+común a estas revisiones es que no existe un compresor universalmente mejor: el desempeño
+depende de la coincidencia entre la redundancia que explota el método y la que contienen los
+datos. Esta observación motiva comparar Huffman y LZW sobre fuentes de naturaleza
+deliberadamente distinta.
+\end{aporte}
+
+\subsection{Algoritmos que resuelven el problema}
+\label{sec:ea-algoritmos}
+\begin{aporte}{D}
+\paragraph{Familia de Huffman.} Huffman~\cite{huffman1952} demostró que un algoritmo voraz que
+fusiona repetidamente los dos símbolos menos probables produce un código prefijo de longitud
+media mínima para una distribución conocida. Gallager~\cite{gallager1978} caracterizó estos
+códigos mediante la propiedad de hermanos (\emph{sibling property}), acotó su redundancia en
+función de la probabilidad del símbolo más frecuente y planteó una versión adaptativa. Esa
+línea se completó con los algoritmos dinámicos de Knuth~\cite{knuth1985} y de
+Vitter~\cite{vitter1987}, que actualizan el árbol tras cada símbolo y evitan la segunda pasada
+y la transmisión de la tabla, a cambio de un mayor costo por símbolo. Desde el punto de vista
+de la implementación, Moffat y Turpin~\cite{moffat1997} mostraron que basta transmitir las
+longitudes de los códigos si se usan \emph{códigos canónicos}, que además permiten decodificar
+con tablas pequeñas; la revisión de Moffat~\cite{moffat2019} sintetiza siete décadas de estas
+mejoras. La limitación estructural de toda la familia es que asigna un número entero de bits a
+cada símbolo, por lo que pierde hasta un bit por símbolo frente a la entropía cuando la
+distribución está muy sesgada.
+
+\paragraph{Codificación aritmética: alternativa fuera de alcance.} La codificación
+aritmética~\cite{witten1987} supera esa limitación al representar el mensaje completo como un
+intervalo y acercarse a la entropía del modelo con una fracción de bit de sobrecosto por
+mensaje. Constituye el estándar en compresores estadísticos avanzados, pero su comparación
+excede el alcance de este trabajo, centrado en los dos algoritmos clásicos de cada familia.
+
+\paragraph{Familia Lempel--Ziv.} Ziv y Lempel propusieron dos esquemas universales que no
+requieren conocer la distribución de la fuente: LZ77~\cite{ziv1977}, que codifica cada frase
+como una referencia a una coincidencia previa dentro de una ventana deslizante, y
+LZ78~\cite{ziv1978}, que construye incrementalmente un diccionario explícito de frases y cuya
+tasa converge asintóticamente a la entropía para fuentes estacionarias y ergódicas. Storer y
+Szymanski~\cite{storer1982} formalizaron la compresión por sustitución textual y propusieron
+evitar referencias que no ahorran espacio, idea conocida como LZSS. Welch~\cite{welch1984}
+simplificó LZ78 inicializando el diccionario con todos los símbolos del alfabeto, de modo que
+la salida consiste solo en índices; el resultado, LZW, es rápido y sencillo de implementar
+en hardware y software, pero su diccionario crece sin límite si no se gestiona.
+
+\paragraph{DEFLATE: la combinación de ambas ideas.} El formato DEFLATE~\cite{rfc1951} combina
+una etapa LZ77 con una codificación de Huffman canónica de los literales, longitudes y
+distancias resultantes. Su éxito práctico ilustra que ambas familias son complementarias: la
+etapa de diccionario elimina la repetición de frases y la etapa estadística, el sesgo en la
+distribución de los símbolos resultantes. Por esta razón se incluye en este trabajo como
+referencia externa, no como un tercer algoritmo comparado.
+
+\paragraph{Gestión del diccionario en LZW.} Cuando el diccionario de LZW se llena, el
+compresor debe decidir qué hacer. Cheng et al.~\cite{cheng2021} comparan las políticas
+habituales: el reinicio completo (\emph{reset}) es más rápido pero empeora la tasa de
+compresión, mientras que el reemplazo LRU obtiene mejor tasa a costa de más tiempo y memoria;
+proponen IDA-LZW, que gestiona un área de entradas poco significativas. La implementación de
+este trabajo adopta el reinicio, la política más simple y predecible, y su efecto se estudia
+variando el tamaño máximo del diccionario.
+\end{aporte}
+
+\subsection{Comparaciones previas y metodologías de evaluación}
+\label{sec:ea-comparaciones}
+\begin{aporte}{D}
+La \cref{tab:trabajos-relacionados} resume los estudios que comparan directamente Huffman y
+LZW o variantes de ambos. Jambek y Khairi~\cite{jambek2014} los evalúan para nodos de redes de
+sensores inalámbricos y reportan que Huffman redujo los datos en alrededor de 43\,\% en
+promedio y fue aproximadamente cuatro veces más rápido que LZW. Fauzan et
+al.~\cite{fauzan2022}, en cambio, trabajan con archivos de texto (\texttt{.txt}, \texttt{.csv},
+entre otros) y encuentran que LZW obtuvo mayor ahorro de espacio en \texttt{.txt} y
+\texttt{.csv} (63.85\,\% y 77.56\,\% en promedio), con tiempos de compresión que crecen con
+el tamaño del archivo. Btoush et al.~\cite{btoush2008} comparan LZW, Huffman y codificación de
+longitud fija sobre textos de longitud variable, midiendo tasa, tiempo y entropía, y observan
+que LZW es el peor en archivos pequeños. Bjärås~\cite{bjaras2019} evalúa cinco algoritmos
+ligeros para series temporales en dispositivos IoT, incluidas variantes basadas en Huffman y en
+LZW, y concluye que las basadas en Huffman ofrecen el mejor equilibrio entre tasa, memoria y
+uso de CPU. Cheng et al.~\cite{cheng2021} no comparan contra Huffman, pero muestran que la
+política de diccionario lleno cambia por sí sola la tasa y el tiempo de LZW.
+
+Estos resultados, aparentemente contradictorios, son coherentes con la observación de la
+\cref{sec:ea-problema}: las lecturas de sensores y las series temporales tienen poca
+repetición de frases y una distribución de valores sesgada, lo que favorece a Huffman,
+mientras que el texto contiene palabras y frases recurrentes, que LZW aprovecha una vez que su
+diccionario se ha poblado; en archivos pequeños el diccionario no alcanza a aprender, lo que
+explica la desventaja reportada por Btoush et al. Ninguno de estos trabajos, sin embargo,
+aísla experimentalmente cada tipo de redundancia ni verifica cómo escalan los tiempos.
+
+Respecto a la metodología, la literatura de algoritmia experimental ofrece pautas que los
+estudios anteriores no siguen. Johnson~\cite{johnson2002} recomienda instancias de prueba
+diversas y de tamaño creciente, informes reproducibles y comparaciones con la teoría.
+McGeoch~\cite{mcgeoch2012} describe cómo estimar la tasa de crecimiento de un algoritmo a
+partir de mediciones, por ejemplo mediante la pendiente en escala log--log. Georges et
+al.~\cite{georges2007} demuestran que, en Java, la compilación JIT, la recolección de basura y
+la variabilidad entre ejecuciones pueden invertir las conclusiones si se reporta una única
+medición, y proponen repeticiones con intervalos de confianza. Por último, el uso de corpus
+públicos como Canterbury~\cite{arnold1997} y Silesia~\cite{deorowicz2003} hace comparables los
+resultados entre estudios.
+
+\begin{table}[H]
+  \centering
+  \caption{Estudios comparativos relacionados.}
+  \label{tab:trabajos-relacionados}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}>{\raggedright}p{1.7cm} >{\raggedright}p{2.4cm} >{\raggedright}p{2.8cm}
+                  >{\raggedright}p{2.3cm} >{\raggedright\arraybackslash}p{5.6cm}@{}}
+    \toprule
+    Trabajo & Algoritmos & Datos & Métricas & Hallazgo principal \\
+    \midrule
+    \cite{jambek2014} & Huffman, LZW & Datos de nodos de sensores inalámbricos &
+      Reducción de datos, tiempo &
+      Huffman redujo los datos alrededor de 43\,\% en promedio y fue unas cuatro veces más
+      rápido que LZW. \\
+    \cite{fauzan2022} & Huffman, LZW & Archivos de texto (\texttt{.txt}, \texttt{.csv}, otros) &
+      Ahorro de espacio, tiempo &
+      LZW logró mayor ahorro en \texttt{.txt} y \texttt{.csv} (63.85\,\% y 77.56\,\% en
+      promedio); el tiempo creció con el tamaño del archivo. \\
+    \cite{btoush2008} & LZW, Huffman, longitud fija & Textos de longitud variable &
+      Tasa, tiempo, entropía & LZW fue el peor en archivos pequeños. \\
+    \cite{bjaras2019} & Cinco algoritmos ligeros (variantes Huffman y LZW, entre otros) &
+      Series temporales IoT & Tasa, memoria, CPU &
+      Las variantes basadas en Huffman resultaron las más equilibradas. \\
+    \cite{cheng2021} & Políticas de diccionario de LZW; IDA-LZW & Conjuntos de prueba propios del estudio &
+      Tasa, tiempo, memoria &
+      El reinicio es más rápido pero comprime peor; LRU comprime mejor con más tiempo y
+      memoria. \\
+    \midrule
+    Este trabajo & Huffman canónico, LZW 9--16 bits; DEFLATE como referencia &
+      Sintéticos controlados, texto real, Canterbury y Silesia &
+      Tiempo (mediana, IC 95\,\%), pendiente log--log, bpb &
+      Ver \cref{sec:resultados,sec:discusion}. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{aporte}
+
+\subsection{Síntesis y brecha}
+\label{sec:ea-brecha}
+\begin{aporte}{D}
+La revisión permite identificar tres carencias en las comparaciones previas entre Huffman y
+LZW. Primero, los datos son pequeños o de un único dominio (sensores, series temporales o
+texto), lo que impide separar el efecto del tipo de redundancia del efecto del algoritmo.
+Segundo, ningún estudio valida la complejidad teórica: los tiempos se reportan para unos pocos
+tamaños, sin estimar la tasa de crecimiento. Tercero, falta rigor estadístico: no se describen
+calentamiento, repeticiones ni intervalos de confianza, pese a que en entornos con JIT esto
+puede alterar las conclusiones~\cite{georges2007}.
+
+Este trabajo aborda esas carencias con (i)~fuentes sintéticas que aíslan cada tipo de
+redundancia, junto con texto real y los corpus estándar~\cite{arnold1997,deorowicz2003};
+(ii)~tamaños de entrada que crecen geométricamente, de $2^{14}$ a $2^{24}$ bytes, y un
+ajuste log--log contrastado con la complejidad derivada~\cite{mcgeoch2012}; y (iii)~un
+protocolo con calentamiento, repeticiones, medianas e intervalos de confianza de Student,
+siguiendo las recomendaciones de la algoritmia experimental~\cite{johnson2002,georges2007}.
+\end{aporte}

@@ -1,0 +1,119 @@
+% ---------------------------------------------------------------------
+%  6. Discusión — C (H1), A (H2, H4), B (H3), D (síntesis por pregunta)
+% ---------------------------------------------------------------------
+\section{Discusión: teoría frente a experimento}
+\label{sec:discusion}
+
+Esta sección contrasta cada hipótesis de la \cref{sec:hipotesis} con la evidencia de la
+\cref{sec:resultados} y, a continuación, sintetiza la respuesta a cada pregunta de
+investigación.
+
+\subsection{H1: escalamiento lineal}
+\label{sec:disc-h1}
+\begin{aporte}{C}
+\paragraph{Predicción.} Según la \cref{tab:comparacion-teorica}, los cuatro procedimientos son
+lineales en $n$: la codificación de Huffman es $\Theta(n + \sigma\log\sigma)$, su
+decodificación $\Theta(n\Lbar)$ con $\Lbar$ acotado, y ambas operaciones de LZW son
+$\Theta(n)$. En escala log--log, la pendiente esperada es 1.
+
+\paragraph{Desviaciones previsibles.} El análisis asintótico ignora costos fijos que pesan en
+entradas pequeñas: Huffman construye el código y escribe una cabecera de 262 bytes en cada
+llamada, y LZW reserva e inicializa en cada llamada su tabla hash de $2^{17}$ posiciones (dos
+arreglos de enteros) o, al decodificar, cuatro arreglos de $2^{16}$ entradas. Estos costos
+constantes aplanan la curva en los primeros tamaños y tienden a producir pendientes menores
+que 1 si se incluyen en el ajuste; por eso el ajuste usa $n \ge 2^{16}$. En el extremo opuesto,
+cuando los datos y las tablas dejan de caber en la memoria caché, el costo por byte puede
+aumentar ligeramente sin que cambie la complejidad.
+
+\paragraph{Evidencia.} \Cref{fig:e1-tiempo,fig:e1-nspb} y \cref{tab:pendientes}.
+% TODO-RESULTS: contrastar H1 con las pendientes y R^2 medidos (tab:pendientes), indicar si se acepta, y explicar cualquier pendiente alejada de 1 con los costos fijos o efectos de caché descritos.
+\todoresults{Contrastar H1 con las pendientes y $R^2$ de la \cref{tab:pendientes}; indicar si
+se acepta y explicar cualquier pendiente alejada de 1 con los costos fijos o los efectos de
+caché descritos.}
+\end{aporte}
+
+\subsection{H2: Huffman frente a la entropía}
+\label{sec:disc-h2}
+\begin{aporte}{A}
+\paragraph{Predicción.} La tasa medida incluye la cabecera y el relleno del último byte, por lo
+que
+\begin{equation}
+  \bpb_{\text{Huffman}} = \Lbar + \frac{8 \cdot 262}{n} + \frac{\delta}{n}, \qquad 0 \le \delta < 8,
+  \label{eq:bpb-huffman}
+\end{equation}
+y, por la \cref{eq:cota-huffman}, tiende a un valor en $[H_0, H_0 + 1)$ cuando $n$ crece. En
+E2 con $k$ potencia de dos y $n = 2^{23}$, las frecuencias empíricas son casi iguales, el árbol
+resultante es completo y equilibrado, y cada símbolo recibe $\log_2 k$ bits: la teoría predice
+una tasa prácticamente igual a $H_0$, con un sobrecosto de cabecera de $8\cdot 262/2^{23}$ bpb,
+del orden de $2.5\times10^{-4}$. En la fuente geométrica, en cambio, las probabilidades no son
+potencias de $1/2$ y cabe esperar una distancia positiva, aunque menor que un bit, respecto de
+$H_0$. Sobre texto, Huffman no puede bajar de $H_0$ porque no modela el contexto.
+
+\paragraph{Evidencia.} \Cref{fig:e2-bpb,fig:e1-bpb} y la columna $H_0$ de la \cref{tab:corpus}.
+% TODO-RESULTS: verificar que todos los bpb de Huffman (E1, E2, E3) estén en [H0, H0+1) salvo el efecto de cabecera en n pequeño; cuantificar la distancia a H0 en E2 y en skewed.
+\todoresults{Verificar que los bits por byte de Huffman en E1, E2 y E3 queden en
+$[H_0, H_0+1)$, salvo el efecto de la cabecera en $n$ pequeño, y cuantificar la distancia a
+$H_0$ en E2 y en \texttt{skewed}.}
+\end{aporte}
+
+\subsection{H3: tipo de redundancia y ganador}
+\label{sec:disc-h3}
+\begin{aporte}{B}
+\paragraph{Predicción.} LZW solo ahorra espacio cuando sus frases son largas: cada código
+cuesta entre 9 y $b$ bits, así que una frase de longitud media $m$ cuesta del orden de
+$b/m$ bits por byte. En datos con palabras y frases recurrentes, el diccionario captura
+secuencias largas y la tasa puede quedar por debajo de $H_0$, algo imposible para un código de
+orden cero. En datos i.i.d. las frases crecen muy lentamente, porque cada extensión requiere
+que un par (frase, byte) ya haya aparecido; con bytes uniformes, la mayoría de las frases
+tienen uno o dos bytes y cada código de 9 a 16 bits representa poco más de un byte, de modo
+que se espera expansión ($\bpb > 8$). Huffman, por el contrario, nunca supera
+$\Lbar < H_0 + 1$ más la cabecera.
+
+\paragraph{Evidencia.} \Cref{fig:e1-bpb,fig:e2-bpb} y \cref{tab:corpus}.
+% TODO-RESULTS: contrastar H3 con E1 (synthtext, dickens frente a uniform, skewed), E2 y E3 (\resLzwWins de \resCorpusFiles); identificar archivos del corpus que contradigan la hipótesis y explicar por qué.
+\todoresults{Contrastar H3 con E1 (\texttt{synthtext} y \texttt{dickens} frente a
+\texttt{uniform} y \texttt{skewed}), con E2 y con E3 (LZW gana en \resLzwWins{} de
+\resCorpusFiles{} archivos); identificar los archivos que contradigan la hipótesis y explicar
+por qué.}
+\end{aporte}
+
+\subsection{H4: sensibilidad del tiempo a la entropía}
+\label{sec:disc-h4}
+\begin{aporte}{A}
+\paragraph{Predicción.} El decodificador canónico ejecuta una iteración por bit leído, $n\Lbar$
+en total; con $\Lbar \approx \log_2 k$ en E2, su tiempo debería crecer aproximadamente de forma
+lineal con $\log_2 k$. El codificador de Huffman escribe un campo por símbolo con
+\texttt{BitWriter}, cuyo costo depende solo débilmente de $\ell_s$, por lo que se espera
+menor sensibilidad. La decodificación de LZW escribe cada byte de salida una vez; la entropía
+solo afecta al número de códigos, que crece cuando las frases se acortan, de modo que se espera
+una dependencia mucho más débil que la de Huffman.
+
+\paragraph{Evidencia.} \Cref{fig:e2-tiempo}.
+% TODO-RESULTS: contrastar H4 con E2 (pendiente aproximada del tiempo de decodificación de Huffman frente a log2 k; comparar con LZW usando \resEntropyHuffDecMsKTwo, \resEntropyHuffDecMsKTwoFiftySix, \resEntropyLzwDecMsKTwo, \resEntropyLzwDecMsKTwoFiftySix).
+\todoresults{Contrastar H4 con la \cref{fig:e2-tiempo}: tendencia del tiempo de decodificación
+de Huffman frente a $\log_2 k$ comparada con la de LZW.}
+\end{aporte}
+
+\subsection{Síntesis por pregunta de investigación}
+\label{sec:disc-rq}
+\begin{aporte}{D}
+\paragraph{RQ1 (escalamiento).} Se responde con H1 y H4: la teoría predice crecimiento lineal
+para ambos algoritmos, con una constante que en la decodificación de Huffman depende de la
+longitud media del código.
+% TODO-RESULTS: respuesta a RQ1 basada en H1 y H4.
+\todoresults{Responder RQ1 a partir de la discusión de H1 y H4.}
+
+\paragraph{RQ2 (compresión, entropía y tipo de dato).} Se responde con H2 y H3: Huffman está
+acotado por $H_0$ y no puede aprovechar repeticiones, mientras que LZW puede bajar de $H_0$ en
+datos con frases repetidas, pero pierde ---y puede expandir--- en fuentes sin memoria.
+% TODO-RESULTS: respuesta a RQ2 basada en H2, H3 y E3.
+\todoresults{Responder RQ2 a partir de H2, H3 y del agregado del corpus.}
+
+\paragraph{RQ3 (tamaño del diccionario).} Un diccionario mayor retiene más frases y reinicia con
+menos frecuencia, pero cada código cuesta más bits; la teoría no fija un óptimo universal, que
+depende de cuán repetitivos y estacionarios sean los datos~\cite{cheng2021}.
+% TODO-RESULTS: respuesta a RQ3 basada en E4 (\resLzwBitsBestDickens, \resLzwBitsBestXml, \resLzwBitsBestEcoli).
+\todoresults{Responder RQ3 a partir de E4 (mejor ancho: \texttt{dickens}
+$b = \resLzwBitsBestDickens$, \texttt{xml} $b = \resLzwBitsBestXml$, \texttt{E.coli}
+$b = \resLzwBitsBestEcoli$).}
+\end{aporte}

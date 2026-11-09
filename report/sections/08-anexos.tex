@@ -1,0 +1,164 @@
+% ---------------------------------------------------------------------
+%  Anexos — A: reproducibilidad (C); B: aportes individuales (A, B, C, D)
+% ---------------------------------------------------------------------
+\section{Reproducibilidad}
+\label{app:reproducibilidad}
+\begin{aporte}{C}
+El repositorio contiene todo lo necesario para repetir el estudio. Desde la raíz, con
+\texttt{bash}, la secuencia completa es la del \cref{lst:reproducir}. El archivo
+\texttt{env.sh} configura el JDK, Apache Ant y Tectonic incluidos en \texttt{.tools/}; el
+\emph{script} de corpus descarga Canterbury, el corpus grande y Silesia, y verifica sus sumas
+SHA-256; \texttt{ant benchmark} ejecuta E1--E4 y escribe en \texttt{results/} los CSV, la tabla
+del corpus y las macros que este informe importa; \texttt{build.sh} copia esos resultados y
+compila el PDF.
+
+\begin{lstlisting}[language=bash, numbers=none, caption={Comandos para reproducir el estudio.}, label={lst:reproducir}]
+source env.sh                  # JDK, Ant y Tectonic portables
+data/download-corpora.sh       # corpus Canterbury, grande y Silesia (SHA-256)
+cd code
+ant test                       # 43 pruebas JUnit
+ant benchmark                  # experimentos E1-E4 -> ../results
+cd ../report
+./build.sh                     # copia ../results y genera build/main.pdf
+\end{lstlisting}
+
+Para una verificación rápida del arnés, sin valor estadístico, puede ejecutarse
+\texttt{ant benchmark -Dbench.args="--quick"}, y la opción \texttt{--only e1,e2} restringe los
+experimentos. El proyecto también se abre directamente en NetBeans (\emph{File > Open
+Project}, carpeta \texttt{code/}), donde \emph{Run} ejecuta una demostración de ambos
+algoritmos y \emph{Test} ejecuta la batería de pruebas. La interfaz de línea de comandos
+permite usar los algoritmos sobre archivos arbitrarios:
+\texttt{java -jar dist/HuffmanVsLZW.jar compress <huffman|lzw|lzw-N> <entrada> <salida>},
+\texttt{decompress <entrada> <salida>} y \texttt{stats <entrada>}.
+\end{aporte}
+
+\section{Aportes individuales detallados}
+\label{app:aportes}
+Cada integrante describe a continuación la implementación que desarrolló: su objetivo, su
+funcionamiento, cómo se implementó y cómo se integra con el resto del trabajo.
+
+\subsection{\texorpdfstring{\integranteA}{Integrante A}: codificación de Huffman}
+\label{app:aporte-a}
+\begin{aporte}{A}
+\paragraph{Objetivo.} Implementar un compresor de Huffman estático y canónico sobre el alfabeto
+de bytes que sea correcto para cualquier entrada, que alcance la longitud media óptima
+(\cref{eq:cota-huffman}) y cuya cabecera sea compacta y verificable.
+
+\paragraph{Cómo funciona.} La codificación hace dos pasadas: la primera cuenta las frecuencias
+de los 256 bytes; con ellas se calculan las longitudes óptimas mediante el algoritmo voraz
+(\cref{alg:huffman}) y se asignan códigos canónicos (\cref{eq:canonico}); la segunda pasada
+escribe el código de cada byte. La decodificación lee las 256 longitudes de la cabecera,
+reconstruye las tablas canónicas y decodifica bit a bit (\cref{alg:huffman-dec}).
+
+\paragraph{Cómo se implementó.} \texttt{HuffmanCodec} usa un \texttt{PriorityQueue} de índices
+de nodo con desempate por índice, arreglos planos de pesos y padres (sin objetos nodo), y un
+recorrido descendente para las profundidades (\cref{lst:huffman}). El formato del flujo es:
+magia \texttt{HF}, longitud original de 4 bytes y 256 longitudes de 1 byte, seguidas de los
+bits. La tabla canónica rechaza longitudes sobresuscritas (suma de Kraft mayor que 1), lo que
+detecta cabeceras corruptas. \texttt{BitWriter} y \texttt{BitReader} manejan campos de 1 a 64
+bits con un acumulador de 64 bits, bit más significativo primero.
+
+\paragraph{Integración.} \texttt{HuffmanCodec} implementa la interfaz \texttt{Codec}, de modo que
+el arnés (\texttt{BenchmarkRunner}) y la línea de comandos (\texttt{Main}) lo usan sin conocer
+sus detalles. \texttt{BitWriter} y \texttt{BitReader} son compartidos con LZW. Sus pruebas
+(\texttt{HuffmanCodecTest}, 11; \texttt{BitStreamTest}, 5) forman parte de \texttt{ant test}.
+
+\paragraph{Archivos.} \texttt{code/src/pe/edu/ulima/compression/huffman/HuffmanCodec.java},
+\texttt{code/src/pe/edu/ulima/compression/io/BitWriter.java},
+\texttt{code/src/pe/edu/ulima/compression/io/BitReader.java} y sus pruebas en
+\texttt{code/test/pe/edu/ulima/compression/huffman/} y \texttt{.../io/}; en el informe,
+\cref{sec:huffman}.
+\end{aporte}
+
+\subsection{\texorpdfstring{\integranteB}{Integrante B}: algoritmo LZW}
+\label{app:aporte-b}
+\begin{aporte}{B}
+\paragraph{Objetivo.} Implementar LZW con códigos de ancho variable y tamaño máximo de
+diccionario configurable, de forma que la memoria quede acotada y que el ancho máximo pueda
+variarse en el experimento E4.
+
+\paragraph{Cómo funciona.} El codificador extiende la frase actual mientras el par (frase,
+byte) esté en el diccionario y, cuando no lo está, emite el código de la frase y registra la
+nueva entrada (\cref{alg:lzw-enc}). Los códigos crecen de 9 a $b$ bits; al llenarse el
+diccionario se emite \texttt{CLEAR} (código 256) y se reinicia. El decodificador reconstruye el
+mismo diccionario con un código de retraso, resuelve el caso $KwKwK$ y escribe cada frase de
+atrás hacia adelante siguiendo los prefijos (\cref{alg:lzw-dec}).
+
+\paragraph{Cómo se implementó.} \texttt{LzwCodec} representa el diccionario del codificador con
+\texttt{PhraseTable}, una tabla hash de direccionamiento abierto de capacidad $2^{b+1}$ (factor de
+carga máximo 0.5), sondeo lineal y hashing de Fibonacci; la búsqueda devuelve la ranura donde
+insertar si la clave no existe (\cref{lst:lzw}). El decodificador usa cuatro arreglos indexados
+por código (\texttt{prefix}, \texttt{suffix}, \texttt{firstByte}, \texttt{phraseLength}). El
+formato es: magia \texttt{LZ}, $b$ (1 byte) y longitud original (4 bytes), seguidos de los
+códigos. El decodificador valida cada código frente al tamaño actual del diccionario y la
+longitud declarada, y rechaza flujos corruptos. El método \texttt{traceCodes} expone la
+secuencia emitida para pruebas y enseñanza.
+
+\paragraph{Integración.} \texttt{LzwCodec} implementa \texttt{Codec} y reutiliza
+\texttt{BitWriter} y \texttt{BitReader}. El arnés lo instancia con $b = 16$ en E1--E3 y con
+$b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-N}. Sus 8 pruebas
+(\texttt{LzwCodecTest}) forman parte de \texttt{ant test}.
+
+\paragraph{Archivos.} \texttt{code/src/pe/edu/ulima/compression/lzw/LzwCodec.java} y
+\texttt{code/test/pe/edu/ulima/compression/lzw/LzwCodecTest.java}; en el informe,
+\cref{sec:lzw}.
+\end{aporte}
+
+\subsection{\texorpdfstring{\integranteC}{Integrante C}: metodología experimental y arnés de medición}
+\label{app:aporte-c}
+\begin{aporte}{C}
+\paragraph{Objetivo.} Medir ambos algoritmos de forma estadísticamente rigurosa y
+reproducible, y producir automáticamente los datos, tablas y figuras del informe.
+
+\paragraph{Cómo funciona.} \texttt{BenchmarkRunner} ejecuta E1--E4 según el protocolo de la
+\cref{sec:protocolo}: calentamiento global, verificación de ida y vuelta, calentamiento local,
+repeticiones cronometradas y resúmenes estadísticos. \texttt{Stats} calcula media, mediana,
+desviación estándar, intervalo de confianza del 95\,\% con la $t$ de Student, el ajuste
+log--log por mínimos cuadrados y la entropía de orden cero. \texttt{DataGenerator} produce las
+fuentes sintéticas deterministas de la \cref{tab:datos}.
+
+\paragraph{Cómo se implementó.} El arnés trabaja sobre la interfaz \texttt{Codec}, lo que
+permite medir igual a Huffman, a LZW y a DEFLATE (\texttt{DeflateCodec}, envoltorio de
+\texttt{java.util.zip}). \texttt{ResultWriter} escribe los CSV, la tabla del corpus en \LaTeX{} y
+\texttt{macros.tex}, de modo que ningún número se transcribe a mano. \texttt{Main} ofrece la
+línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
+\texttt{data/download-corpora.sh} descarga y verifica los corpus.
+
+\paragraph{Integración.} El arnés consume los códecs de los integrantes A y B; sus salidas en
+\texttt{results/} alimentan directamente las figuras y tablas de la \cref{sec:resultados}
+mediante \texttt{pgfplots}, \texttt{pgfplotstable} y las macros, a través de
+\texttt{report/build.sh}. Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
+\texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
+
+\paragraph{Archivos.} \texttt{code/src/pe/edu/ulima/compression/bench/} (\texttt{BenchmarkRunner},
+\texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter}),
+\texttt{code/src/pe/edu/ulima/compression/app/Main.java}, sus pruebas,
+\texttt{data/download-corpora.sh} y \texttt{report/build.sh}; en el informe,
+\cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia,sec:resultados} y la discusión de H1.
+\end{aporte}
+
+\subsection{\texorpdfstring{\integranteD}{Integrante D}: estado del arte, redacción y bibliografía}
+\label{app:aporte-d}
+\begin{aporte}{D}
+\paragraph{Objetivo.} Situar el trabajo en la literatura, plantear el problema, los objetivos y
+las preguntas de investigación, y redactar las conclusiones a partir del contraste entre teoría
+y experimento.
+
+\paragraph{Cómo funciona.} La revisión se organiza en tres niveles ---el problema, los
+algoritmos que lo resuelven y las comparaciones previas--- y concluye con la brecha que este
+trabajo atiende (\cref{sec:estado-arte}). Las conclusiones responden cada pregunta de
+investigación con la evidencia de las \cref{sec:resultados,sec:discusion}.
+
+\paragraph{Cómo se implementó.} La bibliografía (\texttt{report/refs.bib}) reúne 28 referencias
+verificadas por DOI o URL: artículos de revista y de congreso, una tesis doctoral, una tesis de
+maestría, un RFC y libros de texto; el estilo numérico IEEE se aplica con BibTeX. La estructura
+del documento y el código de colores se definen en \texttt{report/main.tex}.
+
+\paragraph{Integración.} Las preguntas de investigación definidas en la introducción
+determinan las hipótesis H1--H4 y los experimentos E1--E4; la síntesis por pregunta
+(\cref{sec:disc-rq}) y la \cref{tab:teoria-experimento} cierran ese ciclo.
+
+\paragraph{Archivos.} \texttt{report/main.tex}, \texttt{report/refs.bib} y
+\texttt{report/sections/01-introduccion.tex}, \texttt{02-estado-del-arte.tex} y
+\texttt{07-conclusiones.tex}.
+\end{aporte}

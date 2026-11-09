@@ -1,0 +1,371 @@
+% =====================================================================
+%  Huffman frente a LZW: comparación teórica y experimental
+%  Universidad de Lima — Trabajo de Investigación 2026-2
+%  Compilar con: ./build.sh  (tectonic ejecuta BibTeX automáticamente)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------------------------------------------------------------- idioma y tipografía
+\usepackage{iftex}
+\ifXeTeX
+  % Tectonic compila con XeTeX: Latin Modern en OpenType mediante fontspec, para que
+  % los caracteres UTF-8 (por ejemplo, ¿ y ¡) se rendericen correctamente.
+  \usepackage{fontspec}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{lmodern}
+\fi
+\usepackage[english,spanish,es-noshorthands,es-tabla,es-nodecimaldot]{babel}
+\usepackage{microtype}
+\usepackage[margin=2.5cm,headheight=14pt]{geometry}
+
+% ---------------------------------------------------------------- matemática, unidades, tablas
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\sisetup{group-separator={\,}, group-minimum-digits=4}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{enumitem}
+
+% ---------------------------------------------------------------- gráficos
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,calc,fit,babel}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=small,labelfont=bf,format=hang}
+
+% ---------------------------------------------------------------- algoritmos y código
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+
+% ---------------------------------------------------------------- cajas de aporte
+\usepackage[most]{tcolorbox}
+
+% ---------------------------------------------------------------- encabezados
+\usepackage{fancyhdr}
+
+% ---------------------------------------------------------------- enlaces (al final)
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=green!40!black,
+            urlcolor=blue!60!black,bookmarksnumbered=true]{hyperref}
+\usepackage[spanish,nameinlink]{cleveref}
+
+% =====================================================================
+%  INTEGRANTES Y CÓDIGO DE COLORES — ÚNICO LUGAR PARA EDITAR LOS NOMBRES
+% =====================================================================
+\newcommand{\integranteA}{Integrante A (Apellido, Nombre)}
+\newcommand{\integranteB}{Integrante B (Apellido, Nombre)}
+\newcommand{\integranteC}{Integrante C (Apellido, Nombre)}
+\newcommand{\integranteD}{Integrante D (Apellido, Nombre)}
+\newcommand{\docente}{Docente del curso (Apellido, Nombre)}
+
+\colorlet{memberA}{blue!70!black}
+\colorlet{memberB}{green!45!black}
+\colorlet{memberC}{orange!75!black}
+\colorlet{memberD}{violet!75!black}
+
+% Entorno de autoría: texto en el color del integrante y barra lateral fina.
+% Uso: \begin{aporte}{A} ... \end{aporte}.  Las figuras, tablas y algoritmos
+% dentro de un aporte deben usar la posición [H] (una caja no admite flotantes).
+\newtcolorbox{aporte}[1]{%
+  enhanced jigsaw, breakable, parbox=false,
+  colback=white, coltext=member#1,
+  frame hidden, boxrule=0pt, sharp corners,
+  borderline west={1.2pt}{0pt}{member#1},
+  left=9pt, right=0pt, top=1pt, bottom=1pt,
+  before skip=4pt, after skip=8pt,
+  before upper={\noindent{\scriptsize\sffamily\bfseries
+    Aporte: \csname integrante#1\endcsname}\par\smallskip}}
+
+% Muestra de color para la tabla de distribución.
+\newcommand{\muestra}[1]{\textcolor{member#1}{\rule{1.6em}{0.9em}}}
+
+% =====================================================================
+%  RESULTADOS GENERADOS (results/ se copia desde ../results en build.sh)
+% =====================================================================
+\newcommand{\resmissing}{\textcolor{red}{\textbf{??}}}
+\IfFileExists{results/macros.tex}{\input{results/macros.tex}}{}
+% Valores de respaldo: solo se usan si el benchmark aún no generó la macro.
+\providecommand{\resJvm}{\resmissing}
+\providecommand{\resCpu}{\resmissing}
+\providecommand{\resCores}{\resmissing}
+\providecommand{\resHeap}{\resmissing}
+\providecommand{\resDate}{\resmissing}
+\providecommand{\resCorpusFiles}{\resmissing}
+\providecommand{\resLzwWins}{\resmissing}
+\providecommand{\resCorpusHuffBpb}{\resmissing}
+\providecommand{\resCorpusLzwBpb}{\resmissing}
+\providecommand{\resCorpusDeflateBpb}{\resmissing}
+\providecommand{\resLzwBitsBestDickens}{\resmissing}
+\providecommand{\resLzwBitsBestXml}{\resmissing}
+\providecommand{\resLzwBitsBestEcoli}{\resmissing}
+\providecommand{\resSlopeDickensHuffEnc}{\resmissing}
+\providecommand{\resSlopeDickensHuffDec}{\resmissing}
+\providecommand{\resSlopeDickensLzwEnc}{\resmissing}
+\providecommand{\resSlopeDickensLzwDec}{\resmissing}
+\providecommand{\resRtwoDickensHuffEnc}{\resmissing}
+\providecommand{\resRtwoDickensHuffDec}{\resmissing}
+\providecommand{\resRtwoDickensLzwEnc}{\resmissing}
+\providecommand{\resRtwoDickensLzwDec}{\resmissing}
+\providecommand{\resNspbDickensHuffEnc}{\resmissing}
+\providecommand{\resNspbDickensHuffDec}{\resmissing}
+\providecommand{\resNspbDickensLzwEnc}{\resmissing}
+\providecommand{\resNspbDickensLzwDec}{\resmissing}
+\providecommand{\resEntropyHuffBpbKTwo}{\resmissing}
+\providecommand{\resEntropyHuffBpbKTwoFiftySix}{\resmissing}
+\providecommand{\resEntropyLzwBpbKTwo}{\resmissing}
+\providecommand{\resEntropyLzwBpbKTwoFiftySix}{\resmissing}
+\providecommand{\resEntropyHuffDecMsKTwo}{\resmissing}
+\providecommand{\resEntropyHuffDecMsKTwoFiftySix}{\resmissing}
+\providecommand{\resEntropyLzwDecMsKTwo}{\resmissing}
+\providecommand{\resEntropyLzwDecMsKTwoFiftySix}{\resmissing}
+
+% Inserta #2 solo si existe results/#1; si no, deja un aviso visible.
+\newcommand{\siresultado}[2]{%
+  \IfFileExists{results/#1}{#2}{\todoresults{Falta el archivo \texttt{results/#1}; ejecutar \texttt{ant benchmark}.}}}
+
+% Marcador de interpretación pendiente (lo completa el equipo tras la corrida).
+\newcommand{\todoresults}[1]{%
+  \par\smallskip\noindent
+  \fcolorbox{red}{red!4}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
+    \color{red!80!black}\small\textbf{Pendiente (resultados):} #1}}\par\smallskip}
+
+% =====================================================================
+%  ESTILOS
+% =====================================================================
+\pgfplotsset{
+  informe/.style={
+    width=\linewidth, height=0.72\linewidth,
+    grid=major, grid style={gray!25},
+    tick label style={font=\scriptsize}, label style={font=\small},
+    legend style={font=\scriptsize, draw=gray!50, fill=white, fill opacity=0.9,
+                  text opacity=1, cells={anchor=west}},
+    legend pos=north west,
+    error bars/error bar style={line width=0.4pt},
+    error bars/error mark options={rotate=90, mark size=1.5pt},
+  },
+  huffenc/.style={blue!70!black, mark=*, mark size=1.3pt, line width=0.7pt},
+  huffdec/.style={blue!70!black, mark=o, mark size=1.5pt, line width=0.7pt, densely dashed},
+  lzwenc/.style={red!70!black, mark=square*, mark size=1.2pt, line width=0.7pt},
+  lzwdec/.style={red!70!black, mark=square, mark size=1.4pt, line width=0.7pt, densely dashed},
+  pendiente/.style={black!60, dashed, line width=0.6pt, mark=none},
+}
+
+\definecolor{codebg}{gray}{0.97}
+\lstdefinestyle{java}{
+  language=Java, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue!60!black},
+  commentstyle=\color{gray!70!black}\itshape, stringstyle=\color{green!40!black},
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=6pt, stepnumber=1,
+  backgroundcolor=\color{codebg}, frame=single, rulecolor=\color{gray!40},
+  breaklines=true, showstringspaces=false, tabsize=4, columns=fullflexible,
+  xleftmargin=1.5em, framexleftmargin=1.5em, captionpos=b,
+}
+\lstset{style=java}
+\renewcommand{\lstlistingname}{Listado}
+\renewcommand{\lstlistlistingname}{Índice de listados}
+
+% Pseudocódigo en español.
+\floatname{algorithm}{Algoritmo}
+\renewcommand{\listalgorithmname}{Índice de algoritmos}
+\algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
+\algrenewcommand\algorithmicensure{\textbf{Salida:}}
+\algrenewcommand\algorithmicfunction{\textbf{función}}
+\algrenewcommand\algorithmicprocedure{\textbf{procedimiento}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicelse{\textbf{si no}}
+\algrenewcommand\algorithmicfor{\textbf{para}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicwhile{\textbf{mientras}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicreturn{\textbf{devolver}}
+
+\crefname{table}{tabla}{tablas}
+\Crefname{table}{Tabla}{Tablas}
+\crefname{figure}{figura}{figuras}
+\Crefname{figure}{Figura}{Figuras}
+\crefname{algorithm}{algoritmo}{algoritmos}
+\Crefname{algorithm}{Algoritmo}{Algoritmos}
+\crefname{lstlisting}{listado}{listados}
+\Crefname{lstlisting}{Listado}{Listados}
+\crefname{section}{sección}{secciones}
+\Crefname{section}{Sección}{Secciones}
+\crefname{subsection}{sección}{secciones}
+\Crefname{subsection}{Sección}{Secciones}
+\crefname{appendix}{anexo}{anexos}
+\Crefname{appendix}{Anexo}{Anexos}
+\crefname{equation}{ecuación}{ecuaciones}
+\Crefname{equation}{Ecuación}{Ecuaciones}
+
+\newcommand{\Lbar}{\bar{L}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape Huffman frente a LZW}
+\fancyhead[R]{\small\itshape Universidad de Lima}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlist{itemsep=2pt, topsep=4pt}
+
+\hypersetup{
+  pdftitle={Huffman frente a LZW: comparación teórica y experimental de algoritmos de compresión sin pérdida},
+  pdfauthor={Universidad de Lima, Trabajo de Investigación 2026-2},
+  pdfkeywords={compresión sin pérdida, codificación de Huffman, LZW, análisis de complejidad, algoritmia experimental, entropía},
+}
+
+% =====================================================================
+\begin{document}
+
+% ---------------------------------------------------------------- portada
+\begin{titlepage}
+  \centering
+  \includegraphics[width=4.2cm]{figures/ulima-logo.jpg}\par\vspace{1.0cm}
+  {\large\scshape Universidad de Lima\par}\vspace{0.2cm}
+  {\normalsize Facultad de Ingeniería — Carrera de Ingeniería de Sistemas\par}\vspace{1.4cm}
+  {\normalsize Trabajo de Investigación — Curso: (Área de Ingeniería de Software)\par}\vspace{1.2cm}
+  \rule{\linewidth}{0.8pt}\par\vspace{0.4cm}
+  {\LARGE\bfseries Huffman frente a LZW:\par}\vspace{0.2cm}
+  {\Large comparación teórica y experimental de algoritmos\\ de compresión sin pérdida\par}
+  \vspace{0.4cm}\rule{\linewidth}{0.8pt}\par\vspace{1.6cm}
+  {\normalsize\bfseries Integrantes\par}\vspace{0.3cm}
+  \begin{tabular}{@{}c@{\quad}l@{}}
+    \muestra{A} & \textcolor{memberA}{\integranteA}\\[2pt]
+    \muestra{B} & \textcolor{memberB}{\integranteB}\\[2pt]
+    \muestra{C} & \textcolor{memberC}{\integranteC}\\[2pt]
+    \muestra{D} & \textcolor{memberD}{\integranteD}\\
+  \end{tabular}\par\vspace{1.2cm}
+  {\normalsize\bfseries Docente\par}\vspace{0.2cm}
+  {\normalsize \docente\par}
+  \vfill
+  {\normalsize Lima, Perú — 2026-2\par}
+\end{titlepage}
+
+\pagenumbering{roman}
+
+% ---------------------------------------------------------------- resumen
+\section*{Resumen}
+\addcontentsline{toc}{section}{Resumen}
+\begin{aporte}{D}
+La compresión sin pérdida reduce el costo de almacenar y transmitir datos sin alterar un
+solo bit de la información original. Este trabajo compara dos algoritmos clásicos que
+explotan redundancias de naturaleza distinta: la codificación de Huffman, un código prefijo
+estático que aprovecha la distribución de frecuencias de los símbolos, y el algoritmo
+Lempel--Ziv--Welch (LZW), un método adaptativo de diccionario que reemplaza frases
+repetidas por códigos. Ambos se implementaron en Java (proyecto NetBeans con Ant), con
+codificación canónica de Huffman y LZW de ancho variable de 9 a 16 bits con reinicio del
+diccionario, validados con 43 pruebas JUnit. Se derivó la complejidad temporal y espacial de
+cada algoritmo y se contrastó con cuatro experimentos: escalamiento del tiempo con el tamaño
+de la entrada (ajuste log--log), barrido de entropía con alfabetos uniformes, evaluación sobre
+los corpus Canterbury y Silesia con DEFLATE como referencia, y efecto del tamaño máximo del
+diccionario de LZW. Los tiempos se reportan como medianas con intervalos de confianza del
+95\,\% tras el calentamiento del compilador JIT.
+% TODO-RESULTS: resumir en dos o tres oraciones los hallazgos principales (pendientes, bpb agregados del corpus, ganador por tipo de dato).
+\todoresults{Resumir los hallazgos principales: pendientes log--log obtenidas, bits por byte agregados en el corpus y tipo de dato en que gana cada algoritmo.}
+
+\medskip\noindent\textbf{Palabras clave:} compresión sin pérdida, codificación de Huffman,
+LZW, análisis de complejidad, algoritmia experimental, entropía.
+\end{aporte}
+
+\begin{otherlanguage}{english}
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+\begin{aporte}{D}
+Lossless compression reduces the cost of storing and transmitting data without altering a
+single bit of the original information. This work compares two classical algorithms that
+exploit different kinds of redundancy: Huffman coding, a static prefix code that exploits
+the symbol frequency distribution, and the Lempel--Ziv--Welch (LZW) algorithm, an adaptive
+dictionary method that replaces repeated phrases with codes. Both were implemented in Java
+(a NetBeans project built with Ant), using canonical Huffman codes and variable-width LZW
+codes from 9 to 16 bits with dictionary reset, and validated with 43 JUnit tests. The time and
+space complexity of each algorithm was derived and contrasted through four experiments:
+time scaling with input size (log--log fit), an entropy sweep over uniform alphabets, an
+evaluation on the Canterbury and Silesia corpora with DEFLATE as a reference, and the effect
+of the maximum LZW dictionary size. Times are reported as medians with 95\,\% confidence
+intervals after JIT warm-up.
+% TODO-RESULTS: summarize the main findings in two or three sentences (English).
+\todoresults{Summarize the main findings in English, consistent with the Spanish abstract.}
+
+\medskip\noindent\textbf{Keywords:} lossless compression, Huffman coding, LZW, complexity
+analysis, experimental algorithmics, entropy.
+\end{aporte}
+\end{otherlanguage}
+
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\listoftables
+\listofalgorithms
+\lstlistoflistings
+\clearpage
+
+% ---------------------------------------------------------------- distribución del trabajo
+\section*{Distribución del trabajo y código de colores}
+\addcontentsline{toc}{section}{Distribución del trabajo y código de colores}
+Cada integrante es responsable de una parte del estudio. En el cuerpo del informe, el
+contenido de cada sección o subsección aparece en el color de su autor y con una barra
+lateral del mismo color, encabezada por el nombre del integrante. El detalle de cada
+implementación individual se presenta en el \cref{app:aportes}.
+
+\begin{table}[H]
+  \centering
+  \caption{Integrantes, color asignado y responsabilidades.}
+  \label{tab:distribucion}
+  \small
+  \begin{tabular}{@{}c l p{9.2cm}@{}}
+    \toprule
+    Color & Integrante & Responsabilidades \\
+    \midrule
+    \muestra{A} & \textcolor{memberA}{\integranteA} &
+      Codificación de Huffman: marco teórico, análisis de complejidad, implementación
+      (\texttt{HuffmanCodec}, \texttt{BitWriter}, \texttt{BitReader}) y sus pruebas;
+      discusión de H2 y H4. \\[3pt]
+    \muestra{B} & \textcolor{memberB}{\integranteB} &
+      Algoritmo LZW: marco teórico, análisis de complejidad, implementación
+      (\texttt{LzwCodec}) y sus pruebas; discusión de H3. \\[3pt]
+    \muestra{C} & \textcolor{memberC}{\integranteC} &
+      Metodología experimental, comparación teórica e hipótesis, arnés de medición
+      (\texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}), interfaz de
+      línea de comandos, figuras y tablas de resultados; discusión de H1. \\[3pt]
+    \muestra{D} & \textcolor{memberD}{\integranteD} &
+      Resumen, introducción, definiciones preliminares, estado del arte, síntesis de las
+      preguntas de investigación, conclusiones y bibliografía. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\clearpage
+\pagenumbering{arabic}
+
+\input{sections/01-introduccion}
+\input{sections/02-estado-del-arte}
+\input{sections/03-marco-teorico}
+\input{sections/04-metodologia}
+\input{sections/05-resultados}
+\input{sections/06-discusion}
+\input{sections/07-conclusiones}
+
+% ---------------------------------------------------------------- bibliografía
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Referencias}
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+% ---------------------------------------------------------------- anexos
+\clearpage
+\appendix
+\input{sections/08-anexos}
+
+\end{document}

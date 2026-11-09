@@ -1,0 +1,391 @@
+% ---------------------------------------------------------------------
+%  5. Resultados — Integrante C
+%  Todos los valores provienen de results/ (CSV y macros generados por
+%  BenchmarkRunner); build.sh copia ../results en report/results.
+% ---------------------------------------------------------------------
+\section{Resultados}
+\label{sec:resultados}
+
+% Gráfico de E1: tiempo frente a n en escala log-log.
+% #1 = archivo CSV, #2 = título, #3 = extremos de la recta de pendiente 1.
+\newcommand{\graficoEuno}[3]{%
+  \begin{tikzpicture}
+    \begin{loglogaxis}[informe, height=0.78\linewidth, log basis x=2,
+        xlabel={$n$ [bytes]}, ylabel={Mediana [ms]},
+        title={#2}, title style={font=\small\bfseries},
+        legend to name=leyendaEuno, legend columns=5,
+        legend style={draw=gray!50, /tikz/every even column/.append style={column sep=6pt}}]
+      \addplot+[huffenc, error bars/.cd, y dir=plus, y explicit]
+        table[col sep=comma, x=n, y=huff_enc_ms, y error=huff_enc_ci] {results/#1};
+      \addlegendentry{Huffman codificación}
+      \addplot+[huffdec, error bars/.cd, y dir=plus, y explicit]
+        table[col sep=comma, x=n, y=huff_dec_ms, y error=huff_dec_ci] {results/#1};
+      \addlegendentry{Huffman decodificación}
+      \addplot+[lzwenc, error bars/.cd, y dir=plus, y explicit]
+        table[col sep=comma, x=n, y=lzw_enc_ms, y error=lzw_enc_ci] {results/#1};
+      \addlegendentry{LZW codificación}
+      \addplot+[lzwdec, error bars/.cd, y dir=plus, y explicit]
+        table[col sep=comma, x=n, y=lzw_dec_ms, y error=lzw_dec_ci] {results/#1};
+      \addlegendentry{LZW decodificación}
+      \addplot[pendiente] coordinates {#3};
+      \addlegendentry{pendiente 1 (referencia)}
+    \end{loglogaxis}
+  \end{tikzpicture}}
+
+% Gráfico de E1: costo por byte frente a n.
+\newcommand{\graficoNspb}[2]{%
+  \begin{tikzpicture}
+    \begin{semilogxaxis}[informe, height=0.78\linewidth, log basis x=2,
+        xlabel={$n$ [bytes]}, ylabel={ns/byte}, ymin=0,
+        title={#2}, title style={font=\small\bfseries}, legend pos=north east]
+      \addplot[huffenc] table[col sep=comma, x=n, y=huff_enc_nspb] {results/#1};
+      \addlegendentry{Huffman cod.}
+      \addplot[huffdec] table[col sep=comma, x=n, y=huff_dec_nspb] {results/#1};
+      \addlegendentry{Huffman decod.}
+      \addplot[lzwenc] table[col sep=comma, x=n, y=lzw_enc_nspb] {results/#1};
+      \addlegendentry{LZW cod.}
+      \addplot[lzwdec] table[col sep=comma, x=n, y=lzw_dec_nspb] {results/#1};
+      \addlegendentry{LZW decod.}
+    \end{semilogxaxis}
+  \end{tikzpicture}}
+
+% Gráfico de E1: bits por byte frente a n para un algoritmo (#1 = prefijo de columna).
+\newcommand{\graficoBpbN}[2]{%
+  \begin{tikzpicture}
+    \begin{semilogxaxis}[informe, height=0.78\linewidth, log basis x=2,
+        xlabel={$n$ [bytes]}, ylabel={bits por byte}, ymin=0,
+        title={#2}, title style={font=\small\bfseries},
+        legend to name=leyendaBpbN, legend columns=4,
+        legend style={draw=gray!50, /tikz/every even column/.append style={column sep=6pt}}]
+      \addplot[black!70, mark=*, mark size=1.2pt] table[col sep=comma, x=n, y=#1_bpb] {results/e1_uniform.csv};
+      \addlegendentry{\texttt{uniform}}
+      \addplot[blue!70!black, mark=square*, mark size=1.2pt] table[col sep=comma, x=n, y=#1_bpb] {results/e1_skewed.csv};
+      \addlegendentry{\texttt{skewed}}
+      \addplot[green!45!black, mark=triangle*, mark size=1.5pt] table[col sep=comma, x=n, y=#1_bpb] {results/e1_synthtext.csv};
+      \addlegendentry{\texttt{synthtext}}
+      \addplot[red!70!black, mark=diamond*, mark size=1.5pt] table[col sep=comma, x=n, y=#1_bpb] {results/e1_dickens.csv};
+      \addlegendentry{\texttt{dickens}}
+    \end{semilogxaxis}
+  \end{tikzpicture}}
+
+\subsection{E1: escalamiento del tiempo con el tamaño de la entrada}
+\label{sec:res-e1}
+\begin{aporte}{C}
+La \cref{fig:e1-tiempo} muestra la mediana del tiempo de codificación y de decodificación en
+función de $n$ para las cuatro fuentes, en escala log--log; la recta discontinua tiene
+pendiente 1 y sirve solo como guía visual de crecimiento lineal (su posición vertical es
+arbitraria). Las barras de error indican el semiancho superior del intervalo de confianza del
+95\,\%.
+
+\siresultado{e1_dickens.csv}{%
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoEuno{e1_uniform.csv}{\texttt{uniform}}{(16384,0.16384) (16777216,167.77216)}
+    \caption{Bytes uniformes i.i.d.}
+    \label{fig:e1-uniform}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoEuno{e1_skewed.csv}{\texttt{skewed}}{(16384,0.16384) (16777216,167.77216)}
+    \caption{Geométrica i.i.d. ($p = 0.15$).}
+    \label{fig:e1-skewed}
+  \end{subfigure}\\[6pt]
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoEuno{e1_synthtext.csv}{\texttt{synthtext}}{(16384,0.16384) (16777216,167.77216)}
+    \caption{Texto sintético (Zipf).}
+    \label{fig:e1-synthtext}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoEuno{e1_dickens.csv}{\texttt{dickens}}{(16384,0.16384) (8388608,83.88608)}
+    \caption{Texto real (prefijos de \texttt{dickens}).}
+    \label{fig:e1-dickens}
+  \end{subfigure}\\[4pt]
+  \pgfplotslegendfromname{leyendaEuno}
+  \caption{E1: mediana del tiempo frente al tamaño de la entrada (escala log--log).}
+  \label{fig:e1-tiempo}
+\end{figure}}
+
+% TODO-RESULTS: describir la forma de las curvas de la figura e1-tiempo (paralelismo con la recta de pendiente 1, desviaciones en tamaños pequeños, diferencias entre fuentes y entre codificación/decodificación).
+\todoresults{Interpretar la \cref{fig:e1-tiempo}: paralelismo de las curvas con la recta de
+pendiente 1, desviaciones en los tamaños pequeños y diferencias entre fuentes y entre
+codificación y decodificación.}
+
+La \cref{tab:pendientes} reporta la pendiente del ajuste log--log y su $R^2$ para cada fuente,
+algoritmo y operación, calculados con $n \ge 2^{16}$, junto con el costo por byte en el mayor
+tamaño medido.
+
+\siresultado{fits.csv}{%
+\begin{table}[H]
+  \centering
+  \caption{E1: pendiente $\hat{k}$ del ajuste $\ln t = \hat{k}\ln n + c$, coeficiente $R^2$ y
+           costo por byte en el mayor $n$.}
+  \label{tab:pendientes}
+  \small
+  \pgfplotstabletypeset[
+    col sep=comma,
+    columns={source,algorithm,operation,slope,r2,nspb_at_max},
+    columns/source/.style={string type, column name={Fuente},
+      postproc cell content/.append style={/pgfplots/table/@cell content/.add={\ttfamily}{}}},
+    columns/algorithm/.style={string type, column name={Algoritmo},
+      string replace={huffman}{Huffman}, string replace={lzw}{LZW}},
+    columns/operation/.style={string type, column name={Operación},
+      string replace={encode}{codificación}, string replace={decode}{decodificación}},
+    columns/slope/.style={column name={Pendiente $\hat{k}$}, fixed, fixed zerofill, precision=3},
+    columns/r2/.style={column name={$R^2$}, fixed, fixed zerofill, precision=4},
+    columns/nspb_at_max/.style={column name={ns/byte en $n_{\max}$}, fixed, fixed zerofill, precision=2},
+    every head row/.style={before row=\toprule, after row=\midrule},
+    every last row/.style={after row=\bottomrule},
+    every row no 3/.style={after row=\midrule},
+    every row no 7/.style={after row=\midrule},
+    every row no 11/.style={after row=\midrule},
+  ]{results/fits.csv}
+\end{table}}
+
+% TODO-RESULTS: comentar el rango de pendientes y R^2 de la tabla tab:pendientes (por ejemplo, con \resSlopeDickensHuffEnc, \resSlopeDickensLzwEnc) y su cercanía a 1.
+\todoresults{Comentar el rango de pendientes y de $R^2$ de la \cref{tab:pendientes} y su
+cercanía a 1 (por ejemplo, en \texttt{dickens}: Huffman \resSlopeDickensHuffEnc{} /
+\resSlopeDickensHuffDec{}, LZW \resSlopeDickensLzwEnc{} / \resSlopeDickensLzwDec{}).}
+
+La \cref{fig:e1-nspb} presenta el mismo experimento como costo por byte en escala
+semilogarítmica: bajo complejidad lineal, las curvas deben ser aproximadamente horizontales.
+
+\siresultado{e1_synthtext.csv}{%
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoNspb{e1_dickens.csv}{\texttt{dickens}}
+    \caption{Texto real.}
+    \label{fig:e1-nspb-dickens}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoNspb{e1_synthtext.csv}{\texttt{synthtext}}
+    \caption{Texto sintético.}
+    \label{fig:e1-nspb-synthtext}
+  \end{subfigure}
+  \caption{E1: costo por byte (ns/byte) frente al tamaño de la entrada.}
+  \label{fig:e1-nspb}
+\end{figure}}
+
+% TODO-RESULTS: interpretar la figura e1-nspb (estabilidad del costo por byte, efectos de caché o de costos fijos en tamaños pequeños, comparación del costo relativo de ambos algoritmos).
+\todoresults{Interpretar la \cref{fig:e1-nspb}: estabilidad del costo por byte, efectos de
+costos fijos o de caché y costo relativo de cada algoritmo y operación.}
+
+Finalmente, la \cref{fig:e1-bpb} muestra la tasa de compresión obtenida en E1 para cada
+fuente y tamaño.
+
+\siresultado{e1_uniform.csv}{%
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoBpbN{huff}{Huffman}
+    \caption{Huffman.}
+    \label{fig:e1-bpb-huff}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \graficoBpbN{lzw}{LZW ($b = 16$)}
+    \caption{LZW.}
+    \label{fig:e1-bpb-lzw}
+  \end{subfigure}\\[4pt]
+  \pgfplotslegendfromname{leyendaBpbN}
+  \caption{E1: bits por byte frente al tamaño de la entrada.}
+  \label{fig:e1-bpb}
+\end{figure}}
+
+% TODO-RESULTS: interpretar la figura e1-bpb (efecto de la cabecera de Huffman en n pequeño, aprendizaje del diccionario de LZW, expansión de LZW en uniform).
+\todoresults{Interpretar la \cref{fig:e1-bpb}: efecto de la cabecera de 262 bytes de Huffman en
+$n$ pequeño, mejora de LZW a medida que el diccionario aprende y comportamiento en
+\texttt{uniform}.}
+\end{aporte}
+
+\subsection{E2: barrido de entropía}
+\label{sec:res-e2}
+\begin{aporte}{C}
+En E2 la fuente es i.i.d. uniforme sobre $k$ símbolos, de modo que $H_0 = \log_2 k$ se conoce
+por construcción y no hay frases repetidas más allá de las debidas al azar. La
+\cref{fig:e2-bpb} compara los bits por byte de ambos algoritmos con la entropía empírica y con
+la cota superior $H_0 + 1$ de la \cref{eq:cota-huffman}.
+
+\siresultado{e2_entropy.csv}{%
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{semilogxaxis}[informe, width=0.72\linewidth, height=0.5\linewidth, log basis x=2,
+        xlabel={$k$ (tamaño del alfabeto); $H_0 = \log_2 k$}, ylabel={bits por byte},
+        ymin=0, legend pos=north west]
+      \addplot[huffenc] table[col sep=comma, x=k, y=huff_bpb] {results/e2_entropy.csv};
+      \addlegendentry{Huffman}
+      \addplot[lzwenc] table[col sep=comma, x=k, y=lzw_bpb] {results/e2_entropy.csv};
+      \addlegendentry{LZW ($b = 16$)}
+      \addplot[black, thick, mark=none] table[col sep=comma, x=k, y=h0] {results/e2_entropy.csv};
+      \addlegendentry{$H_0$ empírica}
+      \addplot[pendiente] table[col sep=comma, x=k, y expr=\thisrow{h0}+1] {results/e2_entropy.csv};
+      \addlegendentry{$H_0 + 1$}
+    \end{semilogxaxis}
+  \end{tikzpicture}
+  \caption{E2: bits por byte frente al tamaño del alfabeto ($n = 2^{23}$).}
+  \label{fig:e2-bpb}
+\end{figure}}
+
+% TODO-RESULTS: interpretar e2-bpb (Huffman frente a [H0, H0+1), distancia de LZW a H0 por k; citar por ejemplo \resEntropyHuffBpbKTwo, \resEntropyLzwBpbKTwo, \resEntropyHuffBpbKTwoFiftySix, \resEntropyLzwBpbKTwoFiftySix).
+\todoresults{Interpretar la \cref{fig:e2-bpb}: posición de Huffman en $[H_0, H_0+1)$ y
+distancia de LZW a $H_0$ para cada $k$ (por ejemplo, $k = 2$: Huffman \resEntropyHuffBpbKTwo{},
+LZW \resEntropyLzwBpbKTwo{}; $k = 256$: Huffman \resEntropyHuffBpbKTwoFiftySix{}, LZW
+\resEntropyLzwBpbKTwoFiftySix{}).}
+
+La \cref{fig:e2-tiempo} muestra cómo varía el tiempo con la entropía para un tamaño fijo, lo
+que permite contrastar el término $\Lbar$ del costo de decodificación de Huffman.
+
+\siresultado{e2_entropy.csv}{%
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{semilogxaxis}[informe, height=0.78\linewidth, log basis x=2,
+          xlabel={$k$}, ylabel={Mediana [ms]}, ymin=0, legend pos=north west]
+        \addplot+[huffdec, error bars/.cd, y dir=plus, y explicit]
+          table[col sep=comma, x=k, y=huff_dec_ms, y error=huff_dec_ci] {results/e2_entropy.csv};
+        \addlegendentry{Huffman}
+        \addplot+[lzwdec, error bars/.cd, y dir=plus, y explicit]
+          table[col sep=comma, x=k, y=lzw_dec_ms, y error=lzw_dec_ci] {results/e2_entropy.csv};
+        \addlegendentry{LZW}
+      \end{semilogxaxis}
+    \end{tikzpicture}
+    \caption{Decodificación.}
+    \label{fig:e2-dec}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{semilogxaxis}[informe, height=0.78\linewidth, log basis x=2,
+          xlabel={$k$}, ylabel={Mediana [ms]}, ymin=0, legend pos=north west]
+        \addplot+[huffenc, error bars/.cd, y dir=plus, y explicit]
+          table[col sep=comma, x=k, y=huff_enc_ms, y error=huff_enc_ci] {results/e2_entropy.csv};
+        \addlegendentry{Huffman}
+        \addplot+[lzwenc, error bars/.cd, y dir=plus, y explicit]
+          table[col sep=comma, x=k, y=lzw_enc_ms, y error=lzw_enc_ci] {results/e2_entropy.csv};
+        \addlegendentry{LZW}
+      \end{semilogxaxis}
+    \end{tikzpicture}
+    \caption{Codificación.}
+    \label{fig:e2-enc}
+  \end{subfigure}
+  \caption{E2: tiempo frente al tamaño del alfabeto ($n = 2^{23}$).}
+  \label{fig:e2-tiempo}
+\end{figure}}
+
+% TODO-RESULTS: interpretar e2-tiempo (crecimiento del tiempo de decodificación de Huffman con log2 k frente a LZW; citar \resEntropyHuffDecMsKTwo, \resEntropyHuffDecMsKTwoFiftySix, \resEntropyLzwDecMsKTwo, \resEntropyLzwDecMsKTwoFiftySix).
+\todoresults{Interpretar la \cref{fig:e2-tiempo}: tendencia del tiempo de decodificación de
+Huffman con $\log_2 k$ frente a LZW (por ejemplo, Huffman \resEntropyHuffDecMsKTwo{} ms con
+$k = 2$ y \resEntropyHuffDecMsKTwoFiftySix{} ms con $k = 256$; LZW \resEntropyLzwDecMsKTwo{} y
+\resEntropyLzwDecMsKTwoFiftySix{} ms).}
+\end{aporte}
+
+\subsection{E3: corpus Canterbury y Silesia}
+\label{sec:res-e3}
+\begin{aporte}{C}
+La \cref{tab:corpus} reporta, para cada archivo, su tamaño, su entropía de orden cero, los bits
+por byte de cada algoritmo y el rendimiento de codificación. En negrita aparece el mejor de los
+dos algoritmos comparados; DEFLATE se muestra solo como referencia.
+
+\siresultado{table_corpus.tex}{%
+\begin{table}[H]
+  \centering
+  \caption{E3: bits por byte y rendimiento de codificación en los corpus Canterbury (arriba) y
+           Silesia (abajo).}
+  \label{tab:corpus}
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{@{}l r r r r r r r@{}}
+    \toprule
+    Archivo & Tamaño (KiB) & $H_0$ & Huffman & LZW & DEFLATE$^\dagger$ & Huff. MB/s & LZW MB/s \\
+    \midrule
+    \input{results/table_corpus.tex}
+    \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \begin{minipage}{0.92\linewidth}
+    \footnotesize $^\dagger$\,DEFLATE (zlib del JDK, nivel 6, LZ77 + Huffman) es solo una
+    referencia externa y no forma parte de la comparación. Las columnas Huffman, LZW y DEFLATE
+    están en bits por byte, incluida la cabecera.
+  \end{minipage}
+\end{table}}
+
+En conjunto, sobre los \resCorpusFiles{} archivos, la tasa agregada es de
+\resCorpusHuffBpb{}~bpb para Huffman, \resCorpusLzwBpb{}~bpb para LZW y
+\resCorpusDeflateBpb{}~bpb para DEFLATE; LZW comprime mejor que Huffman en \resLzwWins{} de
+los \resCorpusFiles{} archivos.
+
+% TODO-RESULTS: interpretar tab:corpus (en qué tipos de archivo gana cada algoritmo, relación con H0, archivos donde LZW expande o se acerca a Huffman, rendimiento relativo en MB/s, distancia a DEFLATE).
+\todoresults{Interpretar la \cref{tab:corpus}: tipos de archivo en que gana cada algoritmo,
+relación con $H_0$, casos en que LZW se acerca o supera a 8~bpb, rendimiento relativo en MB/s
+y distancia de ambos a DEFLATE.}
+\end{aporte}
+
+\subsection{E4: tamaño máximo del diccionario de LZW}
+\label{sec:res-e4}
+\begin{aporte}{C}
+La \cref{fig:e4} muestra los bits por byte y el tiempo de codificación de LZW al variar el
+ancho máximo de código $b$, es decir, el tamaño del diccionario $2^b$, en tres archivos de
+naturaleza distinta. El ancho con menor bpb fue $b = \resLzwBitsBestDickens$ en
+\texttt{dickens}, $b = \resLzwBitsBestXml$ en \texttt{xml} y $b = \resLzwBitsBestEcoli$ en
+\texttt{E.coli}.
+
+\siresultado{e4_lzw_bits.csv}{%
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[informe, height=0.78\linewidth, xlabel={$b$ (bits; diccionario de $2^b$ entradas)},
+          ylabel={bits por byte}, xtick={9,...,16}, legend pos=north east]
+        \addplot[blue!70!black, mark=*, mark size=1.3pt]
+          table[col sep=comma, x=bits, y=dickens_bpb] {results/e4_lzw_bits.csv};
+        \addlegendentry{\texttt{dickens}}
+        \addplot[green!45!black, mark=square*, mark size=1.2pt]
+          table[col sep=comma, x=bits, y=xml_bpb] {results/e4_lzw_bits.csv};
+        \addlegendentry{\texttt{xml}}
+        \addplot[red!70!black, mark=triangle*, mark size=1.5pt]
+          table[col sep=comma, x=bits, y=ecoli_bpb] {results/e4_lzw_bits.csv};
+        \addlegendentry{\texttt{E.coli}}
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Tasa de compresión.}
+    \label{fig:e4-bpb}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[informe, height=0.78\linewidth, xlabel={$b$ (bits; diccionario de $2^b$ entradas)},
+          ylabel={Mediana de codificación [ms]}, xtick={9,...,16}, ymin=0, legend pos=north east]
+        \addplot[blue!70!black, mark=*, mark size=1.3pt]
+          table[col sep=comma, x=bits, y=dickens_enc_ms] {results/e4_lzw_bits.csv};
+        \addlegendentry{\texttt{dickens}}
+        \addplot[green!45!black, mark=square*, mark size=1.2pt]
+          table[col sep=comma, x=bits, y=xml_enc_ms] {results/e4_lzw_bits.csv};
+        \addlegendentry{\texttt{xml}}
+        \addplot[red!70!black, mark=triangle*, mark size=1.5pt]
+          table[col sep=comma, x=bits, y=ecoli_enc_ms] {results/e4_lzw_bits.csv};
+        \addlegendentry{\texttt{E.coli}}
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Tiempo de codificación.}
+    \label{fig:e4-tiempo}
+  \end{subfigure}
+  \caption{E4: efecto del tamaño máximo del diccionario de LZW.}
+  \label{fig:e4}
+\end{figure}}
+
+% TODO-RESULTS: interpretar fig:e4 (tendencia del bpb con b, rendimientos decrecientes, diferencias entre texto, XML y ADN, costo temporal de diccionarios grandes y frecuencia de reinicios).
+\todoresults{Interpretar la \cref{fig:e4}: tendencia de los bits por byte al crecer $b$,
+rendimientos decrecientes, diferencias entre texto, XML y ADN, y costo temporal asociado al
+tamaño del diccionario y a la frecuencia de reinicios.}
+\end{aporte}

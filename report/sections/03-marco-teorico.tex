@@ -1,0 +1,403 @@
+% ---------------------------------------------------------------------
+%  3. Marco teórico — D (definiciones), A (Huffman), B (LZW),
+%     C (comparación teórica e hipótesis)
+% ---------------------------------------------------------------------
+\section{Marco teórico}
+\label{sec:marco-teorico}
+
+\subsection{Definiciones preliminares}
+\label{sec:definiciones}
+\begin{aporte}{D}
+Sea $x = x_1x_2\cdots x_n$ una secuencia de $n$ bytes sobre el alfabeto
+$\Sigma = \{0,\dots,255\}$, de la cual aparecen $\sigma \le 256$ símbolos distintos. La
+frecuencia del símbolo $s$ es $f_s$ y su probabilidad empírica es $p_s = f_s/n$.
+
+\paragraph{Fuente y entropía de orden cero.} Un modelo de orden cero trata los símbolos como
+independientes e idénticamente distribuidos (i.i.d.). Su entropía empírica
+\begin{equation}
+  H_0(x) = -\sum_{s\,:\,f_s>0} p_s \log_2 p_s \qquad \text{[bits por símbolo]}
+  \label{eq:entropia}
+\end{equation}
+es el número mínimo promedio de bits por símbolo de cualquier código que asigne a cada
+símbolo una palabra fija~\cite{shannon1948}. Cumple $0 \le H_0 \le \log_2\sigma \le 8$, con
+igualdad superior para la distribución uniforme.
+
+\paragraph{Códigos prefijo y desigualdad de Kraft--McMillan.} Un código asigna a cada símbolo
+$s$ una palabra binaria de longitud $\ell_s$; es \emph{prefijo} si ninguna palabra es prefijo
+de otra, lo que permite decodificar sin separadores. Todo código unívocamente decodificable
+satisface
+\begin{equation}
+  \sum_{s} 2^{-\ell_s} \le 1,
+  \label{eq:kraft}
+\end{equation}
+y, recíprocamente, para cualquier conjunto de longitudes que cumpla \eqref{eq:kraft} existe un
+código prefijo con esas longitudes~\cite{sayood2017,salomon2010}. La longitud media del código
+es $\Lbar = \sum_s p_s \ell_s$.
+
+\paragraph{Métricas de compresión.} Si $|C(x)|$ es el tamaño en bytes de la salida comprimida,
+incluida la cabecera, se definen
+\begin{equation}
+  \bpb = \frac{8\,|C(x)|}{n}, \qquad
+  \text{razón} = \frac{n}{|C(x)|}, \qquad
+  \text{ahorro} = 1 - \frac{|C(x)|}{n}.
+  \label{eq:metricas}
+\end{equation}
+Los bits por byte (bpb) permiten comparar directamente con $H_0$: un valor $\bpb > 8$
+indica expansión.
+\end{aporte}
+
+% =====================================================================
+\subsection{Codificación de Huffman}
+\label{sec:huffman}
+\begin{aporte}{A}
+\paragraph{Idea.} Huffman~\cite{huffman1952} construye un árbol binario de abajo hacia arriba:
+parte de una hoja por símbolo, ponderada por su frecuencia, y fusiona repetidamente los dos
+árboles de menor peso. La profundidad de cada hoja es la longitud de su código. Se trata de un
+algoritmo voraz cuya elección local ---fusionar los dos símbolos menos frecuentes--- es
+óptima~\cite{cormen2022}. El \cref{alg:huffman} muestra el cálculo de longitudes tal como lo
+realiza \texttt{HuffmanCodec.codeLengths}, con un montículo binario de mínimos y desempate
+por orden de creación del nodo para que el resultado sea determinista.
+
+\begin{algorithm}[H]
+  \caption{Longitudes de código de Huffman (\texttt{codeLengths}).}
+  \label{alg:huffman}
+  \small
+  \begin{algorithmic}[1]
+    \Require frecuencias $f_0,\dots,f_{255}$
+    \Ensure longitudes $\ell_0,\dots,\ell_{255}$ ($\ell_s = 0$ si $f_s = 0$)
+    \State $Q \gets$ montículo de mínimos con una hoja por cada $s$ con $f_s > 0$, clave $w(s)=f_s$
+    \If{$|Q| = 1$} \State \Return $\ell_s = 1$ para el único símbolo presente \EndIf
+    \While{$|Q| > 1$}
+      \State $a \gets \textsc{ExtraerMín}(Q)$;\; $b \gets \textsc{ExtraerMín}(Q)$
+      \State crear nodo $z$ con $w(z) = w(a) + w(b)$;\; $\mathit{padre}(a) \gets z$;\; $\mathit{padre}(b) \gets z$
+      \State $\textsc{Insertar}(Q, z)$
+    \EndWhile
+    \ForAll{nodo $v$ en orden decreciente de creación}
+      \State $\mathit{prof}(v) \gets \mathit{prof}(\mathit{padre}(v)) + 1$ \Comment{la raíz tiene profundidad 0}
+    \EndFor
+    \State \Return $\ell_s = \mathit{prof}(s)$ para cada hoja $s$
+  \end{algorithmic}
+\end{algorithm}
+
+\paragraph{Optimalidad y cota de entropía.} Entre todos los códigos prefijo para una
+distribución dada, el de Huffman minimiza $\Lbar$~\cite{huffman1952,cormen2022}. Como su árbol
+es completo (todo nodo interno tiene dos hijos), para $\sigma \ge 2$ la desigualdad
+\eqref{eq:kraft} se cumple con igualdad. Además,
+\begin{equation}
+  H_0 \;\le\; \Lbar \;<\; H_0 + 1,
+  \label{eq:cota-huffman}
+\end{equation}
+la cota inferior por el teorema de Shannon~\cite{shannon1948} y la superior porque el código
+con longitudes $\lceil -\log_2 p_s\rceil$ satisface \eqref{eq:kraft} y Huffman no puede ser
+peor~\cite{sayood2017}. Gallager~\cite{gallager1978} refinó la cota superior en función de la
+probabilidad del símbolo más frecuente.
+
+\paragraph{Códigos canónicos.} Las longitudes bastan para reconstruir el código si las palabras
+se asignan de forma \emph{canónica}: en orden creciente de longitud y, dentro de cada longitud,
+en orden creciente de símbolo, como especifica DEFLATE~\cite{rfc1951}. Con $c_\ell$ el número
+de códigos de longitud $\ell$, el primer código de longitud $\ell$ es
+\begin{equation}
+  \mathit{first}_1 = 0, \qquad \mathit{first}_\ell = \left(\mathit{first}_{\ell-1} + c_{\ell-1}\right) \cdot 2,
+  \label{eq:canonico}
+\end{equation}
+y los símbolos de esa longitud reciben códigos consecutivos a partir de él. Por eso la
+implementación guarda en la cabecera solo 256 longitudes de un byte, en lugar del árbol.
+
+\paragraph{Ejemplo: \texttt{abracadabra}.} La cadena tiene $n = 11$ y frecuencias
+$a{:}5$, $b{:}2$, $r{:}2$, $c{:}1$, $d{:}1$. El algoritmo fusiona primero $c$ y $d$ (peso 2),
+luego $b$ y $r$ (peso 4), después ambos subárboles (peso 6) y finalmente el resultado con $a$
+(peso 11). La \cref{fig:arbol-huffman} muestra el árbol y la \cref{tab:abracadabra} las
+longitudes y los códigos. El código canónico depende solo de las longitudes, por lo que puede
+diferir del que se lee en el árbol sin cambiar $\Lbar$.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      level distance=1.25cm,
+      level 1/.style={sibling distance=4.6cm},
+      level 2/.style={sibling distance=2.8cm},
+      level 3/.style={sibling distance=1.4cm},
+      interno/.style={circle, draw=memberA, fill=memberA!8, minimum size=8mm, inner sep=0pt, font=\small},
+      hoja/.style={rectangle, rounded corners=2pt, draw=memberA, fill=white, minimum width=11mm,
+                   minimum height=7mm, font=\small},
+      edge from parent/.style={draw=memberA!70, -{Stealth[length=2mm]}},
+      etiqueta/.style={font=\scriptsize, fill=white, inner sep=1pt}]
+    \node[interno] {11}
+      child { node[hoja] {\texttt{a}\,:\,5} edge from parent node[etiqueta, above left] {0} }
+      child { node[interno] {6}
+        child { node[interno] {2}
+          child { node[hoja] {\texttt{c}\,:\,1} edge from parent node[etiqueta, above left] {0} }
+          child { node[hoja] {\texttt{d}\,:\,1} edge from parent node[etiqueta, above right] {1} }
+          edge from parent node[etiqueta, above left] {0} }
+        child { node[interno] {4}
+          child { node[hoja] {\texttt{b}\,:\,2} edge from parent node[etiqueta, above left] {0} }
+          child { node[hoja] {\texttt{r}\,:\,2} edge from parent node[etiqueta, above right] {1} }
+          edge from parent node[etiqueta, above right] {1} }
+        edge from parent node[etiqueta, above right] {1} };
+  \end{tikzpicture}
+  \caption{Árbol de Huffman para \texttt{abracadabra}; los nodos internos muestran el peso acumulado.}
+  \label{fig:arbol-huffman}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Longitudes y códigos para \texttt{abracadabra}.}
+  \label{tab:abracadabra}
+  \small
+  \begin{tabular}{@{}c c c c c@{}}
+    \toprule
+    Símbolo & Frecuencia & Longitud $\ell_s$ & Código del árbol & Código canónico \\
+    \midrule
+    \texttt{a} & 5 & 1 & \texttt{0}   & \texttt{0}   \\
+    \texttt{b} & 2 & 3 & \texttt{110} & \texttt{100} \\
+    \texttt{c} & 1 & 3 & \texttt{100} & \texttt{101} \\
+    \texttt{d} & 1 & 3 & \texttt{101} & \texttt{110} \\
+    \texttt{r} & 2 & 3 & \texttt{111} & \texttt{111} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Con $c_1 = 1$, $c_2 = 0$ y $c_3 = 4$, la \cref{eq:canonico} da $\mathit{first}_1 = 0$,
+$\mathit{first}_2 = (0 + 1)\cdot 2 = 2$ y $\mathit{first}_3 = (2 + 0)\cdot 2 = 4 = \texttt{100}_2$, de modo que $b, c, d, r$
+reciben \texttt{100}, \texttt{101}, \texttt{110} y \texttt{111}. La cadena se codifica como
+\texttt{0\,100\,111\,0\,101\,0\,110\,0\,100\,111\,0}, es decir, 23 bits frente a 88 bits sin
+comprimir. Así, $\Lbar = 23/11 \approx 2.091$ y $H_0 \approx 2.040$, lo que verifica
+\eqref{eq:cota-huffman}; además $2^{-1} + 4\cdot 2^{-3} = 1$, la igualdad de Kraft.
+
+\paragraph{Decodificación canónica.} Siguiendo a Moffat y Turpin~\cite{moffat1997}, el
+decodificador no reconstruye el árbol: lee un bit por iteración y, para cada longitud $\ell$,
+comprueba si el valor acumulado cae en el rango de los $c_\ell$ códigos de esa longitud
+(\cref{alg:huffman-dec}). Los símbolos se almacenan ordenados por código canónico, de modo que
+el índice del símbolo se obtiene por simple resta.
+
+\begin{algorithm}[H]
+  \caption{Decodificación canónica de un símbolo (\texttt{decodeSymbol}).}
+  \label{alg:huffman-dec}
+  \small
+  \begin{algorithmic}[1]
+    \Require lector de bits; $c_\ell$ por longitud; símbolos ordenados por código canónico
+    \State $\mathit{code} \gets 0$;\; $\mathit{first} \gets 0$;\; $\mathit{index} \gets 0$
+    \For{$\ell = 1$ \textbf{hasta} $L_{\max}$}
+      \State $\mathit{code} \gets \mathit{code} \mathbin{|} \textsc{LeerBit}()$
+      \If{$\mathit{code} - \mathit{first} < c_\ell$}
+        \State \Return $\textit{símbolos}[\mathit{index} + \mathit{code} - \mathit{first}]$
+      \EndIf
+      \State $\mathit{index} \gets \mathit{index} + c_\ell$;\;
+             $\mathit{first} \gets (\mathit{first} + c_\ell)\cdot 2$;\;
+             $\mathit{code} \gets \mathit{code}\cdot 2$
+    \EndFor
+    \State \textbf{error}: código inválido
+  \end{algorithmic}
+\end{algorithm}
+
+\paragraph{Análisis de complejidad.} Sea $n$ el tamaño de la entrada y $\sigma \le 256$ el
+número de símbolos presentes.
+\begin{itemize}
+  \item \emph{Conteo de frecuencias:} una pasada con un incremento por byte, $\Theta(n)$.
+  \item \emph{Construcción del código:} $\sigma$ inserciones iniciales y $\sigma - 1$
+        iteraciones con dos extracciones y una inserción en el montículo, cada una
+        $O(\log\sigma)$; en total $O(\sigma\log\sigma)$. La asignación de profundidades y de
+        códigos canónicos cuesta $O(\sigma + L_{\max})$.
+  \item \emph{Codificación:} segunda pasada sobre la entrada; cada símbolo escribe $\ell_s$
+        bits con \texttt{BitWriter} en tiempo $O(1 + \ell_s/8)$, de modo que el total es
+        $\Theta(n)$. El costo global de codificar es $\Theta(n + \sigma\log\sigma)$, es decir,
+        $\Theta(n)$ para un alfabeto fijo.
+  \item \emph{Decodificación:} el \cref{alg:huffman-dec} realiza $\ell_s$ iteraciones por
+        símbolo, por lo que el total es $\sum_i \ell_{x_i} = n\Lbar$ iteraciones, es decir,
+        $\Theta(n\Lbar)$. Por \eqref{eq:cota-huffman}, $\Lbar < H_0 + 1 \le \log_2 256 + 1 = 9$,
+        así que el costo es lineal en $n$, pero con una constante proporcional a la longitud
+        media del código y, por tanto, a la entropía de la fuente.
+  \item \emph{Espacio adicional:} $O(\sigma)$ para el montículo, los pesos, los padres y las
+        tablas canónicas, sin contar los arreglos de entrada y salida. La cabecera ocupa
+        $2 + 4 + 256 = 262$ bytes, un sobrecosto de $8\cdot 262/n$ bpb que solo es apreciable
+        en entradas pequeñas.
+\end{itemize}
+\end{aporte}
+
+% =====================================================================
+\subsection{Algoritmo Lempel--Ziv--Welch (LZW)}
+\label{sec:lzw}
+\begin{aporte}{B}
+\paragraph{Idea.} LZW~\cite{welch1984} es una variante de LZ78~\cite{ziv1978} que inicializa el
+diccionario con los 256 bytes posibles. El codificador extiende la frase actual $w$ mientras
+$w\,c$ siga en el diccionario; cuando no lo está, emite el código de $w$, agrega $w\,c$ como
+nueva entrada y reinicia la frase con $c$. El decodificador reconstruye el mismo diccionario
+a partir de los códigos, sin que este se transmita. En esta implementación el código 256 se
+reserva para \texttt{CLEAR}, de modo que las frases nuevas comienzan en 257.
+
+\paragraph{Códigos de ancho variable y reinicio.} Los códigos se escriben con el menor ancho
+capaz de representar todos los códigos posibles en ese momento,
+$\mathit{ancho}(s) = \max\left(9, \lceil\log_2 s\rceil\right)$, donde $s$ es el siguiente
+código libre; el ancho crece de 9 hasta $b$ bits, con $b \in [9, 16]$ configurable
+(\texttt{maxBits}, 16 por defecto). Cuando el diccionario alcanza $2^b$ entradas, el
+codificador emite \texttt{CLEAR} y ambos lados vuelven al diccionario inicial. Esta política
+de reinicio mantiene el modelo adaptativo ante cambios en los datos y acota la memoria, a costa
+de olvidar frases útiles~\cite{cheng2021}. Los \cref{alg:lzw-enc,alg:lzw-dec} resumen
+\texttt{LzwCodec.compress} y \texttt{LzwCodec.decode}.
+
+\begin{algorithm}[H]
+  \caption{Codificación LZW con reinicio (\texttt{compress}).}
+  \label{alg:lzw-enc}
+  \small
+  \begin{algorithmic}[1]
+    \Require bytes $x_1\cdots x_n$ ($n \ge 1$), ancho máximo $b$
+    \State $D \gets$ diccionario con los 256 bytes;\; $s \gets 257$;\; $w \gets x_1$
+    \For{$i = 2$ \textbf{hasta} $n$}
+      \State $c \gets x_i$
+      \If{$(w, c) \in D$}
+        \State $w \gets D[w, c]$ \Comment{extender la frase}
+      \Else
+        \State emitir $w$ con $\mathit{ancho}(s)$ bits
+        \If{$s < 2^b$}
+          \State $D[w, c] \gets s$;\; $s \gets s + 1$
+        \Else
+          \State emitir \texttt{CLEAR} con $\mathit{ancho}(s)$ bits;\; vaciar $D$;\; $s \gets 257$
+        \EndIf
+        \State $w \gets c$
+      \EndIf
+    \EndFor
+    \State emitir $w$ con $\mathit{ancho}(s)$ bits
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Decodificación LZW (\texttt{decode}).}
+  \label{alg:lzw-dec}
+  \small
+  \begin{algorithmic}[1]
+    \Require flujo de códigos, longitud original $n$, ancho máximo $b$
+    \State $s \gets 257$;\; $\mathit{prev} \gets \bot$
+    \While{se hayan producido menos de $n$ bytes}
+      \State leer $k$ con $\mathit{ancho}(s)$ bits si $\mathit{prev} = \bot$, o con
+             $\mathit{ancho}(\min(s + 1, 2^b))$ en otro caso
+      \If{$k = \texttt{CLEAR}$} \State $s \gets 257$;\; $\mathit{prev} \gets \bot$;\; \textbf{continuar} \EndIf
+      \If{$\mathit{prev} = \bot$} \State producir el byte $k$;\; $\mathit{prev} \gets k$;\; \textbf{continuar} \EndIf
+      \If{$s < 2^b$}
+        \State $h \gets \mathit{primero}(k)$ si $k < s$; si no, $h \gets \mathit{primero}(\mathit{prev})$ \Comment{caso $KwKwK$}
+        \State $D[s] \gets (\mathit{prev}, h)$;\; $s \gets s + 1$
+      \EndIf
+      \State producir la frase $D[k]$ recorriendo prefijos de atrás hacia adelante;\; $\mathit{prev} \gets k$
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+
+El decodificador agrega cada entrada un código más tarde que el codificador, porque necesita
+el primer byte de la frase siguiente; por eso lee con el ancho correspondiente a $s + 1$.
+
+\paragraph{Ejemplo: \texttt{TOBEORNOTTOBEORTOBEORNOT}.} La \cref{tab:lzw-welch} reproduce el
+ejemplo clásico de Welch con la numeración de esta implementación. Las 24 letras se codifican
+con 16 códigos, la secuencia
+\texttt{T O B E O R N O T 257 259 261 266 260 262 264}, que es exactamente la que verifica la
+prueba \texttt{emitsTextbookCodeSequence}. Como el diccionario nunca supera 512 entradas, todos
+los códigos usan 9 bits: $16 \cdot 9 = 144$ bits frente a $24 \cdot 8 = 192$ bits de entrada.
+
+\begin{table}[H]
+  \centering
+  \caption{Codificación LZW de \texttt{TOBEORNOTTOBEORTOBEORNOT} (solo los pasos que emiten).}
+  \label{tab:lzw-welch}
+  \small
+  \begin{tabular}{@{}r l c r l@{}}
+    \toprule
+    Paso & Frase $w$ & Siguiente $c$ & Código emitido & Nueva entrada \\
+    \midrule
+     1 & \texttt{T}   & \texttt{O} & 84 (\texttt{T}) & 257 = \texttt{TO} \\
+     2 & \texttt{O}   & \texttt{B} & 79 (\texttt{O}) & 258 = \texttt{OB} \\
+     3 & \texttt{B}   & \texttt{E} & 66 (\texttt{B}) & 259 = \texttt{BE} \\
+     4 & \texttt{E}   & \texttt{O} & 69 (\texttt{E}) & 260 = \texttt{EO} \\
+     5 & \texttt{O}   & \texttt{R} & 79 (\texttt{O}) & 261 = \texttt{OR} \\
+     6 & \texttt{R}   & \texttt{N} & 82 (\texttt{R}) & 262 = \texttt{RN} \\
+     7 & \texttt{N}   & \texttt{O} & 78 (\texttt{N}) & 263 = \texttt{NO} \\
+     8 & \texttt{O}   & \texttt{T} & 79 (\texttt{O}) & 264 = \texttt{OT} \\
+     9 & \texttt{T}   & \texttt{T} & 84 (\texttt{T}) & 265 = \texttt{TT} \\
+    10 & \texttt{TO}  & \texttt{B} & 257 & 266 = \texttt{TOB} \\
+    11 & \texttt{BE}  & \texttt{O} & 259 & 267 = \texttt{BEO} \\
+    12 & \texttt{OR}  & \texttt{T} & 261 & 268 = \texttt{ORT} \\
+    13 & \texttt{TOB} & \texttt{E} & 266 & 269 = \texttt{TOBE} \\
+    14 & \texttt{EO}  & \texttt{R} & 260 & 270 = \texttt{EOR} \\
+    15 & \texttt{RN}  & \texttt{O} & 262 & 271 = \texttt{RNO} \\
+    16 & \texttt{OT}  & (fin)      & 264 & --- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{El caso especial $KwKwK$.} Si la entrada contiene $K\,w\,K\,w\,K$, con $K$ un byte y
+$w$ una cadena, el codificador puede emitir un código que acaba de crear y que el decodificador
+aún no conoce. Con la entrada \texttt{aaa}, por ejemplo, el codificador emite 97
+(\texttt{a}), agrega $257 = \texttt{aa}$ y luego emite 257. Al recibir 257, el decodificador
+tiene $s = 257$: el código es igual al siguiente libre. La única frase consistente es la
+anterior seguida de su propio primer byte, $\texttt{a} + \texttt{a} = \texttt{aa}$, que es lo
+que hace la rama $k = s$ del \cref{alg:lzw-dec}; la prueba \texttt{handlesCodeNotYetInDictionary}
+cubre este caso.
+
+\paragraph{Análisis de complejidad.} Sea $D = 2^b$ el tamaño máximo del diccionario.
+\begin{itemize}
+  \item \emph{Codificación:} el diccionario se implementa como una tabla hash de
+        direccionamiento abierto con sondeo lineal y hashing de Fibonacci (multiplicación por
+        \texttt{0x9E3779B1}), indexada por la clave $(w, c)$. Su capacidad es $2D$, de modo que
+        el factor de carga nunca supera $\alpha = 0.5$. Cada byte de entrada provoca una
+        búsqueda; bajo la hipótesis de hashing uniforme, una búsqueda fallida requiere a lo
+        sumo $1/(1-\alpha) = 2$ sondeos esperados~\cite{cormen2022}. Cada código emitido cuesta
+        $O(1)$ adicional. Un reinicio limpia la tabla en $O(D)$, pero ocurre como mucho una vez
+        cada $D - 257$ códigos, y cada código consume al menos un byte, de modo que su costo
+        amortizado es $O(1)$ por byte. En total, $\Theta(n)$ esperado.
+  \item \emph{Decodificación:} cada código se resuelve con accesos a arreglos
+        (\texttt{prefix}, \texttt{suffix}, \texttt{firstByte}, \texttt{phraseLength}) y cada
+        byte de salida se escribe exactamente una vez al recorrer la frase hacia atrás; el
+        costo es $\Theta(n)$ en el peor caso, sin dependencia de una función hash.
+  \item \emph{Espacio adicional:} $O(D)$, independiente de $n$. Para $b = 16$, el codificador
+        usa dos arreglos de $2^{17}$ enteros y el decodificador cuatro arreglos de $2^{16}$
+        entradas. La cabecera ocupa solo 7 bytes (magia, $b$ y longitud original).
+\end{itemize}
+\end{aporte}
+
+% =====================================================================
+\subsection{Comparación teórica}
+\label{sec:comparacion-teorica}
+\begin{aporte}{C}
+La \cref{tab:comparacion-teorica} resume las diferencias estructurales entre ambos
+algoritmos tal como se implementaron. La diferencia esencial no es asintótica ---ambos son
+lineales--- sino de \emph{modelo}: Huffman es estático y de dos pasadas, y explota solo la
+distribución de frecuencias de los bytes; LZW es adaptativo y de una pasada, y explota
+frases repetidas, pero paga al menos 9 bits por código emitido.
+
+\begin{table}[H]
+  \centering
+  \caption{Comparación teórica de las implementaciones.}
+  \label{tab:comparacion-teorica}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}>{\raggedright}p{3.6cm} >{\raggedright}p{5.6cm} >{\raggedright\arraybackslash}p{5.6cm}@{}}
+    \toprule
+    Aspecto & Huffman canónico & LZW (9--$b$ bits, \texttt{CLEAR}) \\
+    \midrule
+    Tiempo de codificación & $\Theta(n + \sigma\log\sigma) = \Theta(n)$ & $\Theta(n)$ esperado (tabla hash) \\
+    Tiempo de decodificación & $\Theta(n\Lbar)$, con $\Lbar < H_0 + 1 \le 9$ & $\Theta(n)$ en el peor caso \\
+    Espacio adicional & $O(\sigma)$ & $O(2^b)$, independiente de $n$ \\
+    Modelo & Estático, dos pasadas; requiere transmitir el código & Adaptativo, una pasada; el diccionario no se transmite \\
+    Redundancia explotada & Frecuencias de símbolos (orden cero) & Frases repetidas \\
+    Garantía de tasa & $H_0 \le \Lbar < H_0 + 1$ & Asintótica para fuentes estacionarias~\cite{ziv1978}; sin cota para $n$ finito \\
+    Cabecera & 262 bytes & 7 bytes \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{aporte}
+
+\subsection{Hipótesis}
+\label{sec:hipotesis}
+\begin{aporte}{C}
+Del análisis anterior se derivan cuatro hipótesis que guían los experimentos de la
+\cref{sec:metodologia}:
+\begin{enumerate}[label=\textbf{H\arabic*.}, leftmargin=*]
+  \item \label{hip:h1} Los codificadores y decodificadores de ambos algoritmos escalan
+        linealmente con el tamaño de la entrada: la pendiente del ajuste log--log del tiempo
+        frente a $n$ es cercana a 1.
+  \item \label{hip:h2} Los bits por byte de Huffman se ubican en $[H_0, H_0 + 1)$ y, en fuentes
+        i.i.d., quedan cerca de $H_0$.
+  \item \label{hip:h3} LZW supera a Huffman en datos con frases repetidas (texto natural y
+        sintético), pierde frente a él en datos i.i.d. y expande los datos aleatorios
+        uniformes ($\bpb > 8$).
+  \item \label{hip:h4} El tiempo de decodificación de Huffman crece con la longitud media del
+        código (aproximadamente, con la entropía), mientras que el de LZW es prácticamente
+        insensible a ella.
+\end{enumerate}
+\end{aporte}

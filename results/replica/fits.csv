@@ -1,0 +1,17 @@
+source,algorithm,operation,slope,r2,nspb_at_max
+uniform,huffman,encode,0.9836,0.9987,3.441
+uniform,huffman,decode,1.0087,0.9999,6.953
+uniform,lzw,encode,1.0236,0.9985,12.649
+uniform,lzw,decode,1.0054,0.9977,5.047
+skewed,huffman,encode,1.0103,0.9998,4.566
+skewed,huffman,decode,1.0128,1.0000,11.108
+skewed,lzw,encode,1.0242,0.9998,9.944
+skewed,lzw,decode,0.9715,0.9992,3.172
+synthtext,huffman,encode,1.0046,1.0000,4.029
+synthtext,huffman,decode,1.0055,1.0000,7.749
+synthtext,lzw,encode,1.0068,0.9999,9.898
+synthtext,lzw,decode,0.9310,0.9979,2.449
+dickens,huffman,encode,0.9965,0.9999,4.306
+dickens,huffman,decode,0.9952,0.9999,9.597
+dickens,lzw,encode,1.0059,0.9999,10.731
+dickens,lzw,decode,0.9349,0.9982,3.008

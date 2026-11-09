@@ -1,0 +1,108 @@
+% ---------------------------------------------------------------------
+%  7. Conclusiones — Integrante D
+% ---------------------------------------------------------------------
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+\subsection{Comparación entre el análisis teórico y los resultados experimentales}
+\label{sec:concl-teoria-experimento}
+\begin{aporte}{D}
+La \cref{tab:teoria-experimento} reúne, para cada aspecto analizado, la predicción derivada en
+la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
+
+\begin{table}[H]
+  \centering
+  \caption{Predicción teórica frente a evidencia experimental.}
+  \label{tab:teoria-experimento}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}>{\raggedright}p{3.0cm} >{\raggedright}p{5.2cm} >{\raggedright\arraybackslash}p{6.4cm}@{}}
+    \toprule
+    Aspecto & Predicción teórica & Evidencia experimental \\
+    \midrule
+    Tiempo de Huffman & $\Theta(n)$ al codificar; $\Theta(n\Lbar)$ al decodificar (H1) &
+      Pendiente en \texttt{dickens}: \resSlopeDickensHuffEnc{} (cod.), \resSlopeDickensHuffDec{}
+      (decod.); $R^2$: \resRtwoDickensHuffEnc{}, \resRtwoDickensHuffDec{}; resto en la
+      \cref{tab:pendientes} \\
+    Tiempo de LZW & $\Theta(n)$ esperado al codificar; $\Theta(n)$ al decodificar (H1) &
+      Pendiente en \texttt{dickens}: \resSlopeDickensLzwEnc{} (cod.), \resSlopeDickensLzwDec{}
+      (decod.); $R^2$: \resRtwoDickensLzwEnc{}, \resRtwoDickensLzwDec{} \\
+    Costo por byte & Constante en $n$ & En el mayor prefijo de \texttt{dickens}: Huffman
+      \resNspbDickensHuffEnc{} / \resNspbDickensHuffDec{} ns/byte; LZW
+      \resNspbDickensLzwEnc{} / \resNspbDickensLzwDec{} ns/byte (cod. / decod.) \\
+    Tasa de Huffman & $[H_0, H_0 + 1)$; cerca de $H_0$ en fuentes i.i.d. (H2) &
+      E2: \resEntropyHuffBpbKTwo{} bpb con $k = 2$ y \resEntropyHuffBpbKTwoFiftySix{} bpb con
+      $k = 256$ \\
+    Tasa de LZW según el dato & Mejor con frases repetidas; peor en i.i.d.; expansión en
+      bytes uniformes (H3) &
+      E2: \resEntropyLzwBpbKTwo{} bpb con $k = 2$ y \resEntropyLzwBpbKTwoFiftySix{} bpb con
+      $k = 256$; E3: gana en \resLzwWins{} de \resCorpusFiles{} archivos \\
+    Corpus completo & Sin predicción universal &
+      Agregado: Huffman \resCorpusHuffBpb{}, LZW \resCorpusLzwBpb{}, DEFLATE
+      \resCorpusDeflateBpb{} bpb \\
+    Decodificación y entropía & Huffman crece con $\Lbar$; LZW casi insensible (H4) &
+      E2, decodificación: Huffman \resEntropyHuffDecMsKTwo{} a
+      \resEntropyHuffDecMsKTwoFiftySix{} ms; LZW \resEntropyLzwDecMsKTwo{} a
+      \resEntropyLzwDecMsKTwoFiftySix{} ms ($k = 2$ a $256$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% TODO-RESULTS: redactar el párrafo de contraste teoría-experimento: qué predicciones se confirmaron, cuáles se cumplieron parcialmente y por qué (costos fijos, caché, implementación bit a bit).
+\todoresults{Redactar el contraste entre teoría y experimento a partir de la
+\cref{tab:teoria-experimento}: predicciones confirmadas, cumplidas parcialmente y sus causas.}
+\end{aporte}
+
+\subsection{Respuestas a las preguntas de investigación}
+\label{sec:concl-rq}
+\begin{aporte}{D}
+\begin{enumerate}[label=\textbf{RQ\arabic*.}, leftmargin=*]
+  \item % TODO-RESULTS: conclusión sobre el escalamiento temporal de ambos algoritmos.
+        \todoresults{Conclusión sobre el escalamiento temporal de ambos algoritmos frente a su
+        complejidad teórica.}
+  \item % TODO-RESULTS: conclusión sobre la relación entre tasa de compresión, entropía y tipo de dato.
+        \todoresults{Conclusión sobre la relación entre tasa de compresión, entropía de orden
+        cero y tipo de dato; recomendación de uso de cada algoritmo.}
+  \item % TODO-RESULTS: conclusión sobre el tamaño del diccionario de LZW.
+        \todoresults{Conclusión sobre el efecto del tamaño máximo del diccionario de LZW.}
+\end{enumerate}
+
+En términos generales, el análisis teórico indica que la elección entre Huffman y LZW no
+depende de su complejidad asintótica, que es lineal en ambos casos, sino de la coincidencia
+entre la redundancia que cada uno explota y la que contienen los datos, en línea con la
+observación de las revisiones del área~\cite{bell1989,jayasankar2021}.
+% TODO-RESULTS: confirmar o matizar esta conclusión general a la luz de los resultados.
+\todoresults{Confirmar o matizar la conclusión general a la luz de los resultados.}
+\end{aporte}
+
+\subsection{Limitaciones}
+\label{sec:limitaciones}
+\begin{aporte}{D}
+\begin{itemize}
+  \item Las mediciones provienen de una sola máquina y una sola JVM; los tiempos absolutos no
+        son transferibles, aunque las tendencias sí deberían serlo.
+  \item Las implementaciones priorizan la claridad: la decodificación de Huffman lee un bit por
+        iteración en lugar de usar tablas de búsqueda, y LZW usa solo la política de reinicio.
+  \item Huffman se aplicó con un modelo de orden cero sobre bytes; no se evaluaron modelos con
+        contexto ni alfabetos distintos del byte.
+  \item DEFLATE se usó solo como referencia de tasa, mediante una implementación nativa no
+        comparable en tiempo.
+\end{itemize}
+\end{aporte}
+
+\subsection{Trabajo futuro}
+\label{sec:trabajo-futuro}
+\begin{aporte}{D}
+\begin{itemize}
+  \item Implementar Huffman adaptativo~\cite{vitter1987} para eliminar la segunda pasada y la
+        cabecera, y comparar su costo por símbolo con la versión estática.
+  \item Incorporar codificación aritmética~\cite{witten1987} para medir cuánto de la distancia
+        entre Huffman y $H_0$ se debe a la restricción de bits enteros.
+  \item Comparar con LZ77 y con una implementación propia de DEFLATE~\cite{ziv1977,rfc1951},
+        que combina diccionario y codificación estadística.
+  \item Evaluar políticas alternativas de diccionario lleno en LZW, como LRU o
+        IDA-LZW~\cite{cheng2021}, frente al reinicio usado aquí.
+  \item Acelerar la decodificación canónica con tablas de búsqueda~\cite{moffat1997} y repetir
+        E2 para cuantificar su efecto sobre H4.
+\end{itemize}
+\end{aporte}

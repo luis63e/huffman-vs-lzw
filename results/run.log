@@ -1,0 +1,383 @@
+Buildfile: /home/luis/work/trabajo/code/build.xml
+
+-pre-init:
+
+-init-private:
+
+-init-user:
+
+-init-project:
+
+-init-macrodef-property:
+
+-init-modules-supported:
+
+-do-init:
+
+-post-init:
+
+-init-check:
+
+-init-ap-cmdline-properties:
+
+-init-macrodef-modulename:
+
+-init-source-module-properties:
+
+-init-macrodef-javac-with-module:
+
+-init-macrodef-javac-with-processors:
+
+-init-macrodef-javac-without-processors:
+
+-init-macrodef-javac:
+
+-init-macrodef-test-impl:
+
+-init-macrodef-junit-init:
+
+-init-test-properties:
+
+-init-macrodef-junit-prototype-with-module:
+
+-init-macrodef-junit-prototype-without-module:
+
+-init-macrodef-junit-single:
+
+-init-macrodef-junit-batch:
+
+-init-macrodef-junit:
+
+-init-macrodef-junit-impl:
+Trying to override old definition of task http://www.netbeans.org/ns/j2se-project/3:test-impl
+
+-init-macrodef-testng:
+
+-init-macrodef-testng-impl:
+
+-init-macrodef-test:
+
+-init-macrodef-junit-debug-impl:
+
+-init-macrodef-test-debug-junit:
+
+-init-macrodef-testng-debug:
+
+-init-macrodef-testng-debug-impl:
+
+-init-macrodef-test-debug-testng:
+
+-init-macrodef-test-debug:
+
+-init-debug-args:
+
+-init-macrodef-nbjpda:
+
+-init-macrodef-debug:
+
+-init-macrodef-java-with-module:
+
+-init-macrodef-java-with-unnamed-module:
+
+-init-macrodef-java-without-module:
+
+-init-macrodef-java:
+
+-init-presetdef-jar:
+
+-init-ap-cmdline-supported:
+
+-init-ap-cmdline:
+
+init:
+
+-deps-jar-init:
+   [delete] Deleting: /home/luis/work/trabajo/code/build/built-jar.properties
+
+deps-jar:
+
+-warn-already-built-jar:
+[propertyfile] Updating property file: /home/luis/work/trabajo/code/build/built-jar.properties
+
+-check-automatic-build:
+
+-clean-after-automatic-build:
+
+-verify-automatic-build:
+
+-pre-pre-compile:
+
+-pre-compile:
+
+-copy-persistence-xml:
+
+-compile-depend:
+
+-do-compile:
+
+-post-compile:
+
+compile:
+
+-pre-jar:
+
+-check-module-main-class:
+
+-set-module-main-class:
+
+-pre-pre-jar:
+    [mkdir] Created dir: /home/luis/work/trabajo/code/dist
+
+-do-jar-create-manifest:
+
+-do-jar-copy-manifest:
+     [copy] Copying 1 file to /home/luis/work/trabajo/code/build
+
+-do-jar-set-mainclass:
+
+-do-jar-set-profile:
+
+-do-jar-set-splashscreen:
+
+-check-do-mkdist:
+
+-do-jar-jar:
+[j2seproject1:jar] Building jar: /home/luis/work/trabajo/code/dist/HuffmanVsLZW.jar
+     [echo] To run this application from the command line without Ant, try:
+     [echo] /home/luis/work/trabajo/.tools/jdk/bin/java -cp /home/luis/work/trabajo/code/dist/HuffmanVsLZW.jar pe.edu.ulima.compression.app.Main
+
+-init-macrodef-copylibs:
+
+-do-jar-copylibs:
+
+-do-jar-delete-manifest:
+
+-do-jar-without-libraries:
+
+-do-jar-with-libraries:
+
+-post-jar:
+
+-do-jar:
+
+-pre-deploy:
+
+-check-jlink:
+
+-do-deploy:
+
+-post-deploy:
+
+deploy:
+
+jar:
+
+benchmark:
+     [java] Warm-up done (4194304 bytes x 3 iterations per codec and source)
+     [java] E1 uniform n=16384 huffman enc=0.11ms dec=0.11ms bpb=8.128
+     [java] E1 uniform n=16384 lzw enc=0.53ms dec=0.29ms bpb=11.757
+     [java] E1 uniform n=32768 huffman enc=0.14ms dec=0.21ms bpb=8.064
+     [java] E1 uniform n=32768 lzw enc=0.39ms dec=0.19ms bpb=11.728
+     [java] E1 uniform n=65536 huffman enc=0.25ms dec=0.42ms bpb=8.032
+     [java] E1 uniform n=65536 lzw enc=0.78ms dec=0.36ms bpb=11.320
+     [java] E1 uniform n=131072 huffman enc=0.46ms dec=0.86ms bpb=8.016
+     [java] E1 uniform n=131072 lzw enc=1.53ms dec=0.69ms bpb=11.193
+     [java] E1 uniform n=262144 huffman enc=0.82ms dec=1.70ms bpb=8.008
+     [java] E1 uniform n=262144 lzw enc=3.11ms dec=1.32ms bpb=11.022
+     [java] E1 uniform n=524288 huffman enc=1.62ms dec=3.40ms bpb=8.004
+     [java] E1 uniform n=524288 lzw enc=6.18ms dec=2.59ms bpb=11.023
+     [java] E1 uniform n=1048576 huffman enc=3.24ms dec=6.82ms bpb=8.002
+     [java] E1 uniform n=1048576 lzw enc=12.37ms dec=5.20ms bpb=11.016
+     [java] E1 uniform n=2097152 huffman enc=6.59ms dec=13.69ms bpb=8.001
+     [java] E1 uniform n=2097152 lzw enc=26.24ms dec=10.34ms bpb=11.008
+     [java] E1 uniform n=4194304 huffman enc=13.55ms dec=27.35ms bpb=8.000
+     [java] E1 uniform n=4194304 lzw enc=52.32ms dec=21.32ms bpb=10.996
+     [java] E1 uniform n=8388608 huffman enc=27.32ms dec=55.81ms bpb=8.000
+     [java] E1 uniform n=8388608 lzw enc=154.98ms dec=58.23ms bpb=10.996
+     [java] E1 uniform n=16777216 huffman enc=90.07ms dec=153.41ms bpb=8.000
+     [java] E1 uniform n=16777216 lzw enc=219.00ms dec=85.65ms bpb=10.995
+     [java] E1 skewed n=16384 huffman enc=0.07ms dec=0.16ms bpb=4.209
+     [java] E1 skewed n=16384 lzw enc=0.22ms dec=0.13ms bpb=5.036
+     [java] E1 skewed n=32768 huffman enc=0.14ms dec=0.33ms bpb=4.160
+     [java] E1 skewed n=32768 lzw enc=0.32ms dec=0.16ms bpb=4.947
+     [java] E1 skewed n=65536 huffman enc=0.28ms dec=0.67ms bpb=4.124
+     [java] E1 skewed n=65536 lzw enc=0.58ms dec=0.26ms bpb=4.872
+     [java] E1 skewed n=131072 huffman enc=0.54ms dec=1.38ms bpb=4.109
+     [java] E1 skewed n=131072 lzw enc=1.16ms dec=0.48ms bpb=4.803
+     [java] E1 skewed n=262144 huffman enc=1.13ms dec=2.77ms bpb=4.103
+     [java] E1 skewed n=262144 lzw enc=2.39ms dec=0.91ms bpb=4.774
+     [java] E1 skewed n=524288 huffman enc=2.31ms dec=5.66ms bpb=4.099
+     [java] E1 skewed n=524288 lzw enc=5.32ms dec=1.85ms bpb=4.757
+     [java] E1 skewed n=1048576 huffman enc=4.60ms dec=11.23ms bpb=4.095
+     [java] E1 skewed n=1048576 lzw enc=10.32ms dec=3.48ms bpb=4.744
+     [java] E1 skewed n=2097152 huffman enc=10.86ms dec=27.30ms bpb=4.092
+     [java] E1 skewed n=2097152 lzw enc=36.93ms dec=10.89ms bpb=4.740
+     [java] E1 skewed n=4194304 huffman enc=28.64ms dec=64.02ms bpb=4.093
+     [java] E1 skewed n=4194304 lzw enc=74.25ms dec=22.71ms bpb=4.741
+     [java] E1 skewed n=8388608 huffman enc=42.64ms dec=102.99ms bpb=4.092
+     [java] E1 skewed n=8388608 lzw enc=89.19ms dec=28.65ms bpb=4.739
+     [java] E1 skewed n=16777216 huffman enc=75.56ms dec=187.49ms bpb=4.092
+     [java] E1 skewed n=16777216 lzw enc=176.77ms dec=56.20ms bpb=4.739
+     [java] E1 synthtext n=16384 huffman enc=0.06ms dec=0.11ms bpb=4.102
+     [java] E1 synthtext n=16384 lzw enc=0.21ms dec=0.11ms bpb=3.103
+     [java] E1 synthtext n=32768 huffman enc=0.13ms dec=0.23ms bpb=4.046
+     [java] E1 synthtext n=32768 lzw enc=0.33ms dec=0.15ms bpb=2.850
+     [java] E1 synthtext n=65536 huffman enc=0.25ms dec=0.48ms bpb=4.019
+     [java] E1 synthtext n=65536 lzw enc=0.59ms dec=0.24ms bpb=2.677
+     [java] E1 synthtext n=131072 huffman enc=0.51ms dec=1.00ms bpb=4.008
+     [java] E1 synthtext n=131072 lzw enc=1.12ms dec=0.42ms bpb=2.493
+     [java] E1 synthtext n=262144 huffman enc=1.03ms dec=2.01ms bpb=4.002
+     [java] E1 synthtext n=262144 lzw enc=2.25ms dec=0.73ms bpb=2.336
+     [java] E1 synthtext n=524288 huffman enc=2.02ms dec=4.00ms bpb=4.001
+     [java] E1 synthtext n=524288 lzw enc=4.60ms dec=1.37ms bpb=2.279
+     [java] E1 synthtext n=1048576 huffman enc=4.13ms dec=7.95ms bpb=4.000
+     [java] E1 synthtext n=1048576 lzw enc=9.22ms dec=2.64ms bpb=2.249
+     [java] E1 synthtext n=2097152 huffman enc=8.39ms dec=15.94ms bpb=3.999
+     [java] E1 synthtext n=2097152 lzw enc=21.73ms dec=5.41ms bpb=2.225
+     [java] E1 synthtext n=4194304 huffman enc=20.16ms dec=33.21ms bpb=3.998
+     [java] E1 synthtext n=4194304 lzw enc=41.04ms dec=10.90ms bpb=2.220
+     [java] E1 synthtext n=8388608 huffman enc=40.85ms dec=69.10ms bpb=3.997
+     [java] E1 synthtext n=8388608 lzw enc=96.26ms dec=22.63ms bpb=2.213
+     [java] E1 synthtext n=16777216 huffman enc=105.03ms dec=178.57ms bpb=3.997
+     [java] E1 synthtext n=16777216 lzw enc=246.99ms dec=69.20ms bpb=2.211
+     [java] E1 dickens n=16384 huffman enc=0.12ms dec=0.26ms bpb=4.984
+     [java] E1 dickens n=16384 lzw enc=1.44ms dec=0.35ms bpb=4.356
+     [java] E1 dickens n=32768 huffman enc=0.22ms dec=0.46ms bpb=4.778
+     [java] E1 dickens n=32768 lzw enc=0.68ms dec=0.35ms bpb=4.010
+     [java] E1 dickens n=65536 huffman enc=0.48ms dec=0.97ms bpb=4.682
+     [java] E1 dickens n=65536 lzw enc=1.18ms dec=0.56ms bpb=3.743
+     [java] E1 dickens n=131072 huffman enc=0.83ms dec=1.58ms bpb=4.609
+     [java] E1 dickens n=131072 lzw enc=3.22ms dec=0.70ms bpb=3.493
+     [java] E1 dickens n=262144 huffman enc=1.79ms dec=3.38ms bpb=4.567
+     [java] E1 dickens n=262144 lzw enc=5.43ms dec=1.54ms bpb=3.295
+     [java] E1 dickens n=524288 huffman enc=3.81ms dec=6.97ms bpb=4.536
+     [java] E1 dickens n=524288 lzw enc=10.38ms dec=2.82ms bpb=3.235
+     [java] E1 dickens n=1048576 huffman enc=7.56ms dec=13.55ms bpb=4.542
+     [java] E1 dickens n=1048576 lzw enc=23.51ms dec=6.08ms bpb=3.248
+     [java] E1 dickens n=2097152 huffman enc=14.73ms dec=26.82ms bpb=4.549
+     [java] E1 dickens n=2097152 lzw enc=36.72ms dec=10.67ms bpb=3.305
+     [java] E1 dickens n=4194304 huffman enc=24.83ms dec=51.02ms bpb=4.569
+     [java] E1 dickens n=4194304 lzw enc=58.95ms dec=16.41ms bpb=3.292
+     [java] E1 dickens n=8388608 huffman enc=38.01ms dec=80.42ms bpb=4.578
+     [java] E1 dickens n=8388608 lzw enc=86.76ms dec=26.63ms bpb=3.288
+     [java] E2 k=2 n=8388608 huffman enc=26.95ms dec=8.60ms bpb=1.000
+     [java] E2 k=2 n=8388608 lzw enc=60.60ms dec=13.17ms bpb=1.133
+     [java] E2 k=4 n=8388608 huffman enc=24.33ms dec=15.12ms bpb=2.000
+     [java] E2 k=4 n=8388608 lzw enc=55.63ms dec=15.34ms bpb=2.220
+     [java] E2 k=8 n=8388608 huffman enc=23.71ms dec=21.87ms bpb=3.000
+     [java] E2 k=8 n=8388608 lzw enc=58.16ms dec=18.45ms bpb=3.366
+     [java] E2 k=16 n=8388608 huffman enc=25.35ms dec=28.96ms bpb=4.000
+     [java] E2 k=16 n=8388608 lzw enc=78.62ms dec=24.02ms bpb=4.608
+     [java] E2 k=32 n=8388608 huffman enc=28.07ms dec=37.34ms bpb=5.000
+     [java] E2 k=32 n=8388608 lzw enc=80.49ms dec=27.25ms bpb=5.896
+     [java] E2 k=64 n=8388608 huffman enc=30.39ms dec=43.70ms bpb=6.000
+     [java] E2 k=64 n=8388608 lzw enc=85.42ms dec=26.27ms bpb=7.373
+     [java] E2 k=128 n=8388608 huffman enc=29.95ms dec=49.94ms bpb=7.000
+     [java] E2 k=128 n=8388608 lzw enc=85.42ms dec=32.12ms bpb=8.526
+     [java] E2 k=256 n=8388608 huffman enc=28.18ms dec=57.26ms bpb=8.000
+     [java] E2 k=256 n=8388608 lzw enc=107.11ms dec=42.08ms bpb=10.997
+     [java] E3 canterbury/E.coli n=4638690 huffman enc=13.32ms dec=8.32ms bpb=2.000
+     [java] E3 canterbury/E.coli n=4638690 lzw enc=33.01ms dec=8.64ms bpb=2.169
+     [java] E3 canterbury/E.coli n=4638690 deflate enc=573.61ms dec=8.09ms bpb=2.314
+     [java] E3 canterbury/alice29.txt n=152089 huffman enc=0.68ms dec=1.40ms bpb=4.626
+     [java] E3 canterbury/alice29.txt n=152089 lzw enc=1.45ms dec=0.54ms bpb=3.274
+     [java] E3 canterbury/alice29.txt n=152089 deflate enc=4.66ms dec=0.37ms bpb=2.862
+     [java] E3 canterbury/asyoulik.txt n=125179 huffman enc=0.55ms dec=1.22ms bpb=4.861
+     [java] E3 canterbury/asyoulik.txt n=125179 lzw enc=1.16ms dec=0.47ms bpb=3.515
+     [java] E3 canterbury/asyoulik.txt n=125179 deflate enc=4.29ms dec=0.34ms bpb=3.125
+     [java] E3 canterbury/bible.txt n=4047392 huffman enc=17.27ms dec=35.05ms bpb=4.385
+     [java] E3 canterbury/bible.txt n=4047392 lzw enc=41.25ms dec=11.61ms bpb=2.780
+     [java] E3 canterbury/bible.txt n=4047392 deflate enc=129.64ms dec=8.17ms bpb=2.356
+     [java] E3 canterbury/cp.html n=24603 huffman enc=0.11ms dec=0.21ms bpb=5.353
+     [java] E3 canterbury/cp.html n=24603 lzw enc=0.28ms dec=0.14ms bpb=3.681
+     [java] E3 canterbury/cp.html n=24603 deflate enc=0.33ms dec=0.06ms bpb=2.588
+     [java] E3 canterbury/fields.c n=11150 huffman enc=0.05ms dec=0.09ms bpb=5.229
+     [java] E3 canterbury/fields.c n=11150 lzw enc=0.16ms dec=0.09ms bpb=3.564
+     [java] E3 canterbury/fields.c n=11150 deflate enc=0.14ms dec=0.03ms bpb=2.239
+     [java] E3 canterbury/grammar.lsp n=3721 huffman enc=0.02ms dec=0.02ms bpb=5.229
+     [java] E3 canterbury/grammar.lsp n=3721 lzw enc=0.12ms dec=0.07ms bpb=3.906
+     [java] E3 canterbury/grammar.lsp n=3721 deflate enc=0.04ms dec=0.01ms bpb=2.623
+     [java] E3 canterbury/kennedy.xls n=1029744 huffman enc=3.60ms dec=3.66ms bpb=3.595
+     [java] E3 canterbury/kennedy.xls n=1029744 lzw enc=7.26ms dec=1.66ms bpb=2.402
+     [java] E3 canterbury/kennedy.xls n=1029744 deflate enc=16.61ms dec=1.16ms bpb=1.585
+     [java] E3 canterbury/lcet10.txt n=426754 huffman enc=1.82ms dec=3.86ms bpb=4.702
+     [java] E3 canterbury/lcet10.txt n=426754 lzw enc=4.17ms dec=1.37ms bpb=3.187
+     [java] E3 canterbury/lcet10.txt n=426754 deflate enc=12.71ms dec=0.98ms bpb=2.716
+     [java] E3 canterbury/plrabn12.txt n=481861 huffman enc=2.11ms dec=4.71ms bpb=4.580
+     [java] E3 canterbury/plrabn12.txt n=481861 lzw enc=4.61ms dec=1.51ms bpb=3.406
+     [java] E3 canterbury/plrabn12.txt n=481861 deflate enc=19.81ms dec=1.25ms bpb=3.242
+     [java] E3 canterbury/ptt5 n=513216 huffman enc=2.04ms dec=1.43ms bpb=1.665
+     [java] E3 canterbury/ptt5 n=513216 lzw enc=2.53ms dec=0.96ms bpb=0.970
+     [java] E3 canterbury/ptt5 n=513216 deflate enc=5.48ms dec=0.53ms bpb=0.880
+     [java] E3 canterbury/sum n=38240 huffman enc=0.21ms dec=0.34ms bpb=5.420
+     [java] E3 canterbury/sum n=38240 lzw enc=0.42ms dec=0.20ms bpb=4.206
+     [java] E3 canterbury/sum n=38240 deflate enc=0.95ms dec=0.10ms bpb=2.717
+     [java] E3 canterbury/world192.txt n=2473400 huffman enc=12.60ms dec=24.35ms bpb=5.042
+     [java] E3 canterbury/world192.txt n=2473400 lzw enc=25.74ms dec=7.70ms bpb=3.258
+     [java] E3 canterbury/world192.txt n=2473400 deflate enc=78.07ms dec=8.69ms bpb=2.345
+     [java] E3 canterbury/xargs.1 n=4227 huffman enc=0.05ms dec=0.04ms bpb=5.420
+     [java] E3 canterbury/xargs.1 n=4227 lzw enc=0.94ms dec=0.53ms bpb=4.434
+     [java] E3 canterbury/xargs.1 n=4227 deflate enc=0.10ms dec=0.02ms bpb=3.282
+     [java] E3 silesia/dickens n=10192446 huffman enc=47.22ms dec=99.46ms bpb=4.573
+     [java] E3 silesia/dickens n=10192446 lzw enc=107.48ms dec=33.61ms bpb=3.288
+     [java] E3 silesia/dickens n=10192446 deflate enc=404.93ms dec=26.52ms bpb=3.039
+     [java] E3 silesia/mozilla n=51220480 huffman enc=342.28ms dec=645.38ms bpb=6.244
+     [java] E3 silesia/mozilla n=51220480 lzw enc=812.10ms dec=263.53ms bpb=4.298
+     [java] E3 silesia/mozilla n=51220480 deflate enc=1277.90ms dec=119.34ms bpb=2.981
+     [java] E3 silesia/mr n=9970564 huffman enc=40.57ms dec=46.18ms bpb=3.709
+     [java] E3 silesia/mr n=9970564 lzw enc=88.85ms dec=25.68ms bpb=3.014
+     [java] E3 silesia/mr n=9970564 deflate enc=315.79ms dec=22.79ms bpb=2.949
+     [java] E3 silesia/nci n=33553445 huffman enc=127.31ms dec=117.74ms bpb=2.438
+     [java] E3 silesia/nci n=33553445 lzw enc=245.17ms dec=64.86ms bpb=0.937
+     [java] E3 silesia/nci n=33553445 deflate enc=264.44ms dec=26.09ms bpb=0.763
+     [java] E3 silesia/ooffice n=6152192 huffman enc=29.98ms dec=71.00ms bpb=6.664
+     [java] E3 silesia/ooffice n=6152192 lzw enc=73.77ms dec=26.00ms bpb=5.288
+     [java] E3 silesia/ooffice n=6152192 deflate enc=192.28ms dec=20.02ms bpb=4.028
+     [java] E3 silesia/osdb n=10085684 huffman enc=46.04ms dec=92.05ms bpb=6.617
+     [java] E3 silesia/osdb n=10085684 lzw enc=119.83ms dec=35.29ms bpb=4.384
+     [java] E3 silesia/osdb n=10085684 deflate enc=174.19ms dec=20.90ms bpb=2.931
+     [java] E3 silesia/reymont n=6627202 huffman enc=30.43ms dec=54.46ms bpb=4.867
+     [java] E3 silesia/reymont n=6627202 lzw enc=62.51ms dec=18.25ms bpb=2.461
+     [java] E3 silesia/reymont n=6627202 deflate enc=234.11ms dec=13.19ms bpb=2.246
+     [java] E3 silesia/samba n=21606400 huffman enc=102.02ms dec=199.12ms bpb=6.127
+     [java] E3 silesia/samba n=21606400 lzw enc=215.89ms dec=60.56ms bpb=3.063
+     [java] E3 silesia/samba n=21606400 deflate enc=333.22ms dec=36.16ms bpb=2.018
+     [java] E3 silesia/sao n=7251944 huffman enc=33.94ms dec=88.35ms bpb=7.549
+     [java] E3 silesia/sao n=7251944 lzw enc=91.07ms dec=33.69ms bpb=7.535
+     [java] E3 silesia/sao n=7251944 deflate enc=268.06ms dec=21.79ms bpb=5.882
+     [java] E3 silesia/webster n=41458703 huffman enc=200.71ms dec=384.03ms bpb=5.003
+     [java] E3 silesia/webster n=41458703 lzw enc=434.77ms dec=129.26ms bpb=2.764
+     [java] E3 silesia/webster n=41458703 deflate enc=968.76ms dec=88.02ms bpb=2.357
+     [java] E3 silesia/x-ray n=8474240 huffman enc=35.77ms dec=54.85ms bpb=6.629
+     [java] E3 silesia/x-ray n=8474240 lzw enc=83.17ms dec=27.05ms bpb=6.666
+     [java] E3 silesia/x-ray n=8474240 deflate enc=209.26ms dec=32.78ms bpb=5.707
+     [java] E3 silesia/xml n=5345280 huffman enc=21.68ms dec=41.28ms bpb=5.555
+     [java] E3 silesia/xml n=5345280 lzw enc=52.04ms dec=12.24ms bpb=1.655
+     [java] E3 silesia/xml n=5345280 deflate enc=58.64ms dec=5.39ms bpb=1.030
+     [java] E4 dickens bits=9 lzw enc=88.39ms dec=51.94ms bpb=6.056
+     [java] E4 xml bits=9 lzw enc=44.48ms dec=23.56ms bpb=5.118
+     [java] E4 ecoli bits=9 lzw enc=24.74ms dec=14.86ms bpb=3.101
+     [java] E4 dickens bits=10 lzw enc=90.94ms dec=45.90ms bpb=5.083
+     [java] E4 xml bits=10 lzw enc=47.37ms dec=22.19ms bpb=3.946
+     [java] E4 ecoli bits=10 lzw enc=23.14ms dec=11.62ms bpb=2.631
+     [java] E4 dickens bits=11 lzw enc=94.13ms dec=45.26ms bpb=4.542
+     [java] E4 xml bits=11 lzw enc=46.46ms dec=20.17ms bpb=3.203
+     [java] E4 ecoli bits=11 lzw enc=21.98ms dec=10.69ms bpb=2.435
+     [java] E4 dickens bits=12 lzw enc=93.72ms dec=38.86ms bpb=4.167
+     [java] E4 xml bits=12 lzw enc=44.80ms dec=16.30ms bpb=2.673
+     [java] E4 ecoli bits=12 lzw enc=21.92ms dec=9.62ms bpb=2.329
+     [java] E4 dickens bits=13 lzw enc=96.28ms dec=36.84ms bpb=3.882
+     [java] E4 xml bits=13 lzw enc=43.53ms dec=14.10ms bpb=2.279
+     [java] E4 ecoli bits=13 lzw enc=25.84ms dec=9.05ms bpb=2.265
+     [java] E4 dickens bits=14 lzw enc=96.95ms dec=35.07ms bpb=3.653
+     [java] E4 xml bits=14 lzw enc=45.06ms dec=13.01ms bpb=1.992
+     [java] E4 ecoli bits=14 lzw enc=30.06ms dec=8.96ms bpb=2.222
+     [java] E4 dickens bits=15 lzw enc=102.55ms dec=34.83ms bpb=3.462
+     [java] E4 xml bits=15 lzw enc=45.36ms dec=12.22ms bpb=1.797
+     [java] E4 ecoli bits=15 lzw enc=33.69ms dec=8.83ms bpb=2.191
+     [java] E4 dickens bits=16 lzw enc=106.31ms dec=32.27ms bpb=3.288
+     [java] E4 xml bits=16 lzw enc=51.59ms dec=11.94ms bpb=1.655
+     [java] E4 ecoli bits=16 lzw enc=32.85ms dec=8.52ms bpb=2.169
+
+BUILD SUCCESSFUL
+Total time: 4 minutes 26 seconds
