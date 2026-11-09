@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NetBeans "Java with Ant" project. Targets: clean, jar, test, run, benchmark. -->
+<project name="HuffmanVsLZW" default="default" basedir=".">
+    <description>Builds, tests, and runs the project HuffmanVsLZW.</description>
+    <import file="nbproject/build-impl.xml"/>
+
+    <!-- Runs the full experimental campaign (see README.md). -->
+    <target name="benchmark" depends="jar" description="Run all experiments and write CSV results">
+        <property name="bench.out" location="../results"/>
+        <property name="bench.corpus" location="../data/corpus"/>
+        <property name="bench.args" value=""/>
+        <java classname="pe.edu.ulima.compression.bench.BenchmarkRunner" fork="true" failonerror="true">
+            <classpath path="${dist.jar}"/>
+            <jvmarg line="-Xms3g -Xmx3g -XX:+UseParallelGC"/>
+            <arg value="--out"/>
+            <arg value="${bench.out}"/>
+            <arg value="--corpus"/>
+            <arg value="${bench.corpus}"/>
+            <arg line="${bench.args}"/>
+        </java>
+    </target>
+</project>
