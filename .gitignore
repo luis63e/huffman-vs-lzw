@@ -1,0 +1,7 @@
+.tools/
+code/build/
+code/dist/
+code/nbproject/private/
+data/corpus/
+report/build/
+*.class
