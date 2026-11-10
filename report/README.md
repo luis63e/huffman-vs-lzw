@@ -32,7 +32,10 @@ red "Pendiente" box and missing macros print a red `??`.
 ## Member names and colors
 
 Edit only the block marked `INTEGRANTES Y CÓDIGO DE COLORES` in `main.tex`:
-`\integranteA` … `\integranteD`, `\docente`, and the colors `memberA` … `memberD`.
+`\integranteA` … `\integranteE` (five members, names still placeholders), `\docente`, and the
+colors `memberA` … `memberE`. Ownership: A Huffman, B LZW, C methodology and benchmark harness,
+D abstract, introduction, state of the art, conclusions and bibliography, E results analysis
+(Section 5), H1 discussion and the theory-vs-experiment comparison (7.1).
 Content owned by a member is wrapped in `\begin{aporte}{A}` … `\end{aporte}`, which prints it in
 that member's color with a thin left bar. Floats inside an `aporte` must use `[H]`.
 

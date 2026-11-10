@@ -1,5 +1,5 @@
 % ---------------------------------------------------------------------
-%  Anexos — A: reproducibilidad (C); B: aportes individuales (A, B, C, D)
+%  Anexos — A: reproducibilidad (C); B: aportes individuales (A, B, C, D, E)
 % ---------------------------------------------------------------------
 \section{Reproducibilidad}
 \label{app:reproducibilidad}
@@ -112,7 +112,8 @@ $b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-
 \label{app:aporte-c}
 \begin{aporte}{C}
 \paragraph{Objetivo.} Medir ambos algoritmos de forma estadísticamente rigurosa y
-reproducible, y producir automáticamente los datos, tablas y figuras del informe.
+reproducible, y producir automáticamente los datos (CSV, tabla del corpus y macros) que
+alimentan el informe.
 
 \paragraph{Cómo funciona.} \texttt{BenchmarkRunner} ejecuta E1--E4 según el protocolo de la
 \cref{sec:protocolo}: calentamiento global, verificación de ida y vuelta, calentamiento local,
@@ -129,16 +130,15 @@ línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 \texttt{data/download-corpora.sh} descarga y verifica los corpus.
 
 \paragraph{Integración.} El arnés consume los códecs de los integrantes A y B; sus salidas en
-\texttt{results/} alimentan directamente las figuras y tablas de la \cref{sec:resultados}
-mediante \texttt{pgfplots}, \texttt{pgfplotstable} y las macros, a través de
-\texttt{report/build.sh}. Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
+\texttt{results/} son la entrada del análisis de resultados del integrante E
+(\cref{app:aporte-e}). Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
 \texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
 
 \paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/bench/} (\texttt{BenchmarkRunner},
 \texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter}),
 \ruta{code/src/pe/edu/ulima/compression/app/Main.java}, sus pruebas,
-\texttt{data/download-corpora.sh} y \texttt{report/build.sh}; en el informe,
-\cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia,sec:resultados} y la discusión de H1.
+y \texttt{data/download-corpora.sh}; en el informe,
+\cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia}.
 \end{aporte}
 
 \subsection{\texorpdfstring{\integranteD}{Integrante D}: estado del arte, redacción y bibliografía}
@@ -151,7 +151,8 @@ y experimento.
 \paragraph{Cómo funciona.} La revisión se organiza en tres niveles ---el problema, los
 algoritmos que lo resuelven y las comparaciones previas--- y concluye con la brecha que este
 trabajo atiende (\cref{sec:estado-arte}). Las conclusiones responden cada pregunta de
-investigación con la evidencia de las \cref{sec:resultados,sec:discusion}.
+investigación con la evidencia de las \cref{sec:resultados,sec:discusion} y precisan las
+limitaciones y el trabajo futuro.
 
 \paragraph{Cómo se implementó.} La bibliografía (\texttt{report/refs.bib}) reúne 28 referencias
 verificadas por DOI o URL: artículos de revista y de congreso, una tesis doctoral, una tesis de
@@ -160,9 +161,44 @@ del documento y el código de colores se definen en \texttt{report/main.tex}.
 
 \paragraph{Integración.} Las preguntas de investigación definidas en la introducción
 determinan las hipótesis H1--H4 y los experimentos E1--E4; la síntesis por pregunta
-(\cref{sec:disc-rq}) y la \cref{tab:teoria-experimento} cierran ese ciclo.
+(\cref{sec:disc-rq}) y las respuestas de las conclusiones cierran ese ciclo.
 
 \paragraph{Archivos.} \texttt{report/main.tex}, \texttt{report/refs.bib} y
 \ruta{report/sections/01-introduccion.tex}, \ruta{02-estado-del-arte.tex} y
-\texttt{07-conclusiones.tex}.
+\texttt{07-conclusiones.tex} (salvo la \cref{sec:concl-teoria-experimento}).
+\end{aporte}
+
+\subsection{\texorpdfstring{\integranteE}{Integrante E}: análisis de resultados y discusión}
+\label{app:aporte-e}
+\begin{aporte}{E}
+\paragraph{Objetivo.} Convertir las mediciones del arnés en evidencia legible ---figuras, tablas
+e interpretación de E1--E4--- y contrastarla con las hipótesis H1--H4 y con el análisis de
+complejidad.
+
+\paragraph{Cómo funciona.} El análisis consume las salidas de \texttt{BenchmarkRunner}:
+\texttt{results/e1\_*.csv} (tiempos, costo por byte y tasas de E1 por fuente),
+\texttt{fits.csv} y \texttt{replica/fits.csv} (pendientes log--log y $R^2$ de la corrida
+principal y de la réplica), \texttt{e2\_entropy.csv}, \texttt{e3\_corpus.csv},
+\texttt{e4\_lzw\_bits.csv}, \texttt{macros.tex} y \texttt{table\_corpus.tex}. A partir de ellas
+se construyen las figuras y tablas de la \cref{sec:resultados}, la discusión de H1
+(\cref{sec:disc-h1}) y la \cref{tab:teoria-experimento}.
+
+\paragraph{Cómo se implementó.} Las figuras se dibujan con \texttt{pgfplots} directamente desde
+los CSV y las tablas se leen con \texttt{pgfplotstable} o se importan de
+\texttt{table\_corpus.tex}; los valores citados en el texto usan las macros
+\texttt{\textbackslash res*} de \texttt{macros.tex} cuando existen. Cada número escrito en la
+prosa se validó contra el CSV correspondiente, y cada resultado se contrastó con la predicción
+de H1--H4. El paso de copia de \texttt{report/build.sh} trae una instantánea de
+\texttt{results/} al informe, incluidas las pendientes de la réplica como
+\texttt{fits\_replica.csv}.
+
+\paragraph{Integración.} El análisis depende de los datos y las hipótesis del integrante C
+(\cref{sec:comparacion-teorica,sec:hipotesis}), derivadas de los análisis de complejidad de los
+integrantes A y B; la
+discusión de H2--H4 y las conclusiones del integrante D se apoyan en estas figuras y tablas.
+
+\paragraph{Archivos.} \ruta{report/sections/05-resultados.tex}, \ruta{06-discusion.tex}
+(discusión de H1), \ruta{07-conclusiones.tex} (\cref{sec:concl-teoria-experimento}) y el paso de
+copia de \texttt{report/build.sh}; en el informe,
+\cref{sec:resultados,sec:disc-h1,sec:concl-teoria-experimento}.
 \end{aporte}

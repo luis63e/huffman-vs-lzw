@@ -72,12 +72,14 @@
 \newcommand{\integranteB}{Integrante B (Apellido, Nombre)}
 \newcommand{\integranteC}{Integrante C (Apellido, Nombre)}
 \newcommand{\integranteD}{Integrante D (Apellido, Nombre)}
+\newcommand{\integranteE}{Integrante E (Apellido, Nombre)}
 \newcommand{\docente}{Docente del curso (Apellido, Nombre)}
 
 \colorlet{memberA}{blue!70!black}
 \colorlet{memberB}{green!45!black}
 \colorlet{memberC}{orange!75!black}
 \colorlet{memberD}{violet!75!black}
+\colorlet{memberE}{red!60!black}
 
 % Entorno de autoría: texto en el color del integrante y barra lateral fina.
 % Uso: \begin{aporte}{A} ... \end{aporte}.  Las figuras, tablas y algoritmos
@@ -257,7 +259,8 @@
     \muestra{A} & \textcolor{memberA}{\integranteA}\\[2pt]
     \muestra{B} & \textcolor{memberB}{\integranteB}\\[2pt]
     \muestra{C} & \textcolor{memberC}{\integranteC}\\[2pt]
-    \muestra{D} & \textcolor{memberD}{\integranteD}\\
+    \muestra{D} & \textcolor{memberD}{\integranteD}\\[2pt]
+    \muestra{E} & \textcolor{memberE}{\integranteE}\\
   \end{tabular}\par\vspace{1.2cm}
   {\normalsize\bfseries Docente\par}\vspace{0.2cm}
   {\normalsize \docente\par}
@@ -363,11 +366,15 @@ implementación individual se presenta en el \cref{app:aportes}.
       (\texttt{LzwCodec}) y sus pruebas; discusión de H3. \\[3pt]
     \muestra{C} & \textcolor{memberC}{\integranteC} &
       Metodología experimental, comparación teórica e hipótesis, arnés de medición
-      (\texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}), interfaz de
-      línea de comandos, figuras y tablas de resultados; discusión de H1. \\[3pt]
+      (\texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator},
+      \texttt{DeflateCodec}), interfaz de línea de comandos y descarga de los corpus. \\[3pt]
     \muestra{D} & \textcolor{memberD}{\integranteD} &
       Resumen, introducción, definiciones preliminares, estado del arte, síntesis de las
-      preguntas de investigación, conclusiones y bibliografía. \\
+      preguntas de investigación, conclusiones (respuestas, limitaciones y trabajo futuro) y
+      bibliografía. \\[3pt]
+    \muestra{E} & \textcolor{memberE}{\integranteE} &
+      Análisis de resultados: figuras, tablas e interpretación de E1--E4; discusión de H1;
+      comparación entre el análisis teórico y los resultados experimentales. \\
     \bottomrule
   \end{tabular}
 \end{table}

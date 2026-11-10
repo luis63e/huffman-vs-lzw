@@ -1,5 +1,5 @@
 % ---------------------------------------------------------------------
-%  5. Resultados — Integrante C
+%  5. Resultados — Integrante E
 %  Todos los valores provienen de results/ (CSV y macros generados por
 %  BenchmarkRunner); build.sh copia ../results en report/results.
 % ---------------------------------------------------------------------
@@ -71,7 +71,7 @@
 
 \subsection{E1: escalamiento del tiempo con el tamaño de la entrada}
 \label{sec:res-e1}
-\begin{aporte}{C}
+\begin{aporte}{E}
 La \cref{fig:e1-tiempo} muestra la mediana del tiempo de codificación y de decodificación en
 función de $n$ para las cuatro fuentes, en escala log--log; la recta discontinua tiene
 pendiente 1 y sirve solo como guía visual de crecimiento lineal (su posición vertical es
@@ -248,7 +248,7 @@ produce 11.00~bpb, un 37.4\,\% más que la entrada sin comprimir.
 
 \subsection{E2: barrido de entropía}
 \label{sec:res-e2}
-\begin{aporte}{C}
+\begin{aporte}{E}
 En E2 la fuente es i.i.d. uniforme sobre $k$ símbolos, de modo que $H_0 = \log_2 k$ se conoce
 por construcción y no hay frases repetidas más allá de las debidas al azar. La
 \cref{fig:e2-bpb} compara los bits por byte de ambos algoritmos con la entropía empírica y con
@@ -340,7 +340,7 @@ esa configuración. La codificación de Huffman es casi insensible a la entropí
 
 \subsection{E3: corpus Canterbury y Silesia}
 \label{sec:res-e3}
-\begin{aporte}{C}
+\begin{aporte}{E}
 La \cref{tab:corpus} reporta, para cada archivo, su tamaño, su entropía de orden cero, los bits
 por byte de cada algoritmo y el rendimiento de codificación. En negrita aparece el mejor de los
 dos algoritmos comparados; DEFLATE se muestra solo como referencia.
@@ -400,7 +400,7 @@ tamaño similar, sugiere además ruido de medición a esa escala.
 
 \subsection{E4: tamaño máximo del diccionario de LZW}
 \label{sec:res-e4}
-\begin{aporte}{C}
+\begin{aporte}{E}
 La \cref{fig:e4} muestra los bits por byte y los tiempos de LZW al variar el
 ancho máximo de código $b$, es decir, el tamaño del diccionario $2^b$, en tres archivos de
 naturaleza distinta. El ancho con menor bpb fue $b = \resLzwBitsBestDickens$ en
