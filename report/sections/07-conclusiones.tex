@@ -29,7 +29,10 @@ la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
       (decod.); $R^2$: \resRtwoDickensLzwEnc{}, \resRtwoDickensLzwDec{} \\
     Costo por byte & Constante en $n$ & En el mayor prefijo de \texttt{dickens}: Huffman
       \resNspbDickensHuffEnc{} / \resNspbDickensHuffDec{} ns/byte; LZW
-      \resNspbDickensLzwEnc{} / \resNspbDickensLzwDec{} ns/byte (cod. / decod.) \\
+      \resNspbDickensLzwEnc{} / \resNspbDickensLzwDec{} ns/byte (cod. / decod.); decrece con $n$
+      en tamaños pequeños por costos fijos \\
+    Pendientes en todas las series & Cercanas a 1 (H1) &
+      Corrida principal: 0.85--1.08; réplica: 0.93--1.02 ($R^2 \ge 0.997$) \\
     Tasa de Huffman & $[H_0, H_0 + 1)$; cerca de $H_0$ en fuentes i.i.d. (H2) &
       E2: \resEntropyHuffBpbKTwo{} bpb con $k = 2$ y \resEntropyHuffBpbKTwoFiftySix{} bpb con
       $k = 256$ \\
@@ -48,45 +51,78 @@ la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
   \end{tabular}
 \end{table}
 
-% TODO-RESULTS: redactar el párrafo de contraste teoría-experimento: qué predicciones se confirmaron, cuáles se cumplieron parcialmente y por qué (costos fijos, caché, implementación bit a bit).
-\todoresults{Redactar el contraste entre teoría y experimento a partir de la
-\cref{tab:teoria-experimento}: predicciones confirmadas, cumplidas parcialmente y sus causas.}
+Las predicciones de complejidad se confirmaron: los cuatro procedimientos escalan linealmente
+con $n$, con pendientes entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en la
+réplica. Las desviaciones respecto de 1 tienen causas identificadas: los costos fijos por
+llamada ---cabecera y construcción del código en Huffman; reserva e inicialización de tablas de
+tamaño $O(2^b)$ en LZW--- reducen la pendiente cuando se amortizan en el rango medido, y los
+efectos de caché y del recolector la elevan en los mayores tamaños. También se confirmaron las
+predicciones de tasa: Huffman quedó dentro de $[H_0, H_0+1)$ en todos los casos, a solo
+0.0002~bpb de $H_0$ en E2, y LZW ganó con frases repetidas, perdió en fuentes i.i.d. y expandió
+los bytes uniformes. La predicción que se cumplió solo parcialmente es la insensibilidad de LZW a
+la entropía: su tiempo de decodificación se multiplicó por 3.2 entre $k = 2$ y $k = 256$, frente al
+factor de 6.7 de Huffman; la causa es el mayor número de códigos por byte cuando las frases
+se acortan. El análisis asintótico tampoco anticipa las constantes, que resultaron decisivas en
+la práctica: la decodificación bit a bit hace que Huffman decodifique más despacio de lo que
+codifica, y la búsqueda en la tabla hash por cada byte hace que LZW codifique más despacio de lo
+que decodifica.
 \end{aporte}
 
 \subsection{Respuestas a las preguntas de investigación}
 \label{sec:concl-rq}
 \begin{aporte}{D}
 \begin{enumerate}[label=\textbf{RQ\arabic*.}, leftmargin=*]
-  \item % TODO-RESULTS: conclusión sobre el escalamiento temporal de ambos algoritmos.
-        \todoresults{Conclusión sobre el escalamiento temporal de ambos algoritmos frente a su
-        complejidad teórica.}
-  \item % TODO-RESULTS: conclusión sobre la relación entre tasa de compresión, entropía y tipo de dato.
-        \todoresults{Conclusión sobre la relación entre tasa de compresión, entropía de orden
-        cero y tipo de dato; recomendación de uso de cada algoritmo.}
-  \item % TODO-RESULTS: conclusión sobre el tamaño del diccionario de LZW.
-        \todoresults{Conclusión sobre el efecto del tamaño máximo del diccionario de LZW.}
+  \item Sí. Ambos algoritmos escalan en $\Theta(n)$, como predice el análisis, tanto al codificar
+        como al decodificar. La longitud media del código, $\Lbar$, no altera el orden de
+        crecimiento de Huffman, pero sí su constante: con $n$ fijo, su tiempo de decodificación
+        crece linealmente con $\log_2 k$. En la práctica, Huffman es preferible cuando la
+        velocidad de codificación es prioritaria, y LZW cuando lo es la de decodificación.
+  \item Huffman depende solo de la distribución de frecuencias y queda siempre en
+        $[H_0, H_0+1)$; su límite es un bit por símbolo, visible en \texttt{ptt5}. LZW depende
+        de la repetición de frases: puede bajar mucho de $H_0$ en texto y datos estructurados
+        (\texttt{xml}: 1.66~bpb frente a $H_0 = 5.52$), pero pierde frente a Huffman en fuentes
+        sin memoria y expande los datos aleatorios. Se recomienda Huffman para datos cercanos a
+        una fuente sin memoria con distribución sesgada y LZW para texto, código fuente, registros
+        y formatos estructurados; para uso general, la combinación de ambas ideas, como en
+        DEFLATE, comprime mejor que cualquiera de los dos por separado.
+  \item Dentro del rango evaluado (9 a 16 bits), un diccionario mayor siempre mejoró la tasa y
+        aceleró la decodificación, con rendimientos decrecientes que dependen del dato: grandes
+        en \texttt{xml} y \texttt{dickens}; en \texttt{E.coli}, inferiores a 0.05~bpb por bit
+        adicional a partir de 13 bits.
+        El costo es una memoria $O(2^b)$ y una codificación ligeramente más lenta. Para los datos
+        estudiados, $b = 16$ es la mejor opción.
 \end{enumerate}
 
 En términos generales, el análisis teórico indica que la elección entre Huffman y LZW no
 depende de su complejidad asintótica, que es lineal en ambos casos, sino de la coincidencia
 entre la redundancia que cada uno explota y la que contienen los datos, en línea con la
 observación de las revisiones del área~\cite{bell1989,jayasankar2021}.
-% TODO-RESULTS: confirmar o matizar esta conclusión general a la luz de los resultados.
-\todoresults{Confirmar o matizar la conclusión general a la luz de los resultados.}
+Los resultados confirman esta conclusión y la matizan en dos aspectos. Primero, a igual orden
+de complejidad, las constantes de cada operación difieren mucho ---de 3.17 a 14.72~ns/byte en
+el mayor tamaño--- y siguen asimetrías opuestas, de modo que la elección también depende de si importa más comprimir o
+descomprimir rápido. Segundo, el tipo de redundancia decide el ganador con mucha claridad
+---LZW en \resLzwWins{} de \resCorpusFiles{} archivos, Huffman en todas las fuentes sin
+memoria---, pero la mejor tasa agregada la obtuvo DEFLATE, que combina ambos mecanismos.
 \end{aporte}
 
 \subsection{Limitaciones}
 \label{sec:limitaciones}
 \begin{aporte}{D}
 \begin{itemize}
-  \item Las mediciones provienen de una sola máquina y una sola JVM; los tiempos absolutos no
-        son transferibles, aunque las tendencias sí deberían serlo.
+  \item Las mediciones provienen de una sola máquina (\resCpu) y una sola JVM (\resJvm); los
+        tiempos absolutos no son transferibles, aunque las tendencias sí deberían serlo.
+  \item Solo E1 se ejecutó dos veces (corrida principal y réplica); para E2, E3 y E4 se dispone
+        de una sola corrida, de modo que su variabilidad entre corridas no se cuantificó más allá
+        de los intervalos de confianza de cada configuración.
+  \item Las fuentes de E1 y E2 son sintéticas; aunque se complementan con texto real y con dos
+        corpus de referencia, no cubren todos los tipos de dato de uso práctico.
   \item Las implementaciones priorizan la claridad: la decodificación de Huffman lee un bit por
         iteración en lugar de usar tablas de búsqueda, y LZW usa solo la política de reinicio.
   \item Huffman se aplicó con un modelo de orden cero sobre bytes; no se evaluaron modelos con
         contexto ni alfabetos distintos del byte.
-  \item DEFLATE se usó solo como referencia de tasa, mediante una implementación nativa no
-        comparable en tiempo.
+  \item DEFLATE se usó solo como referencia de tasa, mediante una implementación nativa (zlib)
+        optimizada durante décadas y no comparable en tiempo con implementaciones didácticas en
+        Java como las de este trabajo.
 \end{itemize}
 \end{aporte}
 

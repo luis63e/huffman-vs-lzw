@@ -6,3 +6,4 @@ data/corpus/
 report/build/
 *.class
 data/downloads/
+report/results/

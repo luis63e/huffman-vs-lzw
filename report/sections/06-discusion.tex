@@ -26,10 +26,19 @@ cuando los datos y las tablas dejan de caber en la memoria caché, el costo por 
 aumentar ligeramente sin que cambie la complejidad.
 
 \paragraph{Evidencia.} \Cref{fig:e1-tiempo,fig:e1-nspb} y \cref{tab:pendientes}.
-% TODO-RESULTS: contrastar H1 con las pendientes y R^2 medidos (tab:pendientes), indicar si se acepta, y explicar cualquier pendiente alejada de 1 con los costos fijos o efectos de caché descritos.
-\todoresults{Contrastar H1 con las pendientes y $R^2$ de la \cref{tab:pendientes}; indicar si
-se acepta y explicar cualquier pendiente alejada de 1 con los costos fijos o los efectos de
-caché descritos.}
+\paragraph{Contraste.} H1 se acepta para las cuatro operaciones. Las pendientes de la corrida
+principal van de 1.00 a 1.08 en las fuentes sintéticas ($R^2 \ge 0.987$) y de 0.85 a 0.95 en
+\texttt{dickens}; la réplica, con el mismo protocolo, las sitúa entre 0.93 y 1.02 con
+$R^2 \ge 0.997$ en todas las series. Ningún valor se aproxima a 2, y el ajuste lineal en escala
+log--log explica casi toda la varianza. Las pendientes menores que 1 de \texttt{dickens} son la
+huella de los costos fijos descritos arriba: el costo por byte cae con $n$ (en la codificación
+LZW, de 87.85~ns/byte con 16~KiB a 10.34~ns/byte con 8~MiB), de modo que el tiempo crece algo
+más despacio que $n$ en el rango medido. Las pendientes algo mayores que 1 de la corrida
+principal en las fuentes sintéticas coinciden con el aumento del costo por byte en los dos
+mayores tamaños, compatible con efectos de caché y de recolección de memoria, y no se repiten
+con la misma magnitud en la réplica. La diferencia entre corridas, de hasta 0.13 en una misma
+serie, es la variabilidad medida del experimento y es mucho menor que la distancia entre un
+crecimiento lineal y uno cuadrático.
 \end{aporte}
 
 \subsection{H2: Huffman frente a la entropía}
@@ -50,10 +59,19 @@ potencias de $1/2$ y cabe esperar una distancia positiva, aunque menor que un bi
 $H_0$. Sobre texto, Huffman no puede bajar de $H_0$ porque no modela el contexto.
 
 \paragraph{Evidencia.} \Cref{fig:e2-bpb,fig:e1-bpb} y la columna $H_0$ de la \cref{tab:corpus}.
-% TODO-RESULTS: verificar que todos los bpb de Huffman (E1, E2, E3) estén en [H0, H0+1) salvo el efecto de cabecera en n pequeño; cuantificar la distancia a H0 en E2 y en skewed.
-\todoresults{Verificar que los bits por byte de Huffman en E1, E2 y E3 queden en
-$[H_0, H_0+1)$, salvo el efecto de la cabecera en $n$ pequeño, y cuantificar la distancia a
-$H_0$ en E2 y en \texttt{skewed}.}
+\paragraph{Contraste.} H2 se acepta. En E2 la tasa es $H_0 + 0.0002$~bpb para todo $k$, tal
+como predice la \cref{eq:bpb-huffman} con un árbol equilibrado. En \texttt{skewed}, cuyas
+probabilidades no son potencias de $1/2$, la distancia con 16~MiB es de 0.027~bpb (4.0923 frente
+a 4.0657), positiva y muy inferior a un bit. En los \resCorpusFiles{} archivos del corpus se
+cumple $\bpb_{\text{Huffman}} < H_0 + 1$. Las distancias mayores tienen dos causas
+identificables. La primera es la cabecera en archivos diminutos: en \texttt{grammar.lsp}
+(3721~bytes) la cabecera aporta $8 \cdot 262 / 3721 \approx 0.56$~bpb de los 0.60~bpb de
+diferencia, y en \texttt{xargs.1} (4227~bytes), 0.50 de 0.52~bpb. La segunda es
+\texttt{ptt5}, una imagen de fax en la que un único valor de byte domina el archivo: su
+entropía es de 1.21~bpb, pero Huffman obtiene 1.66~bpb, porque ningún símbolo puede recibir
+menos de un bit, por probable que sea. Esta es la limitación clásica de los códigos de longitud
+entera que motiva la codificación aritmética~\cite{witten1987}, y no contradice la cota
+$H_0 + 1$.
 \end{aporte}
 
 \subsection{H3: tipo de redundancia y ganador}
@@ -70,11 +88,25 @@ que se espera expansión ($\bpb > 8$). Huffman, por el contrario, nunca supera
 $\Lbar < H_0 + 1$ más la cabecera.
 
 \paragraph{Evidencia.} \Cref{fig:e1-bpb,fig:e2-bpb} y \cref{tab:corpus}.
-% TODO-RESULTS: contrastar H3 con E1 (synthtext, dickens frente a uniform, skewed), E2 y E3 (\resLzwWins de \resCorpusFiles); identificar archivos del corpus que contradigan la hipótesis y explicar por qué.
-\todoresults{Contrastar H3 con E1 (\texttt{synthtext} y \texttt{dickens} frente a
-\texttt{uniform} y \texttt{skewed}), con E2 y con E3 (LZW gana en \resLzwWins{} de
-\resCorpusFiles{} archivos); identificar los archivos que contradigan la hipótesis y explicar
-por qué.}
+\paragraph{Contraste.} H3 se acepta en sus tres partes. En E1, LZW gana con claridad en los
+datos con frases repetidas ---\texttt{synthtext} con 16~MiB: 2.21 frente a 4.00~bpb;
+\texttt{dickens} con 8~MiB: 3.29 frente a 4.58---, pierde en la fuente i.i.d. sesgada
+(\texttt{skewed}: 4.74 frente a 4.09) y expande los bytes uniformes (11.00~bpb, frente a
+8.0001 de Huffman). E2 confirma el patrón en fuentes sin memoria: LZW es peor que Huffman para
+todo $k$, y la brecha crece de 1.13 frente a 1.00~bpb ($k = 2$) a 11.00 frente a 8.00
+($k = 256$). En el corpus, LZW gana en \resLzwWins{} de los \resCorpusFiles{} archivos, con las
+mayores ventajas en texto estructurado y repetitivo (\texttt{xml}, \texttt{nci},
+\texttt{samba}, \texttt{reymont}). Las dos excepciones son coherentes con la hipótesis.
+\texttt{E.coli} es una secuencia de ADN de cuatro letras: su entropía de orden cero (2.00~bpb)
+ya captura casi toda la redundancia aprovechable, y las repeticiones largas que contiene son
+demasiado escasas para que un diccionario de $2^{16}$ frases compense los 16~bits de cada
+código. En \texttt{x-ray}, una radiografía, LZW apenas encuentra frases repetidas ---su tasa, 6.67~bpb,
+supera incluso $H_0 = 6.60$---, y en
+\texttt{sao} ---un catálogo binario de estrellas--- ambos algoritmos empatan prácticamente. La
+referencia DEFLATE (\resCorpusDeflateBpb{}~bpb agregados, frente a \resCorpusHuffBpb{} de
+Huffman y \resCorpusLzwBpb{} de LZW) supera a ambos porque combina las dos ideas: un modelo de
+diccionario (LZ77) cuya salida se codifica con Huffman~\cite{rfc1951}. Los dos mecanismos son,
+por lo tanto, complementarios y no excluyentes.
 \end{aporte}
 
 \subsection{H4: sensibilidad del tiempo a la entropía}
@@ -89,9 +121,20 @@ solo afecta al número de códigos, que crece cuando las frases se acortan, de m
 una dependencia mucho más débil que la de Huffman.
 
 \paragraph{Evidencia.} \Cref{fig:e2-tiempo}.
-% TODO-RESULTS: contrastar H4 con E2 (pendiente aproximada del tiempo de decodificación de Huffman frente a log2 k; comparar con LZW usando \resEntropyHuffDecMsKTwo, \resEntropyHuffDecMsKTwoFiftySix, \resEntropyLzwDecMsKTwo, \resEntropyLzwDecMsKTwoFiftySix).
-\todoresults{Contrastar H4 con la \cref{fig:e2-tiempo}: tendencia del tiempo de decodificación
-de Huffman frente a $\log_2 k$ comparada con la de LZW.}
+\paragraph{Contraste.} La parte de H4 referida a Huffman se acepta: con $n = 2^{23}$ fijo, el
+tiempo de decodificación crece de \resEntropyHuffDecMsKTwo{} a
+\resEntropyHuffDecMsKTwoFiftySix{}~ms y lo hace de forma aproximadamente lineal en
+$\log_2 k$, que en E2 coincide con $\Lbar$ (unos 6.95~ms por bit de longitud media). Es
+exactamente la dependencia $\Theta(n\Lbar)$ del análisis. El rendimiento de decodificación de
+Huffman en el corpus apunta en la misma dirección: 558~MB/s en \texttt{E.coli}
+($H_0 = 2.00$) frente a 79~MB/s en \texttt{mozilla} ($H_0 = 6.22$). Como se predijo, la
+codificación de Huffman casi no varía (entre 23.71 y 30.39~ms). La parte referida a LZW se
+cumple solo en sentido relativo: su decodificación no es insensible a la entropía, pues crece de
+\resEntropyLzwDecMsKTwo{} a \resEntropyLzwDecMsKTwoFiftySix{}~ms, pero lo hace con un factor
+de 3.2 frente al de 6.7 de Huffman y con mayor dispersión. Esa dependencia no proviene de la
+longitud de los códigos sino del número de códigos: al subir la entropía, las frases se acortan
+y hay que resolver más códigos por byte, cada uno con su costo fijo. Lo mismo explica que la
+codificación de LZW pase de 60.60 a 107.11~ms.
 \end{aporte}
 
 \subsection{Síntesis por pregunta de investigación}
@@ -100,20 +143,27 @@ de Huffman frente a $\log_2 k$ comparada con la de LZW.}
 \paragraph{RQ1 (escalamiento).} Se responde con H1 y H4: la teoría predice crecimiento lineal
 para ambos algoritmos, con una constante que en la decodificación de Huffman depende de la
 longitud media del código.
-% TODO-RESULTS: respuesta a RQ1 basada en H1 y H4.
-\todoresults{Responder RQ1 a partir de la discusión de H1 y H4.}
+Los experimentos lo confirman: las pendientes log--log están entre 0.85 y 1.08 en la corrida
+principal y entre 0.93 y 1.02 en la réplica, y la constante de la decodificación de Huffman
+crece linealmente con $\Lbar$. Las constantes, en cambio, difieren mucho entre operaciones: en
+el mayor tamaño, LZW decodifica a 3.17--5.11~ns/byte y codifica a 10.34--14.72~ns/byte, y
+Huffman codifica a 4.50--6.26~ns/byte y decodifica a 9.14--11.18~ns/byte.
 
 \paragraph{RQ2 (compresión, entropía y tipo de dato).} Se responde con H2 y H3: Huffman está
 acotado por $H_0$ y no puede aprovechar repeticiones, mientras que LZW puede bajar de $H_0$ en
 datos con frases repetidas, pero pierde ---y puede expandir--- en fuentes sin memoria.
-% TODO-RESULTS: respuesta a RQ2 basada en H2, H3 y E3.
-\todoresults{Responder RQ2 a partir de H2, H3 y del agregado del corpus.}
+Los datos lo confirman: Huffman queda en $[H_0, H_0 + 1)$ en todos los casos medidos, y LZW
+gana en \resLzwWins{} de los \resCorpusFiles{} archivos del corpus, pero pierde en todas las
+fuentes i.i.d. y expande los bytes uniformes hasta 11.00~bpb. En el agregado del corpus, LZW
+obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman, y DEFLATE, que combina
+ambas ideas, \resCorpusDeflateBpb{}.
 
 \paragraph{RQ3 (tamaño del diccionario).} Un diccionario mayor retiene más frases y reinicia con
 menos frecuencia, pero cada código cuesta más bits; la teoría no fija un óptimo universal, que
 depende de cuán repetitivos y estacionarios sean los datos~\cite{cheng2021}.
-% TODO-RESULTS: respuesta a RQ3 basada en E4 (\resLzwBitsBestDickens, \resLzwBitsBestXml, \resLzwBitsBestEcoli).
-\todoresults{Responder RQ3 a partir de E4 (mejor ancho: \texttt{dickens}
-$b = \resLzwBitsBestDickens$, \texttt{xml} $b = \resLzwBitsBestXml$, \texttt{E.coli}
-$b = \resLzwBitsBestEcoli$).}
+En E4, el mejor ancho dentro del rango evaluado fue el máximo en los tres archivos
+(\texttt{dickens} $b = \resLzwBitsBestDickens$, \texttt{xml} $b = \resLzwBitsBestXml$,
+\texttt{E.coli} $b = \resLzwBitsBestEcoli$), con rendimientos decrecientes muy marcados en
+\texttt{E.coli}. Un diccionario mayor acelera la decodificación y encarece levemente la
+codificación, a cambio de una memoria $O(2^b)$.
 \end{aporte}

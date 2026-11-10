@@ -9,7 +9,9 @@ LaTeX source of the research report (Universidad de Lima, Trabajo de Investigaci
 ```
 
 The script sources `../env.sh` (portable Tectonic), copies `../results/*.csv` and
-`../results/*.tex` into `report/results/`, and compiles `build/main.pdf`. Tectonic runs BibTeX
+`../results/*.tex` into `report/results/` (plus `../results/replica/fits.csv` as
+`results/fits_replica.csv`, the E1 replica shown next to the main fits), and compiles
+`build/main.pdf`. Tectonic runs BibTeX
 and the reruns automatically.
 
 If a result file is missing, the PDF still builds: the affected figure or table is replaced by a
@@ -34,7 +36,9 @@ Edit only the block marked `INTEGRANTES Y CÓDIGO DE COLORES` in `main.tex`:
 Content owned by a member is wrapped in `\begin{aporte}{A}` … `\end{aporte}`, which prints it in
 that member's color with a thin left bar. Floats inside an `aporte` must use `[H]`.
 
-## Pending interpretation
+## Interpretation and numbers
 
-Paragraphs that depend on the benchmark results are marked with a `% TODO-RESULTS:` comment
-followed by `\todoresults{...}` (a red boxed note). Search for `TODO-RESULTS` to find them.
+The interpretation in `05-resultados.tex`, `06-discusion.tex`, `07-conclusiones.tex` and the
+abstracts is written against the final results. Numbers come from the `\res*` macros where one
+exists; numbers typed in prose were read from the CSVs in `../results/` and must be updated by
+hand if the benchmark is rerun.

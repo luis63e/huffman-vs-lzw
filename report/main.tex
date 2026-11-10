@@ -16,7 +16,7 @@
   \usepackage[utf8]{inputenc}
   \usepackage{lmodern}
 \fi
-\usepackage[english,spanish,es-noshorthands,es-tabla,es-nodecimaldot]{babel}
+\usepackage[english,spanish,es-noshorthands,es-tabla,es-nodecimaldot,es-lcroman]{babel}
 \usepackage{microtype}
 \usepackage[margin=2.5cm,headheight=14pt]{geometry}
 
@@ -27,6 +27,7 @@
 \sisetup{group-separator={\,}, group-minimum-digits=4}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{enumitem}
 
@@ -58,6 +59,11 @@
 \usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=green!40!black,
             urlcolor=blue!60!black,bookmarksnumbered=true]{hyperref}
 \usepackage[spanish,nameinlink]{cleveref}
+
+% Anclas únicas por algoritmo para las líneas de algpseudocode (evita destinos duplicados).
+\makeatletter
+\def\theHALG@line{\thealgorithm.\arabic{ALG@line}}
+\makeatother
 
 % =====================================================================
 %  INTEGRANTES Y CÓDIGO DE COLORES — ÚNICO LUGAR PARA EDITAR LOS NOMBRES
@@ -131,10 +137,11 @@
 
 % Inserta #2 solo si existe results/#1; si no, deja un aviso visible.
 \newcommand{\siresultado}[2]{%
-  \IfFileExists{results/#1}{#2}{\todoresults{Falta el archivo \texttt{results/#1}; ejecutar \texttt{ant benchmark}.}}}
+  \IfFileExists{results/#1}{#2}{\resultadoausente{Falta el archivo \texttt{results/#1};
+    ejecutar \texttt{ant benchmark}.}}}
 
-% Marcador de interpretación pendiente (lo completa el equipo tras la corrida).
-\newcommand{\todoresults}[1]{%
+% Aviso de resultado ausente (solo aparece si falta un archivo de results/).
+\newcommand{\resultadoausente}[1]{%
   \par\smallskip\noindent
   \fcolorbox{red}{red!4}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
     \color{red!80!black}\small\textbf{Pendiente (resultados):} #1}}\par\smallskip}
@@ -208,6 +215,7 @@
 \Crefname{equation}{Ecuación}{Ecuaciones}
 
 \newcommand{\Lbar}{\bar{L}}
+\newcommand{\bpb}{\mathrm{bpb}}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -217,6 +225,10 @@
 \renewcommand{\headrulewidth}{0.4pt}
 
 \setlist{itemsep=2pt, topsep=4pt}
+\setlength{\emergencystretch}{3em}
+
+% Rutas de archivo en monoespaciado que pueden cortarse en / y en punto.
+\newcommand{\ruta}[1]{\nolinkurl{#1}}
 
 \hypersetup{
   pdftitle={Huffman frente a LZW: comparación teórica y experimental de algoritmos de compresión sin pérdida},
@@ -228,6 +240,8 @@
 \begin{document}
 
 % ---------------------------------------------------------------- portada
+% Numeración propia para la portada: evita un ancla page.1 duplicada en hyperref.
+\pagenumbering{Alph}
 \begin{titlepage}
   \centering
   \includegraphics[width=4.2cm]{figures/ulima-logo.jpg}\par\vspace{1.0cm}
@@ -270,8 +284,15 @@ de la entrada (ajuste log--log), barrido de entropía con alfabetos uniformes, e
 los corpus Canterbury y Silesia con DEFLATE como referencia, y efecto del tamaño máximo del
 diccionario de LZW. Los tiempos se reportan como medianas con intervalos de confianza del
 95\,\% tras el calentamiento del compilador JIT.
-% TODO-RESULTS: resumir en dos o tres oraciones los hallazgos principales (pendientes, bpb agregados del corpus, ganador por tipo de dato).
-\todoresults{Resumir los hallazgos principales: pendientes log--log obtenidas, bits por byte agregados en el corpus y tipo de dato en que gana cada algoritmo.}
+Las pendientes log--log, entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en una
+réplica independiente, confirman el crecimiento lineal de las cuatro operaciones, con
+asimetrías opuestas: Huffman decodifica más despacio de lo que codifica y LZW al revés. Huffman
+quedó siempre en $[H_0, H_0 + 1)$, mientras que LZW comprimió mejor en \resLzwWins{} de los
+\resCorpusFiles{} archivos del corpus (\resCorpusLzwBpb{} frente a \resCorpusHuffBpb{}~bits
+por byte en el agregado), pero perdió en todas las fuentes sin memoria y expandió los bytes
+uniformes hasta 11.00~bits por byte. DEFLATE, que combina ambas ideas, obtuvo
+\resCorpusDeflateBpb{}~bits por byte, lo que muestra que los dos mecanismos son
+complementarios.
 
 \medskip\noindent\textbf{Palabras clave:} compresión sin pérdida, codificación de Huffman,
 LZW, análisis de complejidad, algoritmia experimental, entropía.
@@ -293,8 +314,14 @@ time scaling with input size (log--log fit), an entropy sweep over uniform alpha
 evaluation on the Canterbury and Silesia corpora with DEFLATE as a reference, and the effect
 of the maximum LZW dictionary size. Times are reported as medians with 95\,\% confidence
 intervals after JIT warm-up.
-% TODO-RESULTS: summarize the main findings in two or three sentences (English).
-\todoresults{Summarize the main findings in English, consistent with the Spanish abstract.}
+Log--log slopes between 0.85 and 1.08 in the main run and between 0.93 and 1.02 in an
+independent replica confirm linear growth for all four operations, with opposite asymmetries:
+Huffman decodes more slowly than it encodes, and LZW does the reverse. Huffman always stayed
+within $[H_0, H_0 + 1)$, whereas LZW compressed better on \resLzwWins{} of the
+\resCorpusFiles{} corpus files (\resCorpusLzwBpb{} versus \resCorpusHuffBpb{} bits per byte
+overall), but lost on every memoryless source and expanded uniform bytes to 11.00 bits per byte.
+DEFLATE, which combines both ideas, reached \resCorpusDeflateBpb{} bits per byte, showing that
+the two mechanisms are complementary.
 
 \medskip\noindent\textbf{Keywords:} lossless compression, Huffman coding, LZW, complexity
 analysis, experimental algorithmics, entropy.

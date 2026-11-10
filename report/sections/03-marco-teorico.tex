@@ -366,7 +366,7 @@ frases repetidas, pero paga al menos 9 bits por código emitido.
   \label{tab:comparacion-teorica}
   \small
   \renewcommand{\arraystretch}{1.15}
-  \begin{tabular}{@{}>{\raggedright}p{3.6cm} >{\raggedright}p{5.6cm} >{\raggedright\arraybackslash}p{5.6cm}@{}}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright}p{3.4cm} >{\raggedright}X >{\raggedright\arraybackslash}X@{}}
     \toprule
     Aspecto & Huffman canónico & LZW (9--$b$ bits, \texttt{CLEAR}) \\
     \midrule
@@ -378,7 +378,7 @@ frases repetidas, pero paga al menos 9 bits por código emitido.
     Garantía de tasa & $H_0 \le \Lbar < H_0 + 1$ & Asintótica para fuentes estacionarias~\cite{ziv1978}; sin cota para $n$ finito \\
     Cabecera & 262 bytes & 7 bytes \\
     \bottomrule
-  \end{tabular}
+  \end{tabularx}
 \end{table}
 \end{aporte}
 

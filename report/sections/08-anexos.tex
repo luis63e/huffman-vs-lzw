@@ -28,8 +28,12 @@ experimentos. El proyecto también se abre directamente en NetBeans (\emph{File 
 Project}, carpeta \texttt{code/}), donde \emph{Run} ejecuta una demostración de ambos
 algoritmos y \emph{Test} ejecuta la batería de pruebas. La interfaz de línea de comandos
 permite usar los algoritmos sobre archivos arbitrarios:
-\texttt{java -jar dist/HuffmanVsLZW.jar compress <huffman|lzw|lzw-N> <entrada> <salida>},
-\texttt{decompress <entrada> <salida>} y \texttt{stats <entrada>}.
+
+\begin{lstlisting}[language=bash, numbers=none]
+java -jar dist/HuffmanVsLZW.jar compress <huffman|lzw|lzw-N> <entrada> <salida>
+java -jar dist/HuffmanVsLZW.jar decompress <entrada> <salida>
+java -jar dist/HuffmanVsLZW.jar stats <entrada>
+\end{lstlisting}
 \end{aporte}
 
 \section{Aportes individuales detallados}
@@ -63,10 +67,10 @@ el arnés (\texttt{BenchmarkRunner}) y la línea de comandos (\texttt{Main}) lo 
 sus detalles. \texttt{BitWriter} y \texttt{BitReader} son compartidos con LZW. Sus pruebas
 (\texttt{HuffmanCodecTest}, 11; \texttt{BitStreamTest}, 5) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \texttt{code/src/pe/edu/ulima/compression/huffman/HuffmanCodec.java},
-\texttt{code/src/pe/edu/ulima/compression/io/BitWriter.java},
-\texttt{code/src/pe/edu/ulima/compression/io/BitReader.java} y sus pruebas en
-\texttt{code/test/pe/edu/ulima/compression/huffman/} y \texttt{.../io/}; en el informe,
+\paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/huffman/HuffmanCodec.java},
+\ruta{code/src/pe/edu/ulima/compression/io/BitWriter.java},
+\ruta{code/src/pe/edu/ulima/compression/io/BitReader.java} y sus pruebas en
+\ruta{code/test/pe/edu/ulima/compression/huffman/} y \ruta{.../io/}; en el informe,
 \cref{sec:huffman}.
 \end{aporte}
 
@@ -99,8 +103,8 @@ secuencia emitida para pruebas y enseñanza.
 $b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-N}. Sus 8 pruebas
 (\texttt{LzwCodecTest}) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \texttt{code/src/pe/edu/ulima/compression/lzw/LzwCodec.java} y
-\texttt{code/test/pe/edu/ulima/compression/lzw/LzwCodecTest.java}; en el informe,
+\paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/lzw/LzwCodec.java} y
+\ruta{code/test/pe/edu/ulima/compression/lzw/LzwCodecTest.java}; en el informe,
 \cref{sec:lzw}.
 \end{aporte}
 
@@ -130,9 +134,9 @@ mediante \texttt{pgfplots}, \texttt{pgfplotstable} y las macros, a través de
 \texttt{report/build.sh}. Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
 \texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \texttt{code/src/pe/edu/ulima/compression/bench/} (\texttt{BenchmarkRunner},
+\paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/bench/} (\texttt{BenchmarkRunner},
 \texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter}),
-\texttt{code/src/pe/edu/ulima/compression/app/Main.java}, sus pruebas,
+\ruta{code/src/pe/edu/ulima/compression/app/Main.java}, sus pruebas,
 \texttt{data/download-corpora.sh} y \texttt{report/build.sh}; en el informe,
 \cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia,sec:resultados} y la discusión de H1.
 \end{aporte}
@@ -159,6 +163,6 @@ determinan las hipótesis H1--H4 y los experimentos E1--E4; la síntesis por pre
 (\cref{sec:disc-rq}) y la \cref{tab:teoria-experimento} cierran ese ciclo.
 
 \paragraph{Archivos.} \texttt{report/main.tex}, \texttt{report/refs.bib} y
-\texttt{report/sections/01-introduccion.tex}, \texttt{02-estado-del-arte.tex} y
+\ruta{report/sections/01-introduccion.tex}, \ruta{02-estado-del-arte.tex} y
 \texttt{07-conclusiones.tex}.
 \end{aporte}

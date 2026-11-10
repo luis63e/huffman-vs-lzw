@@ -7,13 +7,14 @@
 \label{sec:resultados}
 
 % Gráfico de E1: tiempo frente a n en escala log-log.
-% #1 = archivo CSV, #2 = título, #3 = extremos de la recta de pendiente 1.
-\newcommand{\graficoEuno}[3]{%
+% #1 = archivo CSV, #2 = título, #3 = extremos de la recta de pendiente 1,
+% #4 = nombre único de la leyenda (solo se muestra la del primer gráfico).
+\newcommand{\graficoEuno}[4]{%
   \begin{tikzpicture}
     \begin{loglogaxis}[informe, height=0.78\linewidth, log basis x=2,
         xlabel={$n$ [bytes]}, ylabel={Mediana [ms]},
         title={#2}, title style={font=\small\bfseries},
-        legend to name=leyendaEuno, legend columns=5,
+        legend to name=#4, legend columns=3,
         legend style={draw=gray!50, /tikz/every even column/.append style={column sep=6pt}}]
       \addplot+[huffenc, error bars/.cd, y dir=plus, y explicit]
         table[col sep=comma, x=n, y=huff_enc_ms, y error=huff_enc_ci] {results/#1};
@@ -55,7 +56,7 @@
     \begin{semilogxaxis}[informe, height=0.78\linewidth, log basis x=2,
         xlabel={$n$ [bytes]}, ylabel={bits por byte}, ymin=0,
         title={#2}, title style={font=\small\bfseries},
-        legend to name=leyendaBpbN, legend columns=4,
+        legend to name=leyendaBpbN-#1, legend columns=4,
         legend style={draw=gray!50, /tikz/every even column/.append style={column sep=6pt}}]
       \addplot[black!70, mark=*, mark size=1.2pt] table[col sep=comma, x=n, y=#1_bpb] {results/e1_uniform.csv};
       \addlegendentry{\texttt{uniform}}
@@ -82,25 +83,25 @@ arbitraria). Las barras de error indican el semiancho superior del intervalo de 
   \centering
   \begin{subfigure}[t]{0.49\linewidth}
     \centering
-    \graficoEuno{e1_uniform.csv}{\texttt{uniform}}{(16384,0.16384) (16777216,167.77216)}
+    \graficoEuno{e1_uniform.csv}{\texttt{uniform}}{(16384,0.16384) (16777216,167.77216)}{leyendaEuno}
     \caption{Bytes uniformes i.i.d.}
     \label{fig:e1-uniform}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.49\linewidth}
     \centering
-    \graficoEuno{e1_skewed.csv}{\texttt{skewed}}{(16384,0.16384) (16777216,167.77216)}
+    \graficoEuno{e1_skewed.csv}{\texttt{skewed}}{(16384,0.16384) (16777216,167.77216)}{leyendaEuno-skewed}
     \caption{Geométrica i.i.d. ($p = 0.15$).}
     \label{fig:e1-skewed}
   \end{subfigure}\\[6pt]
   \begin{subfigure}[t]{0.49\linewidth}
     \centering
-    \graficoEuno{e1_synthtext.csv}{\texttt{synthtext}}{(16384,0.16384) (16777216,167.77216)}
+    \graficoEuno{e1_synthtext.csv}{\texttt{synthtext}}{(16384,0.16384) (16777216,167.77216)}{leyendaEuno-synthtext}
     \caption{Texto sintético (Zipf).}
     \label{fig:e1-synthtext}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.49\linewidth}
     \centering
-    \graficoEuno{e1_dickens.csv}{\texttt{dickens}}{(16384,0.16384) (8388608,83.88608)}
+    \graficoEuno{e1_dickens.csv}{\texttt{dickens}}{(16384,0.16384) (8388608,83.88608)}{leyendaEuno-dickens}
     \caption{Texto real (prefijos de \texttt{dickens}).}
     \label{fig:e1-dickens}
   \end{subfigure}\\[4pt]
@@ -109,46 +110,71 @@ arbitraria). Las barras de error indican el semiancho superior del intervalo de 
   \label{fig:e1-tiempo}
 \end{figure}}
 
-% TODO-RESULTS: describir la forma de las curvas de la figura e1-tiempo (paralelismo con la recta de pendiente 1, desviaciones en tamaños pequeños, diferencias entre fuentes y entre codificación/decodificación).
-\todoresults{Interpretar la \cref{fig:e1-tiempo}: paralelismo de las curvas con la recta de
-pendiente 1, desviaciones en los tamaños pequeños y diferencias entre fuentes y entre
-codificación y decodificación.}
+En las cuatro fuentes, las curvas de las cuatro operaciones son aproximadamente paralelas a la
+recta de pendiente 1 a partir de $n \approx 2^{16}$: duplicar la entrada duplica, en buena
+aproximación, el tiempo. En los tamaños menores la tendencia se rompe y los intervalos se
+ensanchan, porque los costos fijos de cada llamada ---construir el código y escribir la cabecera
+de Huffman, reservar e inicializar las tablas de LZW--- son comparables con el trabajo
+proporcional a $n$, y porque mediciones de décimas de milisegundo son más sensibles al ruido
+del JIT y del recolector. El caso extremo es la codificación LZW de \texttt{dickens}: 1.44~ms
+con 16~KiB frente a 0.68~ms con 32~KiB (\texttt{e1\_dickens.csv}), con un semiancho de
+intervalo de 0.91~ms. El orden entre operaciones es estable: la decodificación de LZW es la
+operación más rápida en todas las fuentes; la codificación de LZW es la más lenta en tres de
+ellas, y en \texttt{skewed} la supera ligeramente la decodificación de Huffman; y, en Huffman,
+decodificar es siempre más lento que codificar.
 
 La \cref{tab:pendientes} reporta la pendiente del ajuste log--log y su $R^2$ para cada fuente,
 algoritmo y operación, calculados con $n \ge 2^{16}$, junto con el costo por byte en el mayor
-tamaño medido.
+tamaño medido. Las dos últimas columnas corresponden a una réplica independiente de E1,
+ejecutada con el mismo protocolo en la misma máquina, que permite estimar la variabilidad entre
+corridas.
 
-\siresultado{fits.csv}{%
+\siresultado{fits.csv}{\siresultado{fits_replica.csv}{%
+\pgfplotstableread[col sep=comma]{results/fits.csv}\tablaAjustes
+\pgfplotstableread[col sep=comma]{results/fits_replica.csv}\tablaAjustesReplica
+% Ambas tablas tienen las mismas filas en el mismo orden (fuente, algoritmo, operación).
+\pgfplotstablecreatecol[copy column from table={\tablaAjustesReplica}{slope}]{slope_rep}\tablaAjustes
+\pgfplotstablecreatecol[copy column from table={\tablaAjustesReplica}{r2}]{r2_rep}\tablaAjustes
 \begin{table}[H]
   \centering
   \caption{E1: pendiente $\hat{k}$ del ajuste $\ln t = \hat{k}\ln n + c$, coeficiente $R^2$ y
-           costo por byte en el mayor $n$.}
+           costo por byte en el mayor $n$, en la corrida principal y en la réplica.}
   \label{tab:pendientes}
   \small
+  \setlength{\tabcolsep}{5pt}
   \pgfplotstabletypeset[
-    col sep=comma,
-    columns={source,algorithm,operation,slope,r2,nspb_at_max},
+    columns={source,algorithm,operation,slope,r2,nspb_at_max,slope_rep,r2_rep},
     columns/source/.style={string type, column name={Fuente},
       postproc cell content/.append style={/pgfplots/table/@cell content/.add={\ttfamily}{}}},
     columns/algorithm/.style={string type, column name={Algoritmo},
       string replace={huffman}{Huffman}, string replace={lzw}{LZW}},
     columns/operation/.style={string type, column name={Operación},
       string replace={encode}{codificación}, string replace={decode}{decodificación}},
-    columns/slope/.style={column name={Pendiente $\hat{k}$}, fixed, fixed zerofill, precision=3},
+    columns/slope/.style={column name={$\hat{k}$}, fixed, fixed zerofill, precision=3},
     columns/r2/.style={column name={$R^2$}, fixed, fixed zerofill, precision=4},
     columns/nspb_at_max/.style={column name={ns/byte en $n_{\max}$}, fixed, fixed zerofill, precision=2},
-    every head row/.style={before row=\toprule, after row=\midrule},
+    columns/slope_rep/.style={column name={$\hat{k}$}, fixed, fixed zerofill, precision=3},
+    columns/r2_rep/.style={column name={$R^2$}, fixed, fixed zerofill, precision=4},
+    every head row/.style={before row={\toprule
+        \multicolumn{3}{@{}l}{} & \multicolumn{3}{c}{Corrida principal} & \multicolumn{2}{c}{Réplica}\\
+        \cmidrule(lr){4-6}\cmidrule(l){7-8}},
+      after row=\midrule},
     every last row/.style={after row=\bottomrule},
     every row no 3/.style={after row=\midrule},
     every row no 7/.style={after row=\midrule},
     every row no 11/.style={after row=\midrule},
-  ]{results/fits.csv}
-\end{table}}
+  ]\tablaAjustes
+\end{table}}}
 
-% TODO-RESULTS: comentar el rango de pendientes y R^2 de la tabla tab:pendientes (por ejemplo, con \resSlopeDickensHuffEnc, \resSlopeDickensLzwEnc) y su cercanía a 1.
-\todoresults{Comentar el rango de pendientes y de $R^2$ de la \cref{tab:pendientes} y su
-cercanía a 1 (por ejemplo, en \texttt{dickens}: Huffman \resSlopeDickensHuffEnc{} /
-\resSlopeDickensHuffDec{}, LZW \resSlopeDickensLzwEnc{} / \resSlopeDickensLzwDec{}).}
+En la corrida principal, las pendientes de las fuentes sintéticas están entre 1.00 y 1.08, con
+$R^2 \ge 0.987$; en \texttt{dickens} son algo menores que 1: Huffman \resSlopeDickensHuffEnc{}
+(codificación) y \resSlopeDickensHuffDec{} (decodificación), LZW \resSlopeDickensLzwEnc{} y
+\resSlopeDickensLzwDec{}, con $R^2 \ge \resRtwoDickensLzwEnc$. En la réplica, las dieciséis
+pendientes quedan entre 0.93 y 1.02, con $R^2 \ge 0.997$ en todas las series; en
+\texttt{dickens}, entre 0.93 y 1.01. La mayor diferencia entre corridas para una misma serie es
+de 0.13 (codificación LZW de \texttt{dickens}: 0.879 frente a 1.006), lo que indica que la
+segunda cifra decimal de la pendiente está dentro de la variabilidad experimental. En ningún
+caso la pendiente se acerca a 2, como correspondería a un crecimiento cuadrático.
 
 La \cref{fig:e1-nspb} presenta el mismo experimento como costo por byte en escala
 semilogarítmica: bajo complejidad lineal, las curvas deben ser aproximadamente horizontales.
@@ -172,9 +198,21 @@ semilogarítmica: bajo complejidad lineal, las curvas deben ser aproximadamente 
   \label{fig:e1-nspb}
 \end{figure}}
 
-% TODO-RESULTS: interpretar la figura e1-nspb (estabilidad del costo por byte, efectos de caché o de costos fijos en tamaños pequeños, comparación del costo relativo de ambos algoritmos).
-\todoresults{Interpretar la \cref{fig:e1-nspb}: estabilidad del costo por byte, efectos de
-costos fijos o de caché y costo relativo de cada algoritmo y operación.}
+El costo por byte disminuye con $n$ en los primeros tamaños y luego se estabiliza, que es la
+firma de un costo fijo por llamada amortizado sobre más bytes. En \texttt{dickens}, la
+codificación LZW pasa de 87.85~ns/byte con 16~KiB a 10.34~ns/byte con 8~MiB, y la
+decodificación de Huffman de 15.71 a 9.59~ns/byte. En \texttt{synthtext}, la codificación de
+Huffman se mantiene entre 3.83 y 4.81~ns/byte desde $2^{16}$ hasta $2^{22}$ bytes y solo sube en
+los dos mayores tamaños (4.87 y 6.26~ns/byte), comportamiento compatible con datos y salidas que
+ya no caben en la caché del procesador. En el mayor $n$ de cada fuente
+(\cref{tab:pendientes}), los costos se ordenan así: la decodificación de LZW cuesta entre 3.17 y
+5.11~ns/byte, la codificación de Huffman entre 4.50 y 6.26, la decodificación de Huffman entre
+9.14 y 11.18, y la codificación de LZW entre 10.34 y 14.72. Las asimetrías son opuestas: en
+Huffman decodificar cuesta entre 1.7 y 2.5 veces más que codificar, porque el decodificador
+canónico procesa un bit por iteración; en LZW, codificar cuesta entre 2.6 y 3.6 veces más que
+decodificar, porque el codificador realiza una búsqueda en la tabla hash por cada byte de entrada,
+mientras que el decodificador resuelve cada código con accesos directos a arreglos y copia la
+frase completa.
 
 Finalmente, la \cref{fig:e1-bpb} muestra la tasa de compresión obtenida en E1 para cada
 fuente y tamaño.
@@ -194,15 +232,18 @@ fuente y tamaño.
     \caption{LZW.}
     \label{fig:e1-bpb-lzw}
   \end{subfigure}\\[4pt]
-  \pgfplotslegendfromname{leyendaBpbN}
+  \pgfplotslegendfromname{leyendaBpbN-huff}
   \caption{E1: bits por byte frente al tamaño de la entrada.}
   \label{fig:e1-bpb}
 \end{figure}}
 
-% TODO-RESULTS: interpretar la figura e1-bpb (efecto de la cabecera de Huffman en n pequeño, aprendizaje del diccionario de LZW, expansión de LZW en uniform).
-\todoresults{Interpretar la \cref{fig:e1-bpb}: efecto de la cabecera de 262 bytes de Huffman en
-$n$ pequeño, mejora de LZW a medida que el diccionario aprende y comportamiento en
-\texttt{uniform}.}
+En Huffman, la tasa apenas depende de $n$: solo en los tamaños pequeños se nota la cabecera de
+262 bytes, que con $n = 2^{14}$ añade $8 \cdot 262 / 16384 \approx 0.13$~bpb; así,
+\texttt{uniform} pasa de 8.13~bpb con 16~KiB a 8.0001~bpb con 16~MiB. En LZW, la tasa mejora a
+medida que el diccionario aprende frases más largas: \texttt{synthtext} baja de 3.10 a
+2.21~bpb y \texttt{dickens} de 4.36 a 3.29~bpb, mientras que \texttt{skewed} solo baja de 5.04 a
+4.74~bpb. En \texttt{uniform}, LZW expande los datos en todos los tamaños: incluso con 16~MiB
+produce 11.00~bpb, un 37.4\,\% más que la entrada sin comprimir.
 \end{aporte}
 
 \subsection{E2: barrido de entropía}
@@ -234,11 +275,14 @@ la cota superior $H_0 + 1$ de la \cref{eq:cota-huffman}.
   \label{fig:e2-bpb}
 \end{figure}}
 
-% TODO-RESULTS: interpretar e2-bpb (Huffman frente a [H0, H0+1), distancia de LZW a H0 por k; citar por ejemplo \resEntropyHuffBpbKTwo, \resEntropyLzwBpbKTwo, \resEntropyHuffBpbKTwoFiftySix, \resEntropyLzwBpbKTwoFiftySix).
-\todoresults{Interpretar la \cref{fig:e2-bpb}: posición de Huffman en $[H_0, H_0+1)$ y
-distancia de LZW a $H_0$ para cada $k$ (por ejemplo, $k = 2$: Huffman \resEntropyHuffBpbKTwo{},
-LZW \resEntropyLzwBpbKTwo{}; $k = 256$: Huffman \resEntropyHuffBpbKTwoFiftySix{}, LZW
-\resEntropyLzwBpbKTwoFiftySix{}).}
+Huffman coincide con la entropía en todo el barrido: para cada $k$ produce exactamente
+$H_0 + 0.0002$~bpb (de 1.0002 con $k = 2$ a 8.0002 con $k = 256$), y esa diferencia es la
+cabecera, $8 \cdot 262 / 2^{23} \approx 0.00025$~bpb. LZW, en cambio, queda por encima de $H_0$
+para todo $k$ y la distancia crece con el tamaño del alfabeto: \resEntropyLzwBpbKTwo{} frente a
+\resEntropyHuffBpbKTwo{}~bpb con $k = 2$, 4.61 frente a 4.00 con $k = 16$ y
+\resEntropyLzwBpbKTwoFiftySix{} frente a \resEntropyHuffBpbKTwoFiftySix{} con $k = 256$. Desde
+$k = 64$ LZW supera incluso la cota $H_0 + 1$ de Huffman (7.37~bpb frente a 7), y con
+$k \ge 128$ expande los datos (8.53 y 11.00~bpb).
 
 La \cref{fig:e2-tiempo} muestra cómo varía el tiempo con la entropía para un tamaño fijo, lo
 que permite contrastar el término $\Lbar$ del costo de decodificación de Huffman.
@@ -282,11 +326,16 @@ que permite contrastar el término $\Lbar$ del costo de decodificación de Huffm
   \label{fig:e2-tiempo}
 \end{figure}}
 
-% TODO-RESULTS: interpretar e2-tiempo (crecimiento del tiempo de decodificación de Huffman con log2 k frente a LZW; citar \resEntropyHuffDecMsKTwo, \resEntropyHuffDecMsKTwoFiftySix, \resEntropyLzwDecMsKTwo, \resEntropyLzwDecMsKTwoFiftySix).
-\todoresults{Interpretar la \cref{fig:e2-tiempo}: tendencia del tiempo de decodificación de
-Huffman con $\log_2 k$ frente a LZW (por ejemplo, Huffman \resEntropyHuffDecMsKTwo{} ms con
-$k = 2$ y \resEntropyHuffDecMsKTwoFiftySix{} ms con $k = 256$; LZW \resEntropyLzwDecMsKTwo{} y
-\resEntropyLzwDecMsKTwoFiftySix{} ms).}
+La decodificación de Huffman pasa de \resEntropyHuffDecMsKTwo{}~ms con $k = 2$ a
+\resEntropyHuffDecMsKTwoFiftySix{}~ms con $k = 256$, un factor de 6.7. Como el eje horizontal
+es logarítmico, la recta casi perfecta de la \cref{fig:e2-dec} indica un crecimiento lineal en
+$\log_2 k$: cada bit adicional de longitud de código añade entre 6.25 y 8.37~ms, unos 6.95~ms en
+promedio, es decir, alrededor de 0.83~ns por bit decodificado. La decodificación de LZW también
+crece, de \resEntropyLzwDecMsKTwo{} a \resEntropyLzwDecMsKTwoFiftySix{}~ms (factor 3.2), pero
+con menor pendiente y con más dispersión: con $k = 128$ el semiancho del intervalo es de
+24.55~ms en la decodificación y de 92.96~ms en la codificación, señal de iteraciones atípicas en
+esa configuración. La codificación de Huffman es casi insensible a la entropía (entre 23.71 y
+30.39~ms), mientras que la de LZW sube de 60.60 a 107.11~ms.
 \end{aporte}
 
 \subsection{E3: corpus Canterbury y Silesia}
@@ -308,7 +357,8 @@ dos algoritmos comparados; DEFLATE se muestra solo como referencia.
     \toprule
     Archivo & Tamaño (KiB) & $H_0$ & Huffman & LZW & DEFLATE$^\dagger$ & Huff. MB/s & LZW MB/s \\
     \midrule
-    \input{results/table_corpus.tex}
+    % Entrada primitiva: \input (robusto) dentro de tabular impide el \bottomrule siguiente.
+    \csname @@input\endcsname results/table_corpus.tex
     \bottomrule
   \end{tabular}
   \par\smallskip
@@ -324,16 +374,34 @@ En conjunto, sobre los \resCorpusFiles{} archivos, la tasa agregada es de
 \resCorpusDeflateBpb{}~bpb para DEFLATE; LZW comprime mejor que Huffman en \resLzwWins{} de
 los \resCorpusFiles{} archivos.
 
-% TODO-RESULTS: interpretar tab:corpus (en qué tipos de archivo gana cada algoritmo, relación con H0, archivos donde LZW expande o se acerca a Huffman, rendimiento relativo en MB/s, distancia a DEFLATE).
-\todoresults{Interpretar la \cref{tab:corpus}: tipos de archivo en que gana cada algoritmo,
-relación con $H_0$, casos en que LZW se acerca o supera a 8~bpb, rendimiento relativo en MB/s
-y distancia de ambos a DEFLATE.}
+Huffman queda siempre por encima de $H_0$ y por debajo de $H_0 + 1$. En los archivos de más de
+1~MB la distancia no supera 0.044~bpb (\texttt{world192.txt}); es mayor en los archivos muy
+pequeños, donde pesa la cabecera, y en \texttt{ptt5}, que se analiza en la
+\cref{sec:disc-h2}. LZW gana en \resLzwWins{} de los \resCorpusFiles{} archivos y en 23 de
+ellos baja de $H_0$; las mayores ventajas aparecen en datos estructurados con frases
+recurrentes: \texttt{xml} (1.66 frente a 5.55~bpb), \texttt{nci} (0.94 frente a 2.44),
+\texttt{samba} (3.06 frente a 6.13) y \texttt{reymont} (2.46 frente a 4.87). Huffman gana en
+\texttt{E.coli} (2.00 frente a 2.17~bpb) y en \texttt{x-ray} (6.63 frente a 6.67), y
+\texttt{sao} es prácticamente un empate (7.55 frente a 7.53). Ningún archivo del corpus lleva a
+LZW por encima de 8~bpb. DEFLATE comprime mejor que ambos en 25 archivos; la excepción es
+\texttt{E.coli}, donde su 2.31~bpb queda detrás de los dos.
+
+En rendimiento, la codificación de Huffman procesa entre 150 y 348~MB/s en los archivos de más
+de 1~MB, y la de LZW entre 63 y 142~MB/s (203~MB/s en \texttt{ptt5}). En la decodificación el
+orden se invierte: LZW alcanza entre 194 y 621~MB/s en esos archivos y Huffman entre 79 y
+558~MB/s, con los valores altos en archivos de entropía baja (\texttt{E.coli}, 558~MB/s;
+\texttt{ptt5}, 360~MB/s) y los bajos en archivos de entropía alta (\texttt{mozilla}, 79~MB/s;
+\texttt{sao}, 82~MB/s) (\texttt{e3\_corpus.csv}). En los archivos diminutos el rendimiento de
+LZW se desploma ---32~MB/s en \texttt{grammar.lsp} y 4.5~MB/s en \texttt{xargs.1}--- porque
+cada llamada reserva e inicializa tablas de tamaño $O(2^b)$, independiente de $n$, cuyo costo
+domina cuando la entrada tiene unos pocos kilobytes; la diferencia entre ambos archivos, de
+tamaño similar, sugiere además ruido de medición a esa escala.
 \end{aporte}
 
 \subsection{E4: tamaño máximo del diccionario de LZW}
 \label{sec:res-e4}
 \begin{aporte}{C}
-La \cref{fig:e4} muestra los bits por byte y el tiempo de codificación de LZW al variar el
+La \cref{fig:e4} muestra los bits por byte y los tiempos de LZW al variar el
 ancho máximo de código $b$, es decir, el tamaño del diccionario $2^b$, en tres archivos de
 naturaleza distinta. El ancho con menor bpb fue $b = \resLzwBitsBestDickens$ en
 \texttt{dickens}, $b = \resLzwBitsBestXml$ en \texttt{xml} y $b = \resLzwBitsBestEcoli$ en
@@ -365,7 +433,7 @@ naturaleza distinta. El ancho con menor bpb fue $b = \resLzwBitsBestDickens$ en
     \centering
     \begin{tikzpicture}
       \begin{axis}[informe, height=0.78\linewidth, xlabel={$b$ (bits; diccionario de $2^b$ entradas)},
-          ylabel={Mediana de codificación [ms]}, xtick={9,...,16}, ymin=0, legend pos=north east]
+          ylabel={Mediana [ms]}, xtick={9,...,16}, ymin=0, legend pos=north east]
         \addplot[blue!70!black, mark=*, mark size=1.3pt]
           table[col sep=comma, x=bits, y=dickens_enc_ms] {results/e4_lzw_bits.csv};
         \addlegendentry{\texttt{dickens}}
@@ -375,17 +443,30 @@ naturaleza distinta. El ancho con menor bpb fue $b = \resLzwBitsBestDickens$ en
         \addplot[red!70!black, mark=triangle*, mark size=1.5pt]
           table[col sep=comma, x=bits, y=ecoli_enc_ms] {results/e4_lzw_bits.csv};
         \addlegendentry{\texttt{E.coli}}
+        \addplot[blue!70!black, densely dashed, mark=o, mark size=1.3pt, forget plot]
+          table[col sep=comma, x=bits, y=dickens_dec_ms] {results/e4_lzw_bits.csv};
+        \addplot[green!45!black, densely dashed, mark=square, mark size=1.2pt, forget plot]
+          table[col sep=comma, x=bits, y=xml_dec_ms] {results/e4_lzw_bits.csv};
+        \addplot[red!70!black, densely dashed, mark=triangle, mark size=1.5pt, forget plot]
+          table[col sep=comma, x=bits, y=ecoli_dec_ms] {results/e4_lzw_bits.csv};
       \end{axis}
     \end{tikzpicture}
-    \caption{Tiempo de codificación.}
+    \caption{Tiempo: codificación (continua) y decodificación (discontinua).}
     \label{fig:e4-tiempo}
   \end{subfigure}
   \caption{E4: efecto del tamaño máximo del diccionario de LZW.}
   \label{fig:e4}
 \end{figure}}
 
-% TODO-RESULTS: interpretar fig:e4 (tendencia del bpb con b, rendimientos decrecientes, diferencias entre texto, XML y ADN, costo temporal de diccionarios grandes y frecuencia de reinicios).
-\todoresults{Interpretar la \cref{fig:e4}: tendencia de los bits por byte al crecer $b$,
-rendimientos decrecientes, diferencias entre texto, XML y ADN, y costo temporal asociado al
-tamaño del diccionario y a la frecuencia de reinicios.}
+En los tres archivos, los bits por byte disminuyen de forma monótona al crecer $b$:
+\texttt{dickens} pasa de 6.06 a 3.29~bpb, \texttt{xml} de 5.12 a 1.66 y \texttt{E.coli} de 3.10 a
+2.17. La ganancia por bit adicional se reduce con $b$, y la saturación depende del dato: en
+\texttt{xml} y \texttt{dickens} el paso de 15 a 16 bits todavía ahorra 0.14 y 0.17~bpb, mientras
+que en \texttt{E.coli} ahorra solo 0.02~bpb, y ningún ancho permite a LZW alcanzar los 2.00~bpb
+de Huffman en ese archivo. En tiempo, la decodificación se acelera al crecer el diccionario
+(\texttt{dickens}, de 51.94 a 32.27~ms; \texttt{xml}, de 23.56 a 11.94~ms; \texttt{E.coli}, de
+14.86 a 8.52~ms), porque cada código representa una frase más larga, hay menos códigos que
+procesar y se producen menos reinicios. La codificación, en cambio, se encarece ligeramente
+(\texttt{dickens}, de 88.39 a 106.31~ms), lo que es coherente con una tabla hash de $2^{b+1}$
+posiciones que deja de caber en las memorias caché más cercanas al procesador.
 \end{aporte}
