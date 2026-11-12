@@ -14,7 +14,7 @@ Algorithms course at Universidad de Lima (2026-2).
 | [`data/`](data/) | Script that downloads the Canterbury and Silesia corpora with pinned SHA-256 checksums |
 | [`results/`](results/) | Raw benchmark output (CSV) used by the report, plus an independent replica of the scaling experiment |
 | [`report/`](report/) | LaTeX source of the technical report ([README](report/README.md)) |
-| [`entrega/`](entrega/) | Compiled report (PDF) |
+| [`entrega/`](entrega/) | Compiled report (PDF), rebuilt by CI whenever `report/` or `results/` change on `main` |
 
 ## Quick start
 

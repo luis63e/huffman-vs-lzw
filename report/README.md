@@ -8,6 +8,11 @@ LaTeX source of the research report (Universidad de Lima, Trabajo de Investigaci
 ./build.sh            # from report/; needs ../results (run `ant benchmark` in ../code first)
 ```
 
+On every push to `main` that changes `report/` or `results/`, the `Report PDF` workflow
+(`.github/workflows/report.yml`) runs this script and commits the result to
+`entrega/Informe_Huffman_vs_LZW.pdf`. It sets `SOURCE_DATE_EPOCH`, so the PDF is reproducible
+and only changes when the report content does.
+
 The script sources `../env.sh` (portable Tectonic), copies `../results/*.csv` and
 `../results/*.tex` into `report/results/` (plus `../results/replica/fits.csv` as
 `results/fits_replica.csv`, the E1 replica shown next to the main fits), and compiles
