@@ -1,5 +1,7 @@
 # Huffman vs. LZW
 
+[![CI](https://github.com/luis63e/huffman-vs-lzw/actions/workflows/ci.yml/badge.svg)](https://github.com/luis63e/huffman-vs-lzw/actions/workflows/ci.yml)
+
 Theoretical and experimental comparison of two lossless compression algorithms, **static
 canonical Huffman coding** and **LZW (Lempel-Ziv-Welch)**, for the research project of the
 Algorithms course at Universidad de Lima (2026-2).
