@@ -94,9 +94,6 @@
   before upper={\noindent{\scriptsize\sffamily\bfseries
     Aporte: \csname integrante#1\endcsname}\par\smallskip}}
 
-% Muestra de color para la tabla de distribución.
-\newcommand{\muestra}[1]{\textcolor{member#1}{\rule{1.6em}{0.9em}}}
-
 % =====================================================================
 %  RESULTADOS GENERADOS (results/ se copia desde ../results en build.sh)
 % =====================================================================
@@ -255,12 +252,12 @@
   {\Large comparación teórica y experimental de algoritmos\\ de compresión sin pérdida\par}
   \vspace{0.4cm}\rule{\linewidth}{0.8pt}\par\vspace{1.6cm}
   {\normalsize\bfseries Integrantes\par}\vspace{0.3cm}
-  \begin{tabular}{@{}c@{\quad}l@{}}
-    \muestra{A} & \textcolor{memberA}{\integranteA}\\[2pt]
-    \muestra{B} & \textcolor{memberB}{\integranteB}\\[2pt]
-    \muestra{C} & \textcolor{memberC}{\integranteC}\\[2pt]
-    \muestra{D} & \textcolor{memberD}{\integranteD}\\[2pt]
-    \muestra{E} & \textcolor{memberE}{\integranteE}\\
+  \begin{tabular}{@{}c@{}}
+    \integranteA\\[2pt]
+    \integranteB\\[2pt]
+    \integranteC\\[2pt]
+    \integranteD\\[2pt]
+    \integranteE\\
   \end{tabular}\par\vspace{1.2cm}
   {\normalsize\bfseries Docente\par}\vspace{0.2cm}
   {\normalsize \docente\par}
@@ -338,47 +335,6 @@ analysis, experimental algorithmics, entropy.
 \listoftables
 \listofalgorithms
 \lstlistoflistings
-\clearpage
-
-% ---------------------------------------------------------------- distribución del trabajo
-\section*{Distribución del trabajo y código de colores}
-\addcontentsline{toc}{section}{Distribución del trabajo y código de colores}
-Cada integrante es responsable de una parte del estudio. En el cuerpo del informe, el
-contenido de cada sección o subsección aparece en el color de su autor y con una barra
-lateral del mismo color, encabezada por el nombre del integrante. El detalle de cada
-implementación individual se presenta en el \cref{app:aportes}.
-
-\begin{table}[H]
-  \centering
-  \caption{Integrantes, color asignado y responsabilidades.}
-  \label{tab:distribucion}
-  \small
-  \begin{tabular}{@{}c l p{9.2cm}@{}}
-    \toprule
-    Color & Integrante & Responsabilidades \\
-    \midrule
-    \muestra{A} & \textcolor{memberA}{\integranteA} &
-      Codificación de Huffman: marco teórico, análisis de complejidad, implementación
-      (\texttt{HuffmanCodec}, \texttt{BitWriter}, \texttt{BitReader}) y sus pruebas;
-      discusión de H2 y H4. \\[3pt]
-    \muestra{B} & \textcolor{memberB}{\integranteB} &
-      Algoritmo LZW: marco teórico, análisis de complejidad, implementación
-      (\texttt{LzwCodec}) y sus pruebas; discusión de H3. \\[3pt]
-    \muestra{C} & \textcolor{memberC}{\integranteC} &
-      Metodología experimental, comparación teórica e hipótesis, arnés de medición
-      (\texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator},
-      \texttt{DeflateCodec}), interfaz de línea de comandos y descarga de los corpus. \\[3pt]
-    \muestra{D} & \textcolor{memberD}{\integranteD} &
-      Resumen, introducción, definiciones preliminares, estado del arte, síntesis de las
-      preguntas de investigación, conclusiones (respuestas, limitaciones y trabajo futuro) y
-      bibliografía. \\[3pt]
-    \muestra{E} & \textcolor{memberE}{\integranteE} &
-      Análisis de resultados: figuras, tablas e interpretación de E1--E4; discusión de H1;
-      comparación entre el análisis teórico y los resultados experimentales. \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
 \clearpage
 \pagenumbering{arabic}
 
