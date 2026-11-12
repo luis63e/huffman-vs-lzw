@@ -20,12 +20,12 @@ Java~\cite{georges2007}.
   \centering
   \begin{tikzpicture}[
       node distance=0.55cm and 0.62cm,
-      paso/.style={rectangle, rounded corners=3pt, draw=memberC, fill=memberC!7,
+      paso/.style={rectangle, rounded corners=3pt, draw=black!70, fill=gray!8,
                    text width=2.7cm, minimum height=1.5cm, align=center, font=\footnotesize},
-      datos/.style={cylinder, shape border rotate=90, aspect=0.2, draw=memberC,
-                    fill=memberC!14, text width=2.35cm, minimum height=1.7cm, align=center,
+      datos/.style={cylinder, shape border rotate=90, aspect=0.2, draw=black!70,
+                    fill=gray!15, text width=2.35cm, minimum height=1.7cm, align=center,
                     font=\footnotesize},
-      flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=memberC!85!black},
+      flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=black!75},
       fase/.style={draw=gray!55, dashed, rounded corners=5pt, inner sep=5pt},
       etiq/.style={font=\scriptsize\bfseries\sffamily, text=gray!65!black}]
     \node[datos] (d) {Conjuntos de datos: sintéticos, texto real, corpus};
@@ -35,7 +35,7 @@ Java~\cite{georges2007}.
     \node[paso, below=1.5cm of w] (r) {$R$ ejecuciones cronometradas: codificar y decodificar};
     \node[paso, left=of r] (s) {Estadística: mediana e IC 95\,\% (t de Student)};
     \node[paso, left=of s] (f) {Ajuste log--log: pendiente y $R^2$; bpb frente a $H_0$};
-    \node[paso, left=of f, fill=memberC!20] (c) {Contraste con la teoría: H1--H4};
+    \node[paso, left=of f, fill=gray!22] (c) {Contraste con la teoría: H1--H4};
     \draw[flecha] (d) -- (i);
     \draw[flecha] (i) -- (v);
     \draw[flecha] (v) -- (w);
@@ -176,13 +176,13 @@ una ejecución incorrecta. La \cref{tab:pruebas} resume la batería por clase.
     \toprule
     Clase de prueba & Pruebas & Aspectos verificados \\
     \midrule
-    \textcolor{memberA}{\texttt{HuffmanCodecTest}} & \textcolor{memberA}{11} & \textcolor{memberA}{Ida y vuelta (vacío, un byte, un solo símbolo repetido con 1 bit por símbolo, los 256 valores, datos aleatorios y sesgados, texto); longitudes óptimas del ejemplo de libro; igualdad de Kraft; códigos canónicos libres de prefijo y ordenados por longitud; rechazo de entradas corruptas; nombre del algoritmo.} \\
-    \textcolor{memberA}{\texttt{BitStreamTest}} & \textcolor{memberA}{5} & \textcolor{memberA}{Orden MSB primero y relleno con ceros; anchos aleatorios hasta 64 bits; desplazamiento inicial; lectura más allá del final; anchos inválidos.} \\
-    \textcolor{memberB}{\texttt{LzwCodecTest}} & \textcolor{memberB}{8} & \textcolor{memberB}{Secuencia del ejemplo de Welch; vacío y un byte; caso $KwKwK$; todos los anchos de 9 a 16 bits con reinicios del diccionario; los 256 valores; compresión de datos repetitivos; configuración inválida y datos corruptos; ancho registrado en la cabecera.} \\
-    \textcolor{memberC}{\texttt{StatsTest}} & \textcolor{memberC}{6} & \textcolor{memberC}{Resumen de muestras, mediana con cantidad par, cuantil normal para muestras grandes, rechazo de muestras insuficientes, exponente de la ley de potencia en escala log--log, entropía de orden cero.} \\
-    \textcolor{memberC}{\texttt{DataGeneratorTest}} & \textcolor{memberC}{3} & \textcolor{memberC}{Determinismo por semilla, entropía esperada de cada fuente, uso exacto de $k$ símbolos.} \\
-    \textcolor{memberC}{\texttt{BenchmarkRunnerTest}} & \textcolor{memberC}{4} & \textcolor{memberC}{Una corrida rápida escribe todos los archivos de resultados; \texttt{--only e2} escribe solo el barrido; argumentos desconocidos o incompletos.} \\
-    \textcolor{memberC}{\texttt{MainTest}} & \textcolor{memberC}{6} & \textcolor{memberC}{Compresión y descompresión de archivos con ambos algoritmos; comando \texttt{stats}; algoritmo y comando desconocidos (código de salida 2); archivo corrupto (código 1); demostración sin argumentos.} \\
+    \texttt{HuffmanCodecTest} & 11 & Ida y vuelta (vacío, un byte, un solo símbolo repetido con 1 bit por símbolo, los 256 valores, datos aleatorios y sesgados, texto); longitudes óptimas del ejemplo de libro; igualdad de Kraft; códigos canónicos libres de prefijo y ordenados por longitud; rechazo de entradas corruptas; nombre del algoritmo. \\
+    \texttt{BitStreamTest} & 5 & Orden MSB primero y relleno con ceros; anchos aleatorios hasta 64 bits; desplazamiento inicial; lectura más allá del final; anchos inválidos. \\
+    \texttt{LzwCodecTest} & 8 & Secuencia del ejemplo de Welch; vacío y un byte; caso $KwKwK$; todos los anchos de 9 a 16 bits con reinicios del diccionario; los 256 valores; compresión de datos repetitivos; configuración inválida y datos corruptos; ancho registrado en la cabecera. \\
+    \texttt{StatsTest} & 6 & Resumen de muestras, mediana con cantidad par, cuantil normal para muestras grandes, rechazo de muestras insuficientes, exponente de la ley de potencia en escala log--log, entropía de orden cero. \\
+    \texttt{DataGeneratorTest} & 3 & Determinismo por semilla, entropía esperada de cada fuente, uso exacto de $k$ símbolos. \\
+    \texttt{BenchmarkRunnerTest} & 4 & Una corrida rápida escribe todos los archivos de resultados; \texttt{--only e2} escribe solo el barrido; argumentos desconocidos o incompletos. \\
+    \texttt{MainTest} & 6 & Compresión y descompresión de archivos con ambos algoritmos; comando \texttt{stats}; algoritmo y comando desconocidos (código de salida 2); archivo corrupto (código 1); demostración sin argumentos. \\
     \bottomrule
   \end{tabular}
 \end{table}

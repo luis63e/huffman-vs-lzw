@@ -117,10 +117,10 @@ diferir del que se lee en el árbol sin cambiar $\Lbar$.
       level 1/.style={sibling distance=4.6cm},
       level 2/.style={sibling distance=2.8cm},
       level 3/.style={sibling distance=1.4cm},
-      interno/.style={circle, draw=memberA, fill=memberA!8, minimum size=8mm, inner sep=0pt, font=\small},
-      hoja/.style={rectangle, rounded corners=2pt, draw=memberA, fill=white, minimum width=11mm,
+      interno/.style={circle, draw=black!70, fill=gray!10, minimum size=8mm, inner sep=0pt, font=\small},
+      hoja/.style={rectangle, rounded corners=2pt, draw=black!70, fill=white, minimum width=11mm,
                    minimum height=7mm, font=\small},
-      edge from parent/.style={draw=memberA!70, -{Stealth[length=2mm]}},
+      edge from parent/.style={draw=black!55, -{Stealth[length=2mm]}},
       etiqueta/.style={font=\scriptsize, fill=white, inner sep=1pt}]
     \node[interno] {11}
       child { node[hoja] {\texttt{a}\,:\,5} edge from parent node[etiqueta, above left] {0} }

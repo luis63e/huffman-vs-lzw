@@ -66,7 +66,7 @@
 \makeatother
 
 % =====================================================================
-%  INTEGRANTES Y CÓDIGO DE COLORES — ÚNICO LUGAR PARA EDITAR LOS NOMBRES
+%  INTEGRANTES — ÚNICO LUGAR PARA EDITAR LOS NOMBRES
 % =====================================================================
 \newcommand{\integranteA}{Integrante A (Apellido, Nombre)}
 \newcommand{\integranteB}{Integrante B (Apellido, Nombre)}
@@ -75,20 +75,14 @@
 \newcommand{\integranteE}{Integrante E (Apellido, Nombre)}
 \newcommand{\docente}{Docente del curso (Apellido, Nombre)}
 
-\colorlet{memberA}{blue!70!black}
-\colorlet{memberB}{green!45!black}
-\colorlet{memberC}{orange!75!black}
-\colorlet{memberD}{violet!75!black}
-\colorlet{memberE}{red!60!black}
-
-% Entorno de autoría: texto en el color del integrante y barra lateral fina.
+% Entorno de autoría: encabezado con el nombre del integrante y barra lateral fina.
 % Uso: \begin{aporte}{A} ... \end{aporte}.  Las figuras, tablas y algoritmos
 % dentro de un aporte deben usar la posición [H] (una caja no admite flotantes).
 \newtcolorbox{aporte}[1]{%
   enhanced jigsaw, breakable, parbox=false,
-  colback=white, coltext=member#1,
+  colback=white,
   frame hidden, boxrule=0pt, sharp corners,
-  borderline west={1.2pt}{0pt}{member#1},
+  borderline west={1.2pt}{0pt}{black!30},
   left=9pt, right=0pt, top=1pt, bottom=1pt,
   before skip=4pt, after skip=8pt,
   before upper={\noindent{\scriptsize\sffamily\bfseries
