@@ -67,10 +67,10 @@ el arnés (\texttt{BenchmarkRunner}) y la línea de comandos (\texttt{Main}) lo 
 sus detalles. \texttt{BitWriter} y \texttt{BitReader} son compartidos con LZW. Sus pruebas
 (\texttt{HuffmanCodecTest}, 11; \texttt{BitStreamTest}, 5) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/huffman/HuffmanCodec.java},
-\ruta{code/src/pe/edu/ulima/compression/io/BitWriter.java},
-\ruta{code/src/pe/edu/ulima/compression/io/BitReader.java} y sus pruebas en
-\ruta{code/test/pe/edu/ulima/compression/huffman/} y \ruta{.../io/}; en el informe,
+\paragraph{Archivos.} \ruta{code/src/compression/huffman/HuffmanCodec.java},
+\ruta{code/src/compression/io/BitWriter.java},
+\ruta{code/src/compression/io/BitReader.java} y sus pruebas en
+\ruta{code/test/compression/huffman/} y \ruta{.../io/}; en el informe,
 \cref{sec:huffman}.
 \end{aporte}
 
@@ -103,8 +103,8 @@ secuencia emitida para pruebas y enseñanza.
 $b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-N}. Sus 8 pruebas
 (\texttt{LzwCodecTest}) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/lzw/LzwCodec.java} y
-\ruta{code/test/pe/edu/ulima/compression/lzw/LzwCodecTest.java}; en el informe,
+\paragraph{Archivos.} \ruta{code/src/compression/lzw/LzwCodec.java} y
+\ruta{code/test/compression/lzw/LzwCodecTest.java}; en el informe,
 \cref{sec:lzw}.
 \end{aporte}
 
@@ -134,9 +134,9 @@ línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 (\cref{app:aporte-e}). Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
 \texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \ruta{code/src/pe/edu/ulima/compression/bench/} (\texttt{BenchmarkRunner},
+\paragraph{Archivos.} \ruta{code/src/compression/bench/} (\texttt{BenchmarkRunner},
 \texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter}),
-\ruta{code/src/pe/edu/ulima/compression/app/Main.java}, sus pruebas,
+\ruta{code/src/compression/app/Main.java}, sus pruebas,
 y \texttt{data/download-corpora.sh}; en el informe,
 \cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia}.
 \end{aporte}

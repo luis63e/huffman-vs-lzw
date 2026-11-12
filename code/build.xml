@@ -9,7 +9,7 @@
         <property name="bench.out" location="../results"/>
         <property name="bench.corpus" location="../data/corpus"/>
         <property name="bench.args" value=""/>
-        <java classname="pe.edu.ulima.compression.bench.BenchmarkRunner" fork="true" failonerror="true">
+        <java classname="compression.bench.BenchmarkRunner" fork="true" failonerror="true">
             <classpath path="${dist.jar}"/>
             <jvmarg line="-Xms3g -Xmx3g -XX:+UseParallelGC"/>
             <arg value="--out"/>

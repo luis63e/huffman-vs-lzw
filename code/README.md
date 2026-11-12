@@ -10,7 +10,7 @@ lossless compression algorithms* (Universidad de Lima, 2026-2).
 project (`nbproject/`), targeting Java 17 or newer. JUnit 4.13.2 and Hamcrest 1.3 are bundled
 in `lib/`, so no library setup is needed.
 
-- **Run** (F6) runs `pe.edu.ulima.compression.app.Main` without arguments, which prints a
+- **Run** (F6) runs `compression.app.Main` without arguments, which prints a
   worked example of both algorithms and the command-line usage.
 - **Test** (Alt+F6) runs the JUnit suite.
 
@@ -44,7 +44,7 @@ Silesia corpus (Deorowicz, 2003), verifies their SHA-256 checksums and extracts 
 
 | Package | Contents |
 |---|---|
-| `pe.edu.ulima.compression` | `Codec` interface shared by every algorithm |
+| `compression` | `Codec` interface shared by every algorithm |
 | `...io` | `BitWriter` / `BitReader`: MSB-first variable-width bit I/O |
 | `...huffman` | `HuffmanCodec`: heap-based code lengths, canonical codes, canonical decoding |
 | `...lzw` | `LzwCodec`: 9-16 bit variable-width codes, hash-table dictionary, CLEAR reset |
