@@ -1,12 +1,12 @@
 % ---------------------------------------------------------------------
-%  6. Discusión — E (H1), A (H2, H4), B (H3), D (síntesis por pregunta)
+%  6. Discusión
 % ---------------------------------------------------------------------
-\section{Discusión: teoría frente a experimento}
+\section{Discusión}
 \label{sec:discusion}
 
 Esta sección contrasta cada hipótesis de la \cref{sec:hipotesis} con la evidencia de la
-\cref{sec:resultados} y, a continuación, sintetiza la respuesta a cada pregunta de
-investigación.
+\cref{sec:resultados} y, a continuación, discute el efecto del tamaño del diccionario de LZW,
+para el que la teoría no fija una predicción.
 
 \subsection{H1: escalamiento lineal}
 \label{sec:disc-h1}
@@ -126,26 +126,9 @@ longitud de los códigos sino del número de códigos: al subir la entropía, la
 y hay que resolver más códigos por byte, cada uno con su costo fijo. Lo mismo explica que la
 codificación de LZW pase de 60.60 a 107.11~ms.
 
-\subsection{Síntesis por pregunta de investigación}
-\label{sec:disc-rq}
-\paragraph{RQ1 (escalamiento).} Se responde con H1 y H4: la teoría predice crecimiento lineal
-para ambos algoritmos, con una constante que en la decodificación de Huffman depende de la
-longitud media del código.
-Los experimentos lo confirman: las pendientes log--log están entre 0.85 y 1.08 en la corrida
-principal y entre 0.93 y 1.02 en la réplica, y la constante de la decodificación de Huffman
-crece linealmente con $\Lbar$. Las constantes, en cambio, difieren mucho entre operaciones: en
-el mayor tamaño, LZW decodifica a 3.17--5.11~ns/byte y codifica a 10.34--14.72~ns/byte, y
-Huffman codifica a 4.50--6.26~ns/byte y decodifica a 9.14--11.18~ns/byte.
-
-\paragraph{RQ2 (compresión, entropía y tipo de dato).} Se responde con H2 y H3: Huffman está
-acotado por $H_0$ y no puede aprovechar repeticiones, mientras que LZW puede bajar de $H_0$ en
-datos con frases repetidas, pero pierde ---y puede expandir--- en fuentes sin memoria.
-Los datos lo confirman: Huffman queda en $[H_0, H_0 + 1)$ en todos los casos medidos, y LZW
-gana en \resLzwWins{} de los \resCorpusFiles{} archivos del corpus, pero pierde en todas las
-fuentes i.i.d. y expande los bytes uniformes hasta 11.00~bpb. En el agregado del corpus, LZW
-obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman.
-
-\paragraph{RQ3 (tamaño del diccionario).} Un diccionario mayor retiene más frases y reinicia con
+\subsection{Tamaño del diccionario de LZW}
+\label{sec:disc-e4}
+Un diccionario mayor retiene más frases y reinicia con
 menos frecuencia, pero cada código cuesta más bits; la teoría no fija un óptimo universal, que
 depende de cuán repetitivos y estacionarios sean los datos~\cite{cheng2021}.
 En E4, el mejor ancho dentro del rango evaluado fue el máximo en los tres archivos

@@ -71,8 +71,11 @@ que decodifica.
   \item Sí. Ambos algoritmos escalan en $\Theta(n)$, como predice el análisis, tanto al codificar
         como al decodificar. La longitud media del código, $\Lbar$, no altera el orden de
         crecimiento de Huffman, pero sí su constante: con $n$ fijo, su tiempo de decodificación
-        crece linealmente con $\log_2 k$. En la práctica, Huffman es preferible cuando la
-        velocidad de codificación es prioritaria, y LZW cuando lo es la de decodificación.
+        crece linealmente con $\log_2 k$. Las constantes difieren entre operaciones: en el mayor tamaño,
+        Huffman codifica a 4.50--6.26~ns/byte y decodifica a 9.14--11.18, mientras que LZW
+        codifica a 10.34--14.72 y decodifica a 3.17--5.11. En la práctica, Huffman es preferible
+        cuando la velocidad de codificación es prioritaria, y LZW cuando lo es la de
+        decodificación.
   \item Huffman depende solo de la distribución de frecuencias y queda siempre en
         $[H_0, H_0+1)$; su límite es un bit por símbolo, visible en \texttt{ptt5}. LZW depende
         de la repetición de frases: puede bajar mucho de $H_0$ en texto y datos estructurados
