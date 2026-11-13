@@ -93,7 +93,7 @@ descendente para asignar profundidades sin recursión. El montículo es un
 \texttt{PriorityQueue} que desempata por índice, lo que hace el código determinista.
 
 \begin{lstlisting}[caption={Fusión de nodos y cálculo de profundidades en \texttt{HuffmanCodec.codeLengths}.},label={lst:huffman}]
-int next = ALPHABET; // internal nodes get indices 256, 257, ...
+int next = ALPHABET; // los nodos internos reciben los índices 256, 257, ...
 while (heap.size() > 1) {
     int a = heap.poll();
     int b = heap.poll();
@@ -103,7 +103,7 @@ while (heap.size() > 1) {
     heap.add(next++);
 }
 
-// Parents always have larger indices than children, so one descending pass assigns depths.
+// Un padre siempre tiene un índice mayor que sus hijos: basta un recorrido descendente.
 int root = next - 1;
 int[] depth = new int[maxNodes];
 for (int node = root - 1; node >= ALPHABET; node--) {
@@ -132,7 +132,7 @@ private void compress(byte[] input, CodeSink sink) {
         int key = (phrase << 8) | next;
         int slot = table.find(key);
         if (table.isOccupied(slot)) {
-            phrase = table.valueAt(slot); // extend the current phrase
+            phrase = table.valueAt(slot); // extender la frase actual
             continue;
         }
         sink.put(phrase, width(size));
