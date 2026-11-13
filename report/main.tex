@@ -49,9 +49,6 @@
 \usepackage{algpseudocode}
 \usepackage{listings}
 
-% ---------------------------------------------------------------- cajas de aporte
-\usepackage[most]{tcolorbox}
-
 % ---------------------------------------------------------------- encabezados
 \usepackage{fancyhdr}
 
@@ -74,19 +71,6 @@
 \newcommand{\integranteD}{Integrante D (Apellido, Nombre)}
 \newcommand{\integranteE}{Integrante E (Apellido, Nombre)}
 \newcommand{\docente}{Docente del curso (Apellido, Nombre)}
-
-% Entorno de autoría: encabezado con el nombre del integrante y barra lateral fina.
-% Uso: \begin{aporte}{A} ... \end{aporte}.  Las figuras, tablas y algoritmos
-% dentro de un aporte deben usar la posición [H] (una caja no admite flotantes).
-\newtcolorbox{aporte}[1]{%
-  enhanced jigsaw, breakable, parbox=false,
-  colback=white,
-  frame hidden, boxrule=0pt, sharp corners,
-  borderline west={1.2pt}{0pt}{black!30},
-  left=9pt, right=0pt, top=1pt, bottom=1pt,
-  before skip=4pt, after skip=8pt,
-  before upper={\noindent{\scriptsize\sffamily\bfseries
-    Aporte: \csname integrante#1\endcsname}\par\smallskip}}
 
 % =====================================================================
 %  RESULTADOS GENERADOS (results/ se copia desde ../results en build.sh)
@@ -264,7 +248,6 @@
 % ---------------------------------------------------------------- resumen
 \section*{Resumen}
 \addcontentsline{toc}{section}{Resumen}
-\begin{aporte}{D}
 La compresión sin pérdida reduce el costo de almacenar y transmitir datos sin alterar un
 solo bit de la información original. Este trabajo compara dos algoritmos clásicos que
 explotan redundancias de naturaleza distinta: la codificación de Huffman, un código prefijo
@@ -290,12 +273,10 @@ complementarios.
 
 \medskip\noindent\textbf{Palabras clave:} compresión sin pérdida, codificación de Huffman,
 LZW, análisis de complejidad, algoritmia experimental, entropía.
-\end{aporte}
 
 \begin{otherlanguage}{english}
 \section*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
-\begin{aporte}{D}
 Lossless compression reduces the cost of storing and transmitting data without altering a
 single bit of the original information. This work compares two classical algorithms that
 exploit different kinds of redundancy: Huffman coding, a static prefix code that exploits
@@ -319,7 +300,6 @@ the two mechanisms are complementary.
 
 \medskip\noindent\textbf{Keywords:} lossless compression, Huffman coding, LZW, complexity
 analysis, experimental algorithmics, entropy.
-\end{aporte}
 \end{otherlanguage}
 
 \clearpage

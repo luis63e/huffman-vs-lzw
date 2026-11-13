@@ -1,9 +1,8 @@
 % ---------------------------------------------------------------------
-%  Anexos — A: reproducibilidad (C); B: aportes individuales (A, B, C, D, E)
+%  Anexos — A: reproducibilidad; B: detalle de la implementación
 % ---------------------------------------------------------------------
 \section{Reproducibilidad}
 \label{app:reproducibilidad}
-\begin{aporte}{C}
 El repositorio contiene todo lo necesario para repetir el estudio. Desde la raíz, con
 \texttt{bash}, la secuencia completa es la del \cref{lst:reproducir}. El archivo
 \texttt{env.sh} configura el JDK, Apache Ant y Tectonic incluidos en \texttt{.tools/}; el
@@ -34,16 +33,14 @@ java -jar dist/HuffmanVsLZW.jar compress <huffman|lzw|lzw-N> <entrada> <salida>
 java -jar dist/HuffmanVsLZW.jar decompress <entrada> <salida>
 java -jar dist/HuffmanVsLZW.jar stats <entrada>
 \end{lstlisting}
-\end{aporte}
 
-\section{Aportes individuales detallados}
-\label{app:aportes}
-Cada integrante describe a continuación la implementación que desarrolló: su objetivo, su
-funcionamiento, cómo se implementó y cómo se integra con el resto del trabajo.
+\section{Detalle de la implementación}
+\label{app:detalle}
+A continuación se describe cada componente del trabajo: su objetivo, su funcionamiento, cómo
+se implementó y cómo se integra con el resto.
 
-\subsection{\texorpdfstring{\integranteA}{Integrante A}: codificación de Huffman}
-\label{app:aporte-a}
-\begin{aporte}{A}
+\subsection{Codificación de Huffman}
+\label{app:detalle-a}
 \paragraph{Objetivo.} Implementar un compresor de Huffman estático y canónico sobre el alfabeto
 de bytes que sea correcto para cualquier entrada, que alcance la longitud media óptima
 (\cref{eq:cota-huffman}) y cuya cabecera sea compacta y verificable.
@@ -72,11 +69,9 @@ sus detalles. \texttt{BitWriter} y \texttt{BitReader} son compartidos con LZW. S
 \ruta{code/src/compression/io/BitReader.java} y sus pruebas en
 \ruta{code/test/compression/huffman/} y \ruta{.../io/}; en el informe,
 \cref{sec:huffman}.
-\end{aporte}
 
-\subsection{\texorpdfstring{\integranteB}{Integrante B}: algoritmo LZW}
-\label{app:aporte-b}
-\begin{aporte}{B}
+\subsection{Algoritmo LZW}
+\label{app:detalle-b}
 \paragraph{Objetivo.} Implementar LZW con códigos de ancho variable y tamaño máximo de
 diccionario configurable, de forma que la memoria quede acotada y que el ancho máximo pueda
 variarse en el experimento E4.
@@ -106,11 +101,9 @@ $b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-
 \paragraph{Archivos.} \ruta{code/src/compression/lzw/LzwCodec.java} y
 \ruta{code/test/compression/lzw/LzwCodecTest.java}; en el informe,
 \cref{sec:lzw}.
-\end{aporte}
 
-\subsection{\texorpdfstring{\integranteC}{Integrante C}: metodología experimental y arnés de medición}
-\label{app:aporte-c}
-\begin{aporte}{C}
+\subsection{Metodología experimental y arnés de medición}
+\label{app:detalle-c}
 \paragraph{Objetivo.} Medir ambos algoritmos de forma estadísticamente rigurosa y
 reproducible, y producir automáticamente los datos (CSV, tabla del corpus y macros) que
 alimentan el informe.
@@ -129,9 +122,9 @@ permite medir igual a Huffman, a LZW y a DEFLATE (\texttt{DeflateCodec}, envolto
 línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 \texttt{data/download-corpora.sh} descarga y verifica los corpus.
 
-\paragraph{Integración.} El arnés consume los códecs de los integrantes A y B; sus salidas en
-\texttt{results/} son la entrada del análisis de resultados del integrante E
-(\cref{app:aporte-e}). Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
+\paragraph{Integración.} El arnés consume los códecs de Huffman y LZW; sus salidas en
+\texttt{results/} son la entrada del análisis de resultados
+(\cref{app:detalle-e}). Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
 \texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
 
 \paragraph{Archivos.} \ruta{code/src/compression/bench/} (\texttt{BenchmarkRunner},
@@ -139,11 +132,9 @@ línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 \ruta{code/src/compression/app/Main.java}, sus pruebas,
 y \texttt{data/download-corpora.sh}; en el informe,
 \cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia}.
-\end{aporte}
 
-\subsection{\texorpdfstring{\integranteD}{Integrante D}: estado del arte, redacción y bibliografía}
-\label{app:aporte-d}
-\begin{aporte}{D}
+\subsection{Estado del arte, redacción y bibliografía}
+\label{app:detalle-d}
 \paragraph{Objetivo.} Situar el trabajo en la literatura, plantear el problema, los objetivos y
 las preguntas de investigación, y redactar las conclusiones a partir del contraste entre teoría
 y experimento.
@@ -166,11 +157,9 @@ determinan las hipótesis H1--H4 y los experimentos E1--E4; la síntesis por pre
 \paragraph{Archivos.} \texttt{report/main.tex}, \texttt{report/refs.bib} y
 \ruta{report/sections/01-introduccion.tex}, \ruta{02-estado-del-arte.tex} y
 \texttt{07-conclusiones.tex} (salvo la \cref{sec:concl-teoria-experimento}).
-\end{aporte}
 
-\subsection{\texorpdfstring{\integranteE}{Integrante E}: análisis de resultados y discusión}
-\label{app:aporte-e}
-\begin{aporte}{E}
+\subsection{Análisis de resultados y discusión}
+\label{app:detalle-e}
 \paragraph{Objetivo.} Convertir las mediciones del arnés en evidencia legible ---figuras, tablas
 e interpretación de E1--E4--- y contrastarla con las hipótesis H1--H4 y con el análisis de
 complejidad.
@@ -192,13 +181,11 @@ de H1--H4. El paso de copia de \texttt{report/build.sh} trae una instantánea de
 \texttt{results/} al informe, incluidas las pendientes de la réplica como
 \texttt{fits\_replica.csv}.
 
-\paragraph{Integración.} El análisis depende de los datos y las hipótesis del integrante C
-(\cref{sec:comparacion-teorica,sec:hipotesis}), derivadas de los análisis de complejidad de los
-integrantes A y B; la
-discusión de H2--H4 y las conclusiones del integrante D se apoyan en estas figuras y tablas.
+\paragraph{Integración.} El análisis depende de los datos y las hipótesis de la metodología
+experimental (\cref{sec:comparacion-teorica,sec:hipotesis}), derivadas de los análisis de
+complejidad de Huffman y LZW; la discusión de H2--H4 y las conclusiones se apoyan en estas figuras y tablas.
 
 \paragraph{Archivos.} \ruta{report/sections/05-resultados.tex}, \ruta{06-discusion.tex}
 (discusión de H1), \ruta{07-conclusiones.tex} (\cref{sec:concl-teoria-experimento}) y el paso de
 copia de \texttt{report/build.sh}; en el informe,
 \cref{sec:resultados,sec:disc-h1,sec:concl-teoria-experimento}.
-\end{aporte}

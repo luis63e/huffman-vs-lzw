@@ -1,12 +1,11 @@
 % ---------------------------------------------------------------------
-%  2. Estado del arte — Integrante D
+%  2. Estado del arte
 % ---------------------------------------------------------------------
 \section{Estado del arte}
 \label{sec:estado-arte}
 
 \subsection{El problema: teoría de la información y codificación sin pérdida}
 \label{sec:ea-problema}
-\begin{aporte}{D}
 El punto de partida de toda la disciplina es el trabajo de Shannon~\cite{shannon1948}, que
 modela una fuente como un proceso aleatorio y define su entropía como el número mínimo
 promedio de bits por símbolo con que puede representarse sin pérdida. El teorema de
@@ -28,11 +27,9 @@ común a estas revisiones es que no existe un compresor universalmente mejor: el
 depende de la coincidencia entre la redundancia que explota el método y la que contienen los
 datos. Esta observación motiva comparar Huffman y LZW sobre fuentes de naturaleza
 deliberadamente distinta.
-\end{aporte}
 
 \subsection{Algoritmos que resuelven el problema}
 \label{sec:ea-algoritmos}
-\begin{aporte}{D}
 \paragraph{Familia de Huffman.} Huffman~\cite{huffman1952} demostró que un algoritmo voraz que
 fusiona repetidamente los dos símbolos menos probables produce un código prefijo de longitud
 media mínima para una distribución conocida. Gallager~\cite{gallager1978} caracterizó estos
@@ -79,11 +76,9 @@ compresión, mientras que el reemplazo LRU obtiene mejor tasa a costa de más ti
 proponen IDA-LZW, que gestiona un área de entradas poco significativas. La implementación de
 este trabajo adopta el reinicio, la política más simple y predecible, y su efecto se estudia
 variando el tamaño máximo del diccionario.
-\end{aporte}
 
 \subsection{Comparaciones previas y metodologías de evaluación}
 \label{sec:ea-comparaciones}
-\begin{aporte}{D}
 La \cref{tab:trabajos-relacionados} resume los estudios que comparan directamente Huffman y
 LZW o variantes de ambos. Jambek y Khairi~\cite{jambek2014} los evalúan para nodos de redes de
 sensores inalámbricos y reportan que Huffman redujo los datos en alrededor de 43\,\% en
@@ -155,11 +150,9 @@ resultados entre estudios.
     \bottomrule
   \end{tabularx}
 \end{table}
-\end{aporte}
 
 \subsection{Síntesis y brecha}
 \label{sec:ea-brecha}
-\begin{aporte}{D}
 La revisión permite identificar tres carencias en las comparaciones previas entre Huffman y
 LZW. Primero, los datos son pequeños o de un único dominio (sensores, series temporales o
 texto), lo que impide separar el efecto del tipo de redundancia del efecto del algoritmo.
@@ -174,4 +167,3 @@ redundancia, junto con texto real y los corpus estándar~\cite{arnold1997,deorow
 ajuste log--log contrastado con la complejidad derivada~\cite{mcgeoch2012}; y (iii)~un
 protocolo con calentamiento, repeticiones, medianas e intervalos de confianza de Student,
 siguiendo las recomendaciones de la algoritmia experimental~\cite{johnson2002,georges2007}.
-\end{aporte}

@@ -1,5 +1,5 @@
 % ---------------------------------------------------------------------
-%  5. Resultados — Integrante E
+%  5. Resultados
 %  Todos los valores provienen de results/ (CSV y macros generados por
 %  BenchmarkRunner); build.sh copia ../results en report/results.
 % ---------------------------------------------------------------------
@@ -71,7 +71,6 @@
 
 \subsection{E1: escalamiento del tiempo con el tamaño de la entrada}
 \label{sec:res-e1}
-\begin{aporte}{E}
 La \cref{fig:e1-tiempo} muestra la mediana del tiempo de codificación y de decodificación en
 función de $n$ para las cuatro fuentes, en escala log--log; la recta discontinua tiene
 pendiente 1 y sirve solo como guía visual de crecimiento lineal (su posición vertical es
@@ -244,11 +243,9 @@ medida que el diccionario aprende frases más largas: \texttt{synthtext} baja de
 2.21~bpb y \texttt{dickens} de 4.36 a 3.29~bpb, mientras que \texttt{skewed} solo baja de 5.04 a
 4.74~bpb. En \texttt{uniform}, LZW expande los datos en todos los tamaños: incluso con 16~MiB
 produce 11.00~bpb, un 37.4\,\% más que la entrada sin comprimir.
-\end{aporte}
 
 \subsection{E2: barrido de entropía}
 \label{sec:res-e2}
-\begin{aporte}{E}
 En E2 la fuente es i.i.d. uniforme sobre $k$ símbolos, de modo que $H_0 = \log_2 k$ se conoce
 por construcción y no hay frases repetidas más allá de las debidas al azar. La
 \cref{fig:e2-bpb} compara los bits por byte de ambos algoritmos con la entropía empírica y con
@@ -336,11 +333,9 @@ con menor pendiente y con más dispersión: con $k = 128$ el semiancho del inter
 24.55~ms en la decodificación y de 92.96~ms en la codificación, señal de iteraciones atípicas en
 esa configuración. La codificación de Huffman es casi insensible a la entropía (entre 23.71 y
 30.39~ms), mientras que la de LZW sube de 60.60 a 107.11~ms.
-\end{aporte}
 
 \subsection{E3: corpus Canterbury y Silesia}
 \label{sec:res-e3}
-\begin{aporte}{E}
 La \cref{tab:corpus} reporta, para cada archivo, su tamaño, su entropía de orden cero, los bits
 por byte de cada algoritmo y el rendimiento de codificación. En negrita aparece el mejor de los
 dos algoritmos comparados; DEFLATE se muestra solo como referencia.
@@ -396,11 +391,9 @@ LZW se desploma ---32~MB/s en \texttt{grammar.lsp} y 4.5~MB/s en \texttt{xargs.1
 cada llamada reserva e inicializa tablas de tamaño $O(2^b)$, independiente de $n$, cuyo costo
 domina cuando la entrada tiene unos pocos kilobytes; la diferencia entre ambos archivos, de
 tamaño similar, sugiere además ruido de medición a esa escala.
-\end{aporte}
 
 \subsection{E4: tamaño máximo del diccionario de LZW}
 \label{sec:res-e4}
-\begin{aporte}{E}
 La \cref{fig:e4} muestra los bits por byte y los tiempos de LZW al variar el
 ancho máximo de código $b$, es decir, el tamaño del diccionario $2^b$, en tres archivos de
 naturaleza distinta. El ancho con menor bpb fue $b = \resLzwBitsBestDickens$ en
@@ -469,4 +462,3 @@ de Huffman en ese archivo. En tiempo, la decodificación se acelera al crecer el
 procesar y se producen menos reinicios. La codificación, en cambio, se encarece ligeramente
 (\texttt{dickens}, de 88.39 a 106.31~ms), lo que es coherente con una tabla hash de $2^{b+1}$
 posiciones que deja de caber en las memorias caché más cercanas al procesador.
-\end{aporte}

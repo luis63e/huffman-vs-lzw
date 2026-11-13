@@ -6,7 +6,6 @@
 
 \subsection{Proceso de comparación}
 \label{sec:proceso}
-\begin{aporte}{C}
 La \cref{fig:metodologia} resume los pasos de la comparación. Se parte de conjuntos de datos
 elegidos para aislar cada tipo de redundancia; ambos algoritmos se implementan detrás de una
 misma interfaz y se validan antes de medir; cada configuración se mide tras calentar el
@@ -58,11 +57,9 @@ Java~\cite{georges2007}.
   \caption{Metodología de la comparación entre Huffman y LZW.}
   \label{fig:metodologia}
 \end{figure}
-\end{aporte}
 
 \subsection{Implementación}
 \label{sec:implementacion}
-\begin{aporte}{C}
 \paragraph{Arquitectura.} El código es un proyecto NetBeans de tipo \emph{Java with Ant}
 compilado para Java~17 y ejecutado con el JDK~21. Todos los algoritmos implementan la interfaz
 \texttt{Codec} (métodos \texttt{name}, \texttt{encode} y \texttt{decode}), que exige que
@@ -88,9 +85,7 @@ a Huffman, a LZW y a la referencia DEFLATE. La \cref{tab:paquetes} describe los 
     \bottomrule
   \end{tabularx}
 \end{table}
-\end{aporte}
 
-\begin{aporte}{A}
 \paragraph{Núcleo de Huffman.} El \cref{lst:huffman} muestra el bucle principal de
 \ruta{HuffmanCodec.codeLengths}. Los nodos internos reciben índices crecientes a partir de
 256, de modo que un padre siempre tiene un índice mayor que sus hijos y basta un recorrido
@@ -115,9 +110,7 @@ for (int node = root - 1; node >= ALPHABET; node--) {
     depth[node] = depth[parent[node]] + 1;
 }
 \end{lstlisting}
-\end{aporte}
 
-\begin{aporte}{B}
 \paragraph{Núcleo de LZW.} El \cref{lst:lzw} reproduce \texttt{LzwCodec.compress}. La clave de
 la tabla hash concatena el código de la frase y el byte siguiente en un entero; una búsqueda
 exitosa extiende la frase, y una fallida emite el código y deja preparada la ranura
@@ -155,17 +148,14 @@ private void compress(byte[] input, CodeSink sink) {
     sink.put(phrase, width(size));
 }
 \end{lstlisting}
-\end{aporte}
 
 \subsection{Validación de la corrección}
 \label{sec:pruebas}
-\begin{aporte}{C}
 Antes de medir, la corrección se verifica en dos niveles. El primero es una batería de 43
 pruebas JUnit~4 que se ejecuta con \texttt{ant test}. El segundo está incorporado en el arnés:
 cada configuración medida se codifica y decodifica una vez y, si el resultado no es idéntico
 a la entrada, la campaña se detiene con un error. Así, ningún tiempo reportado corresponde a
 una ejecución incorrecta. La \cref{tab:pruebas} resume la batería por clase.
-\end{aporte}
 
 \begin{table}[H]
   \centering
@@ -189,7 +179,6 @@ una ejecución incorrecta. La \cref{tab:pruebas} resume la batería por clase.
 
 \subsection{Conjuntos de datos}
 \label{sec:datos}
-\begin{aporte}{C}
 Para separar el efecto del algoritmo del efecto del tipo de redundancia se combinan fuentes
 sintéticas, cuyas propiedades se conocen por construcción, con texto real y con los corpus
 estándar de evaluación de compresores (\cref{tab:datos}). Las fuentes sintéticas se generan
@@ -218,11 +207,9 @@ con \texttt{java.util.Random} y semilla fija 2026, por lo que son reproducibles.
 
 Los corpus se descargan con \texttt{data/download-corpora.sh}, que verifica sumas SHA-256 antes
 de extraerlos.
-\end{aporte}
 
 \subsection{Métricas}
 \label{sec:metricas}
-\begin{aporte}{C}
 \begin{itemize}
   \item \emph{Tiempo:} mediana, en milisegundos, de $R$ ejecuciones de codificación y de
         decodificación, medidas por separado con \texttt{System.nanoTime}.
@@ -239,11 +226,9 @@ de extraerlos.
         $k$~\cite{mcgeoch2012}. El ajuste usa los tamaños $n \ge 2^{16}$, para que los costos
         fijos no dominen.
 \end{itemize}
-\end{aporte}
 
 \subsection{Protocolo de medición}
 \label{sec:protocolo}
-\begin{aporte}{C}
 El protocolo implementado en \texttt{BenchmarkRunner} responde a los riesgos que Georges et
 al.~\cite{georges2007} identifican en la medición de programas Java ---compilación JIT,
 recolección de basura y eliminación de código muerto--- y a las recomendaciones de
@@ -264,11 +249,9 @@ reproducibilidad de Johnson~\cite{johnson2002} y McGeoch~\cite{mcgeoch2012}:
         importa sin transcripción manual. Los parámetros de la JVM son \texttt{-Xms3g},
         \texttt{-Xmx3g} y \texttt{-XX:+UseParallelGC}.
 \end{enumerate}
-\end{aporte}
 
 \subsection{Diseño experimental}
 \label{sec:experimentos}
-\begin{aporte}{C}
 La \cref{tab:experimentos} relaciona cada experimento con la variable que manipula, los
 parámetros fijos, las salidas medidas y la hipótesis que contrasta.
 
@@ -297,11 +280,9 @@ parámetros fijos, las salidas medidas y la hipótesis que contrasta.
     \bottomrule
   \end{tabularx}
 \end{table}
-\end{aporte}
 
 \subsection{Entorno de ejecución}
 \label{sec:entorno}
-\begin{aporte}{C}
 Todas las mediciones se realizaron en una misma máquina, cuyos datos registra
 automáticamente el arnés (\cref{tab:entorno}).
 
@@ -324,11 +305,9 @@ automáticamente el arnés (\cref{tab:entorno}).
     \bottomrule
   \end{tabular}
 \end{table}
-\end{aporte}
 
 \subsection{Amenazas a la validez}
 \label{sec:amenazas}
-\begin{aporte}{C}
 \begin{itemize}
   \item \emph{Ruido de JIT y GC.} Aunque el calentamiento, las repeticiones y la mediana mitigan
         la variabilidad~\cite{georges2007}, las pausas del recolector o la recompilación pueden
@@ -347,4 +326,3 @@ automáticamente el arnés (\cref{tab:entorno}).
         código nativo; sus tiempos no son comparables con implementaciones en Java y solo su
         tasa de compresión se usa como referencia.
 \end{itemize}
-\end{aporte}

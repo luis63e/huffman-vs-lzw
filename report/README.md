@@ -38,11 +38,7 @@ red "Pendiente" box and missing macros print a red `??`.
 
 Edit only the block marked `INTEGRANTES` in `main.tex`:
 `\integranteA` … `\integranteE` (five members, names still placeholders) and `\docente`.
-Ownership: A Huffman, B LZW, C methodology and benchmark harness,
-D abstract, introduction, state of the art, conclusions and bibliography, E results analysis
-(Section 5), H1 discussion and the theory-vs-experiment comparison (7.1).
-Content owned by a member is wrapped in `\begin{aporte}{A}` … `\end{aporte}`, which prints a header with
-the member's name and a thin gray left bar. Floats inside an `aporte` must use `[H]`.
+The names appear only on the title page; the body is plain prose with no per-member attribution.
 
 ## Interpretation and numbers
 

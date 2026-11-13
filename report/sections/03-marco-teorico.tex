@@ -7,7 +7,6 @@
 
 \subsection{Definiciones preliminares}
 \label{sec:definiciones}
-\begin{aporte}{D}
 Sea $x = x_1x_2\cdots x_n$ una secuencia de $n$ bytes sobre el alfabeto
 $\Sigma = \{0,\dots,255\}$, de la cual aparecen $\sigma \le 256$ símbolos distintos. La
 frecuencia del símbolo $s$ es $f_s$ y su probabilidad empírica es $p_s = f_s/n$.
@@ -44,12 +43,10 @@ incluida la cabecera, se definen
 \end{equation}
 Los bits por byte (bpb) permiten comparar directamente con $H_0$: un valor $\bpb > 8$
 indica expansión.
-\end{aporte}
 
 % =====================================================================
 \subsection{Codificación de Huffman}
 \label{sec:huffman}
-\begin{aporte}{A}
 \paragraph{Idea.} Huffman~\cite{huffman1952} construye un árbol binario de abajo hacia arriba:
 parte de una hoja por símbolo, ponderada por su frecuencia, y fusiona repetidamente los dos
 árboles de menor peso. La profundidad de cada hoja es la longitud de su código. Se trata de un
@@ -212,12 +209,10 @@ número de símbolos presentes.
         $2 + 4 + 256 = 262$ bytes, un sobrecosto de $8\cdot 262/n$ bpb que solo es apreciable
         en entradas pequeñas.
 \end{itemize}
-\end{aporte}
 
 % =====================================================================
 \subsection{Algoritmo Lempel--Ziv--Welch (LZW)}
 \label{sec:lzw}
-\begin{aporte}{B}
 \paragraph{Idea.} LZW~\cite{welch1984} es una variante de LZ78~\cite{ziv1978} que inicializa el
 diccionario con los 256 bytes posibles. El codificador extiende la frase actual $w$ mientras
 $w\,c$ siga en el diccionario; cuando no lo está, emite el código de $w$, agrega $w\,c$ como
@@ -348,12 +343,10 @@ cubre este caso.
         usa dos arreglos de $2^{17}$ enteros y el decodificador cuatro arreglos de $2^{16}$
         entradas. La cabecera ocupa solo 7 bytes (magia, $b$ y longitud original).
 \end{itemize}
-\end{aporte}
 
 % =====================================================================
 \subsection{Comparación teórica}
 \label{sec:comparacion-teorica}
-\begin{aporte}{C}
 La \cref{tab:comparacion-teorica} resume las diferencias estructurales entre ambos
 algoritmos tal como se implementaron. La diferencia esencial no es asintótica ---ambos son
 lineales--- sino de \emph{modelo}: Huffman es estático y de dos pasadas, y explota solo la
@@ -380,11 +373,9 @@ frases repetidas, pero paga al menos 9 bits por código emitido.
     \bottomrule
   \end{tabularx}
 \end{table}
-\end{aporte}
 
 \subsection{Hipótesis}
 \label{sec:hipotesis}
-\begin{aporte}{C}
 Del análisis anterior se derivan cuatro hipótesis que guían los experimentos de la
 \cref{sec:metodologia}:
 \begin{enumerate}[label=\textbf{H\arabic*.}, leftmargin=*]
@@ -400,4 +391,3 @@ Del análisis anterior se derivan cuatro hipótesis que guían los experimentos 
         código (aproximadamente, con la entropía), mientras que el de LZW es prácticamente
         insensible a ella.
 \end{enumerate}
-\end{aporte}

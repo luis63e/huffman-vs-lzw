@@ -10,7 +10,6 @@ investigación.
 
 \subsection{H1: escalamiento lineal}
 \label{sec:disc-h1}
-\begin{aporte}{E}
 \paragraph{Predicción.} Según la \cref{tab:comparacion-teorica}, los cuatro procedimientos son
 lineales en $n$: la codificación de Huffman es $\Theta(n + \sigma\log\sigma)$, su
 decodificación $\Theta(n\Lbar)$ con $\Lbar$ acotado, y ambas operaciones de LZW son
@@ -39,11 +38,9 @@ mayores tamaños, compatible con efectos de caché y de recolección de memoria,
 con la misma magnitud en la réplica. La diferencia entre corridas, de hasta 0.13 en una misma
 serie, es la variabilidad medida del experimento y es mucho menor que la distancia entre un
 crecimiento lineal y uno cuadrático.
-\end{aporte}
 
 \subsection{H2: Huffman frente a la entropía}
 \label{sec:disc-h2}
-\begin{aporte}{A}
 \paragraph{Predicción.} La tasa medida incluye la cabecera y el relleno del último byte, por lo
 que
 \begin{equation}
@@ -72,11 +69,9 @@ entropía es de 1.21~bpb, pero Huffman obtiene 1.66~bpb, porque ningún símbolo
 menos de un bit, por probable que sea. Esta es la limitación clásica de los códigos de longitud
 entera que motiva la codificación aritmética~\cite{witten1987}, y no contradice la cota
 $H_0 + 1$.
-\end{aporte}
 
 \subsection{H3: tipo de redundancia y ganador}
 \label{sec:disc-h3}
-\begin{aporte}{B}
 \paragraph{Predicción.} LZW solo ahorra espacio cuando sus frases son largas: cada código
 cuesta entre 9 y $b$ bits, así que una frase de longitud media $m$ cuesta del orden de
 $b/m$ bits por byte. En datos con palabras y frases recurrentes, el diccionario captura
@@ -107,11 +102,9 @@ referencia DEFLATE (\resCorpusDeflateBpb{}~bpb agregados, frente a \resCorpusHuf
 Huffman y \resCorpusLzwBpb{} de LZW) supera a ambos porque combina las dos ideas: un modelo de
 diccionario (LZ77) cuya salida se codifica con Huffman~\cite{rfc1951}. Los dos mecanismos son,
 por lo tanto, complementarios y no excluyentes.
-\end{aporte}
 
 \subsection{H4: sensibilidad del tiempo a la entropía}
 \label{sec:disc-h4}
-\begin{aporte}{A}
 \paragraph{Predicción.} El decodificador canónico ejecuta una iteración por bit leído, $n\Lbar$
 en total; con $\Lbar \approx \log_2 k$ en E2, su tiempo debería crecer aproximadamente de forma
 lineal con $\log_2 k$. El codificador de Huffman escribe un campo por símbolo con
@@ -135,11 +128,9 @@ de 3.2 frente al de 6.7 de Huffman y con mayor dispersión. Esa dependencia no p
 longitud de los códigos sino del número de códigos: al subir la entropía, las frases se acortan
 y hay que resolver más códigos por byte, cada uno con su costo fijo. Lo mismo explica que la
 codificación de LZW pase de 60.60 a 107.11~ms.
-\end{aporte}
 
 \subsection{Síntesis por pregunta de investigación}
 \label{sec:disc-rq}
-\begin{aporte}{D}
 \paragraph{RQ1 (escalamiento).} Se responde con H1 y H4: la teoría predice crecimiento lineal
 para ambos algoritmos, con una constante que en la decodificación de Huffman depende de la
 longitud media del código.
@@ -166,4 +157,3 @@ En E4, el mejor ancho dentro del rango evaluado fue el máximo en los tres archi
 \texttt{E.coli} $b = \resLzwBitsBestEcoli$), con rendimientos decrecientes muy marcados en
 \texttt{E.coli}. Un diccionario mayor acelera la decodificación y encarece levemente la
 codificación, a cambio de una memoria $O(2^b)$.
-\end{aporte}

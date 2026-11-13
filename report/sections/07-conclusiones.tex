@@ -1,12 +1,11 @@
 % ---------------------------------------------------------------------
-%  7. Conclusiones — Integrante D (7.1: Integrante E)
+%  7. Conclusiones
 % ---------------------------------------------------------------------
 \section{Conclusiones}
 \label{sec:conclusiones}
 
 \subsection{Comparación entre el análisis teórico y los resultados experimentales}
 \label{sec:concl-teoria-experimento}
-\begin{aporte}{E}
 La \cref{tab:teoria-experimento} reúne, para cada aspecto analizado, la predicción derivada en
 la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
 
@@ -66,11 +65,9 @@ se acortan. El análisis asintótico tampoco anticipa las constantes, que result
 la práctica: la decodificación bit a bit hace que Huffman decodifique más despacio de lo que
 codifica, y la búsqueda en la tabla hash por cada byte hace que LZW codifique más despacio de lo
 que decodifica.
-\end{aporte}
 
 \subsection{Respuestas a las preguntas de investigación}
 \label{sec:concl-rq}
-\begin{aporte}{D}
 \begin{enumerate}[label=\textbf{RQ\arabic*.}, leftmargin=*]
   \item Sí. Ambos algoritmos escalan en $\Theta(n)$, como predice el análisis, tanto al codificar
         como al decodificar. La longitud media del código, $\Lbar$, no altera el orden de
@@ -103,11 +100,9 @@ el mayor tamaño--- y siguen asimetrías opuestas, de modo que la elección tamb
 descomprimir rápido. Segundo, el tipo de redundancia decide el ganador con mucha claridad
 ---LZW en \resLzwWins{} de \resCorpusFiles{} archivos, Huffman en todas las fuentes sin
 memoria---, pero la mejor tasa agregada la obtuvo DEFLATE, que combina ambos mecanismos.
-\end{aporte}
 
 \subsection{Limitaciones}
 \label{sec:limitaciones}
-\begin{aporte}{D}
 \begin{itemize}
   \item Las mediciones provienen de una sola máquina (\resCpu) y una sola JVM (\resJvm); los
         tiempos absolutos no son transferibles, aunque las tendencias sí deberían serlo.
@@ -124,11 +119,9 @@ memoria---, pero la mejor tasa agregada la obtuvo DEFLATE, que combina ambos mec
         optimizada durante décadas y no comparable en tiempo con implementaciones didácticas en
         Java como las de este trabajo.
 \end{itemize}
-\end{aporte}
 
 \subsection{Trabajo futuro}
 \label{sec:trabajo-futuro}
-\begin{aporte}{D}
 \begin{itemize}
   \item Implementar Huffman adaptativo~\cite{vitter1987} para eliminar la segunda pasada y la
         cabecera, y comparar su costo por símbolo con la versión estática.
@@ -141,4 +134,3 @@ memoria---, pero la mejor tasa agregada la obtuvo DEFLATE, que combina ambos mec
   \item Acelerar la decodificación canónica con tablas de búsqueda~\cite{moffat1997} y repetir
         E2 para cuantificar su efecto sobre H4.
 \end{itemize}
-\end{aporte}
