@@ -80,7 +80,7 @@ a Huffman y a LZW. La \cref{tab:paquetes} describe los paquetes.
     \texttt{io} & \texttt{BitWriter}, \texttt{BitReader} & E/S de campos de bits de ancho variable, bit más significativo primero, con acumulador de 64 bits. \\
     \texttt{huffman} & \texttt{HuffmanCodec} & Longitudes con montículo, códigos canónicos y decodificación canónica. \\
     \texttt{lzw} & \texttt{LzwCodec} & Códigos de 9 a 16 bits, diccionario con tabla hash y reinicio con \texttt{CLEAR}. \\
-    \texttt{bench} & \texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}, \texttt{ResultWriter} & Experimentos E1--E4, estadística, generación de datos y escritura de CSV y macros \LaTeX. \\
+    \texttt{bench} & \texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}, \texttt{ResultWriter} & Experimentos E1--E3, estadística, generación de datos y escritura de CSV y macros \LaTeX. \\
     \texttt{app} & \texttt{Main} & Interfaz de línea de comandos (\texttt{compress}, \texttt{decompress}, \texttt{stats}, \texttt{demo}). \\
     \bottomrule
   \end{tabularx}
@@ -197,10 +197,10 @@ con \texttt{java.util.Random} y semilla fija 2026, por lo que son reproducibles.
     \texttt{uniform} & Bytes i.i.d. uniformes en $\{0,\dots,255\}$ & Ninguna ($H_0 \approx 8$) & E1 \\
     \texttt{skewed} & Símbolos i.i.d. geométricos con $p = 0.15$, truncados a 255 & Frecuencias sesgadas, sin frases & E1 \\
     \texttt{synthtext} & Palabras de un vocabulario de 2000 (2 a 9 letras con frecuencias del inglés) elegidas con ley de Zipf de exponente 1.1, separadas por espacios y saltos de línea & Frases repetidas y frecuencias sesgadas & E1 \\
-    \texttt{dickens} & Prefijos del archivo \texttt{dickens} de Silesia (texto en inglés) & Texto natural & E1, E4 \\
+    \texttt{dickens} & Prefijos del archivo \texttt{dickens} de Silesia (texto en inglés) & Texto natural & E1 \\
     Alfabetos $k$ & Símbolos i.i.d. uniformes en $\{0,\dots,k-1\}$, $k = 2, 4, \dots, 256$, $n = 2^{23}$ & Entropía controlada $H_0 = \log_2 k$ & E2 \\
-    Canterbury~\cite{arnold1997} & 11 archivos del corpus estándar y 3 del corpus grande (\texttt{E.coli}, \texttt{bible.txt}, \texttt{world192.txt}) & Texto, código, binarios, ADN & E3, E4 \\
-    Silesia~\cite{deorowicz2003} & 12 archivos de tipos diversos (texto, XML, bases de datos, ejecutables, imágenes médicas) & Mezcla realista & E3, E4 \\
+    Canterbury~\cite{arnold1997} & 11 archivos del corpus estándar y 3 del corpus grande (\texttt{E.coli}, \texttt{bible.txt}, \texttt{world192.txt}) & Texto, código, binarios, ADN & E3 \\
+    Silesia~\cite{deorowicz2003} & 12 archivos de tipos diversos (texto, XML, bases de datos, ejecutables, imágenes médicas) & Mezcla realista & E3 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -274,9 +274,6 @@ parámetros fijos, las salidas medidas y la hipótesis que contrasta.
     E3 & Archivo del corpus &
       Canterbury y Silesia completos; LZW con $b = 16$ &
       bpb, MB/s, archivos donde gana LZW & H3 (y H2) \\
-    E4 & $b = 9, \dots, 16$ &
-      \texttt{dickens} y \texttt{xml} (Silesia), \texttt{E.coli} (Canterbury) &
-      bpb y tiempos de LZW & RQ3 \\
     \bottomrule
   \end{tabularx}
 \end{table}

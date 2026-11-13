@@ -83,13 +83,32 @@ que decodifica.
         sin memoria y expande los datos aleatorios. Se recomienda Huffman para datos cercanos a
         una fuente sin memoria con distribución sesgada y LZW para texto, código fuente, registros
         y formatos estructurados.
-  \item Dentro del rango evaluado (9 a 16 bits), un diccionario mayor siempre mejoró la tasa y
-        aceleró la decodificación, con rendimientos decrecientes que dependen del dato: grandes
-        en \texttt{xml} y \texttt{dickens}; en \texttt{E.coli}, inferiores a 0.05~bpb por bit
-        adicional a partir de 13 bits.
-        El costo es una memoria $O(2^b)$ y una codificación ligeramente más lenta. Para los datos
-        estudiados, $b = 16$ es la mejor opción.
 \end{enumerate}
+
+La \cref{tab:recomendacion} resume estas respuestas como criterio práctico de elección.
+
+\begin{table}[H]
+  \centering
+  \caption{Algoritmo recomendado según la situación, con la evidencia medida.}
+  \label{tab:recomendacion}
+  \small
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.34\linewidth} l >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Situación & Recomendado & Evidencia \\
+    \midrule
+    Texto, código fuente y formatos estructurados & LZW &
+      \texttt{xml}: 1.66~bpb frente a 5.55 de Huffman \\
+    Datos sin frases repetidas y con frecuencias sesgadas & Huffman &
+      \texttt{skewed}: 4.09~bpb frente a 4.74 de LZW \\
+    Datos aleatorios o ya comprimidos & Huffman &
+      Bytes uniformes: 8.00~bpb; LZW los expande a 11.00 \\
+    Prioridad en la velocidad de compresión & Huffman &
+      4.50--6.26~ns/byte frente a 10.34--14.72 de LZW \\
+    Prioridad en la velocidad de descompresión & LZW &
+      3.17--5.11~ns/byte frente a 9.14--11.18 de Huffman \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 En términos generales, el análisis teórico indica que la elección entre Huffman y LZW no
 depende de su complejidad asintótica, que es lineal en ambos casos, sino de la coincidencia

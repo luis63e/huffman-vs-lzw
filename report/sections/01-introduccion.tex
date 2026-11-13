@@ -31,7 +31,7 @@ datos o a archivos de pocos tamaños, reportan tiempos de una sola ejecución y 
 las mediciones con la complejidad teórica de los
 algoritmos~\cite{jambek2014,fauzan2022,btoush2008}. En consecuencia, no queda claro en qué
 condiciones cada algoritmo comprime mejor, si sus tiempos crecen realmente de forma lineal con
-el tamaño de la entrada, ni cómo influyen la entropía de la fuente o el tamaño del diccionario.
+el tamaño de la entrada, ni cómo influye la entropía de la fuente.
 El problema que aborda este trabajo es, por tanto: \emph{¿cómo se comparan Huffman y LZW, en
 tiempo de ejecución y en tasa de compresión, sobre una gran cantidad de datos de naturaleza
 diversa, y en qué medida el comportamiento observado coincide con el análisis teórico?}
@@ -53,8 +53,6 @@ contrastando las mediciones con el análisis de complejidad de cada algoritmo.
         el exponente de crecimiento mediante regresión log--log con su coeficiente $R^2$.
   \item Medir la tasa de compresión (bits por byte) frente a la entropía de orden cero en un
         barrido controlado de alfabetos y en los corpus estándar Canterbury y Silesia.
-  \item Cuantificar el efecto del tamaño máximo del diccionario de LZW (de 9 a 16 bits) sobre la
-        tasa de compresión y el tiempo.
 \end{enumerate}
 
 \subsection{Preguntas de investigación}
@@ -63,8 +61,6 @@ contrastando las mediciones con el análisis de complejidad de cada algoritmo.
         la entrada según lo que predice su análisis de complejidad?
   \item ¿Cómo se relaciona la tasa de compresión de cada algoritmo con la entropía de orden cero
         y con el tipo de dato (fuentes sin memoria frente a datos con frases repetidas)?
-  \item ¿Qué efecto tiene el tamaño máximo del diccionario de LZW sobre la tasa de compresión y
-        el tiempo de ejecución?
 \end{enumerate}
 
 \subsection{Contribuciones}
@@ -89,6 +85,6 @@ problema, las familias de algoritmos que lo resuelven y los estudios comparativo
 pseudocódigo, ejemplos resueltos, el análisis de complejidad y las hipótesis H1--H4. La
 \cref{sec:metodologia} describe gráficamente la metodología, la implementación, los conjuntos
 de datos y el protocolo de medición. La \cref{sec:resultados} reporta los resultados de los
-experimentos E1--E4, y la \cref{sec:discusion} los contrasta con la teoría. La
+experimentos E1--E3, y la \cref{sec:discusion} los contrasta con la teoría. La
 \cref{sec:conclusiones} responde las preguntas de investigación.
 Los anexos detallan cómo reproducir el estudio y el detalle de la implementación de cada componente.

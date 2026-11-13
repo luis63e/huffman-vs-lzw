@@ -97,6 +97,8 @@ public class BenchmarkRunnerTest {
     public void unknownArgumentPrintsUsage() {
         assertEquals(2, run("--out", tmp.getRoot().getPath(), "--corpus", tmp.getRoot().getPath(), "--bogus"));
         assertTrue(stderr().contains("Usage"));
+        assertEquals("only e1, e2 and e3 exist", 2,
+                run("--out", tmp.getRoot().getPath(), "--corpus", tmp.getRoot().getPath(), "--quick", "--only", "e4"));
     }
 
     @Test

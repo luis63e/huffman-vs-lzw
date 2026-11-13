@@ -328,30 +328,6 @@ benchmark:
      [java] E3 silesia/x-ray n=8474240 lzw enc=83.17ms dec=27.05ms bpb=6.666
      [java] E3 silesia/xml n=5345280 huffman enc=21.68ms dec=41.28ms bpb=5.555
      [java] E3 silesia/xml n=5345280 lzw enc=52.04ms dec=12.24ms bpb=1.655
-     [java] E4 dickens bits=9 lzw enc=88.39ms dec=51.94ms bpb=6.056
-     [java] E4 xml bits=9 lzw enc=44.48ms dec=23.56ms bpb=5.118
-     [java] E4 ecoli bits=9 lzw enc=24.74ms dec=14.86ms bpb=3.101
-     [java] E4 dickens bits=10 lzw enc=90.94ms dec=45.90ms bpb=5.083
-     [java] E4 xml bits=10 lzw enc=47.37ms dec=22.19ms bpb=3.946
-     [java] E4 ecoli bits=10 lzw enc=23.14ms dec=11.62ms bpb=2.631
-     [java] E4 dickens bits=11 lzw enc=94.13ms dec=45.26ms bpb=4.542
-     [java] E4 xml bits=11 lzw enc=46.46ms dec=20.17ms bpb=3.203
-     [java] E4 ecoli bits=11 lzw enc=21.98ms dec=10.69ms bpb=2.435
-     [java] E4 dickens bits=12 lzw enc=93.72ms dec=38.86ms bpb=4.167
-     [java] E4 xml bits=12 lzw enc=44.80ms dec=16.30ms bpb=2.673
-     [java] E4 ecoli bits=12 lzw enc=21.92ms dec=9.62ms bpb=2.329
-     [java] E4 dickens bits=13 lzw enc=96.28ms dec=36.84ms bpb=3.882
-     [java] E4 xml bits=13 lzw enc=43.53ms dec=14.10ms bpb=2.279
-     [java] E4 ecoli bits=13 lzw enc=25.84ms dec=9.05ms bpb=2.265
-     [java] E4 dickens bits=14 lzw enc=96.95ms dec=35.07ms bpb=3.653
-     [java] E4 xml bits=14 lzw enc=45.06ms dec=13.01ms bpb=1.992
-     [java] E4 ecoli bits=14 lzw enc=30.06ms dec=8.96ms bpb=2.222
-     [java] E4 dickens bits=15 lzw enc=102.55ms dec=34.83ms bpb=3.462
-     [java] E4 xml bits=15 lzw enc=45.36ms dec=12.22ms bpb=1.797
-     [java] E4 ecoli bits=15 lzw enc=33.69ms dec=8.83ms bpb=2.191
-     [java] E4 dickens bits=16 lzw enc=106.31ms dec=32.27ms bpb=3.288
-     [java] E4 xml bits=16 lzw enc=51.59ms dec=11.94ms bpb=1.655
-     [java] E4 ecoli bits=16 lzw enc=32.85ms dec=8.52ms bpb=2.169
 
 BUILD SUCCESSFUL
 Total time: 4 minutes 26 seconds

@@ -7,7 +7,7 @@ El repositorio contiene todo lo necesario para repetir el estudio. Desde la raí
 \texttt{bash}, la secuencia completa es la del \cref{lst:reproducir}. El archivo
 \texttt{env.sh} configura el JDK, Apache Ant y Tectonic incluidos en \texttt{.tools/}; el
 \emph{script} de corpus descarga Canterbury, el corpus grande y Silesia, y verifica sus sumas
-SHA-256; \texttt{ant benchmark} ejecuta E1--E4 y escribe en \texttt{results/} los CSV, la tabla
+SHA-256; \texttt{ant benchmark} ejecuta E1--E3 y escribe en \texttt{results/} los CSV, la tabla
 del corpus y las macros que este informe importa; \texttt{build.sh} copia esos resultados y
 compila el PDF.
 
@@ -16,7 +16,7 @@ source env.sh                  # JDK, Ant y Tectonic portables
 data/download-corpora.sh       # corpus Canterbury, grande y Silesia (SHA-256)
 cd code
 ant test                       # 43 pruebas JUnit
-ant benchmark                  # experimentos E1-E4 -> ../results
+ant benchmark                  # experimentos E1-E3 -> ../results
 cd ../report
 ./build.sh                     # copia ../results y genera build/main.pdf
 \end{lstlisting}
@@ -73,8 +73,7 @@ sus detalles. \texttt{BitWriter} y \texttt{BitReader} son compartidos con LZW. S
 \subsection{Algoritmo LZW}
 \label{app:detalle-b}
 \paragraph{Objetivo.} Implementar LZW con códigos de ancho variable y tamaño máximo de
-diccionario configurable, de forma que la memoria quede acotada y que el ancho máximo pueda
-variarse en el experimento E4.
+diccionario configurable, de forma que la memoria quede acotada.
 
 \paragraph{Cómo funciona.} El codificador extiende la frase actual mientras el par (frase,
 byte) esté en el diccionario y, cuando no lo está, emite el código de la frase y registra la
@@ -94,8 +93,7 @@ longitud declarada, y rechaza flujos corruptos. El método \texttt{traceCodes} e
 secuencia emitida para pruebas y enseñanza.
 
 \paragraph{Integración.} \texttt{LzwCodec} implementa \texttt{Codec} y reutiliza
-\texttt{BitWriter} y \texttt{BitReader}. El arnés lo instancia con $b = 16$ en E1--E3 y con
-$b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-N}. Sus 8 pruebas
+\texttt{BitWriter} y \texttt{BitReader}. El arnés lo instancia con $b = 16$ en E1--E3; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-N}. Sus 8 pruebas
 (\texttt{LzwCodecTest}) forman parte de \texttt{ant test}.
 
 \paragraph{Archivos.} \ruta{code/src/compression/lzw/LzwCodec.java} y
@@ -108,7 +106,7 @@ $b = 9,\dots,16$ en E4; la línea de comandos acepta \texttt{lzw} o \texttt{lzw-
 reproducible, y producir automáticamente los datos (CSV, tabla del corpus y macros) que
 alimentan el informe.
 
-\paragraph{Cómo funciona.} \texttt{BenchmarkRunner} ejecuta E1--E4 según el protocolo de la
+\paragraph{Cómo funciona.} \texttt{BenchmarkRunner} ejecuta E1--E3 según el protocolo de la
 \cref{sec:protocolo}: calentamiento global, verificación de ida y vuelta, calentamiento local,
 repeticiones cronometradas y resúmenes estadísticos. \texttt{Stats} calcula media, mediana,
 desviación estándar, intervalo de confianza del 95\,\% con la $t$ de Student, el ajuste
@@ -126,22 +124,22 @@ línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 (\cref{app:detalle-d}). Sus pruebas (\texttt{StatsTest}, 6; \texttt{DataGeneratorTest}, 3;
 \texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
 
-\paragraph{Archivos.} \ruta{code/src/compression/bench/} (\texttt{BenchmarkRunner},
-\texttt{Stats}, \texttt{DataGenerator}, \texttt{ResultWriter}),
-\ruta{code/src/compression/app/Main.java}, sus pruebas,
-y \texttt{data/download-corpora.sh}; en el informe,
-\cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia}.
+{\sloppy \paragraph{Archivos.} El paquete \ruta{code/src/compression/bench/} (\texttt{BenchmarkRunner},
+\texttt{Stats}, \texttt{DataGenerator}, \texttt{ResultWriter}), la clase \texttt{Main} en
+\ruta{code/src/compression/app/}, sus pruebas y el \emph{script}
+\ruta{data/download-corpora.sh}; en el informe,
+\cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia}.\par}
 
 \subsection{Generación de figuras y tablas}
 \label{app:detalle-d}
-\paragraph{Objetivo.} Convertir las mediciones del arnés en las figuras y tablas de E1--E4, de
+\paragraph{Objetivo.} Convertir las mediciones del arnés en las figuras y tablas de E1--E3, de
 modo que el informe se genere a partir de los datos sin transcribir números a mano.
 
 \paragraph{Cómo funciona.} El informe consume las salidas de \texttt{BenchmarkRunner}:
 \texttt{results/e1\_*.csv} (tiempos, costo por byte y tasas de E1 por fuente),
 \texttt{fits.csv} y \texttt{replica/fits.csv} (pendientes log--log y $R^2$ de la corrida
 principal y de la réplica), \texttt{e2\_entropy.csv}, \texttt{e3\_corpus.csv},
-\texttt{e4\_lzw\_bits.csv}, \texttt{macros.tex} y \texttt{table\_corpus.tex}. A partir de ellas
+\texttt{macros.tex} y \texttt{table\_corpus.tex}. A partir de ellas
 se construyen las figuras y tablas de la \cref{sec:resultados} y la
 \cref{tab:teoria-experimento}.
 

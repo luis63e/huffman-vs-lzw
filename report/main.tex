@@ -87,9 +87,6 @@
 \providecommand{\resLzwWins}{\resmissing}
 \providecommand{\resCorpusHuffBpb}{\resmissing}
 \providecommand{\resCorpusLzwBpb}{\resmissing}
-\providecommand{\resLzwBitsBestDickens}{\resmissing}
-\providecommand{\resLzwBitsBestXml}{\resmissing}
-\providecommand{\resLzwBitsBestEcoli}{\resmissing}
 \providecommand{\resSlopeDickensHuffEnc}{\resmissing}
 \providecommand{\resSlopeDickensHuffDec}{\resmissing}
 \providecommand{\resSlopeDickensLzwEnc}{\resmissing}
@@ -255,10 +252,9 @@ Lempel--Ziv--Welch (LZW), un método adaptativo de diccionario que reemplaza fra
 repetidas por códigos. Ambos se implementaron en Java (proyecto NetBeans con Ant), con
 codificación canónica de Huffman y LZW de ancho variable de 9 a 16 bits con reinicio del
 diccionario, validados con 43 pruebas JUnit. Se derivó la complejidad temporal y espacial de
-cada algoritmo y se contrastó con cuatro experimentos: escalamiento del tiempo con el tamaño
-de la entrada (ajuste log--log), barrido de entropía con alfabetos uniformes, evaluación sobre
-los corpus Canterbury y Silesia, y efecto del tamaño máximo del
-diccionario de LZW. Los tiempos se reportan como medianas con intervalos de confianza del
+cada algoritmo y se contrastó con tres experimentos: escalamiento del tiempo con el tamaño
+de la entrada (ajuste log--log), barrido de entropía con alfabetos uniformes y evaluación sobre
+los corpus Canterbury y Silesia. Los tiempos se reportan como medianas con intervalos de confianza del
 95\,\% tras el calentamiento del compilador JIT.
 Las pendientes log--log, entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en una
 réplica independiente, confirman el crecimiento lineal de las cuatro operaciones, con
@@ -282,10 +278,9 @@ the symbol frequency distribution, and the Lempel--Ziv--Welch (LZW) algorithm, a
 dictionary method that replaces repeated phrases with codes. Both were implemented in Java
 (a NetBeans project built with Ant), using canonical Huffman codes and variable-width LZW
 codes from 9 to 16 bits with dictionary reset, and validated with 43 JUnit tests. The time and
-space complexity of each algorithm was derived and contrasted through four experiments:
-time scaling with input size (log--log fit), an entropy sweep over uniform alphabets, an
-evaluation on the Canterbury and Silesia corpora, and the effect
-of the maximum LZW dictionary size. Times are reported as medians with 95\,\% confidence
+space complexity of each algorithm was derived and contrasted through three experiments:
+time scaling with input size (log--log fit), an entropy sweep over uniform alphabets, and an
+evaluation on the Canterbury and Silesia corpora. Times are reported as medians with 95\,\% confidence
 intervals after JIT warm-up.
 Log--log slopes between 0.85 and 1.08 in the main run and between 0.93 and 1.02 in an
 independent replica confirm linear growth for all four operations, with opposite asymmetries:

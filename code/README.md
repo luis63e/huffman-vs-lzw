@@ -32,7 +32,7 @@ Exit codes: `0` success, `1` runtime error (unreadable file, corrupt archive), `
 
 Benchmark options are passed through `-Dbench.args`, for example
 `ant benchmark -Dbench.args="--quick --only e1,e2"`. Available experiments: `e1` scaling with
-input size, `e2` entropy sweep, `e3` Canterbury and Silesia corpora, `e4` LZW dictionary size.
+input size, `e2` entropy sweep and `e3` Canterbury and Silesia corpora.
 
 ## Corpora
 

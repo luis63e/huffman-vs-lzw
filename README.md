@@ -22,7 +22,7 @@ Algorithms course at Universidad de Lima (2026-2).
 source env.sh                 # portable JDK, Ant and Tectonic in .tools/ (see below)
 data/download-corpora.sh      # Canterbury + Silesia corpora into data/corpus/
 cd code && ant test           # run the JUnit suite
-ant benchmark                 # run experiments E1-E4 into ../results
+ant benchmark                 # run experiments E1-E3 into ../results
 cd ../report && ./build.sh    # compile report/build/main.pdf
 ```
 

@@ -5,8 +5,7 @@
 \label{sec:discusion}
 
 Esta sección contrasta cada hipótesis de la \cref{sec:hipotesis} con la evidencia de la
-\cref{sec:resultados} y, a continuación, discute el efecto del tamaño del diccionario de LZW,
-para el que la teoría no fija una predicción.
+\cref{sec:resultados}.
 
 \subsection{H1: escalamiento lineal}
 \label{sec:disc-h1}
@@ -125,14 +124,3 @@ de 3.2 frente al de 6.7 de Huffman y con mayor dispersión. Esa dependencia no p
 longitud de los códigos sino del número de códigos: al subir la entropía, las frases se acortan
 y hay que resolver más códigos por byte, cada uno con su costo fijo. Lo mismo explica que la
 codificación de LZW pase de 60.60 a 107.11~ms.
-
-\subsection{Tamaño del diccionario de LZW}
-\label{sec:disc-e4}
-Un diccionario mayor retiene más frases y reinicia con
-menos frecuencia, pero cada código cuesta más bits; la teoría no fija un óptimo universal, que
-depende de cuán repetitivos y estacionarios sean los datos~\cite{cheng2021}.
-En E4, el mejor ancho dentro del rango evaluado fue el máximo en los tres archivos
-(\texttt{dickens} $b = \resLzwBitsBestDickens$, \texttt{xml} $b = \resLzwBitsBestXml$,
-\texttt{E.coli} $b = \resLzwBitsBestEcoli$), con rendimientos decrecientes muy marcados en
-\texttt{E.coli}. Un diccionario mayor acelera la decodificación y encarece levemente la
-codificación, a cambio de una memoria $O(2^b)$.
