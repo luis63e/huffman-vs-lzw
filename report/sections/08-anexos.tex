@@ -116,8 +116,7 @@ log--log por mínimos cuadrados y la entropía de orden cero. \texttt{DataGenera
 fuentes sintéticas deterministas de la \cref{tab:datos}.
 
 \paragraph{Cómo se implementó.} El arnés trabaja sobre la interfaz \texttt{Codec}, lo que
-permite medir igual a Huffman, a LZW y a DEFLATE (\texttt{DeflateCodec}, envoltorio de
-\texttt{java.util.zip}). \texttt{ResultWriter} escribe los CSV, la tabla del corpus en \LaTeX{} y
+permite medir igual a Huffman y a LZW. \texttt{ResultWriter} escribe los CSV, la tabla del corpus en \LaTeX{} y
 \texttt{macros.tex}, de modo que ningún número se transcribe a mano. \texttt{Main} ofrece la
 línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 \texttt{data/download-corpora.sh} descarga y verifica los corpus.
@@ -128,7 +127,7 @@ línea de comandos con códigos de salida 0, 1 y 2. El \emph{script}
 \texttt{BenchmarkRunnerTest}, 4; \texttt{MainTest}, 6) forman parte de \texttt{ant test}.
 
 \paragraph{Archivos.} \ruta{code/src/compression/bench/} (\texttt{BenchmarkRunner},
-\texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter}),
+\texttt{Stats}, \texttt{DataGenerator}, \texttt{ResultWriter}),
 \ruta{code/src/compression/app/Main.java}, sus pruebas,
 y \texttt{data/download-corpora.sh}; en el informe,
 \cref{sec:comparacion-teorica,sec:hipotesis,sec:metodologia}.

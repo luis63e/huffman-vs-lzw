@@ -66,8 +66,8 @@ en hardware y software, pero su diccionario crece sin límite si no se gestiona.
 una etapa LZ77 con una codificación de Huffman canónica de los literales, longitudes y
 distancias resultantes. Su éxito práctico ilustra que ambas familias son complementarias: la
 etapa de diccionario elimina la repetición de frases y la etapa estadística, el sesgo en la
-distribución de los símbolos resultantes. Por esta razón se incluye en este trabajo como
-referencia externa, no como un tercer algoritmo comparado.
+distribución de los símbolos resultantes. DEFLATE queda fuera del alcance de este trabajo, que
+compara los dos mecanismos por separado.
 
 \paragraph{Gestión del diccionario en LZW.} Cuando el diccionario de LZW se llena, el
 compresor debe decidir qué hacer. Cheng et al.~\cite{cheng2021} comparan las políticas
@@ -143,7 +143,7 @@ resultados entre estudios.
       El reinicio es más rápido pero comprime peor; LRU comprime mejor con más tiempo y
       memoria. \\
     \midrule
-    Este trabajo & Huffman canónico, LZW 9--16 bits; DEFLATE como referencia &
+    Este trabajo & Huffman canónico, LZW 9--16 bits &
       Sintéticos controlados, texto real, Canterbury y Silesia &
       Tiempo (mediana, IC 95\,\%), pendiente log--log, bpb &
       Ver \cref{sec:resultados,sec:discusion}. \\

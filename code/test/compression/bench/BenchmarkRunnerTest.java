@@ -62,12 +62,15 @@ public class BenchmarkRunnerTest {
         assertTrue(e1.get(5).startsWith("16384,"));
 
         List<String> e3 = Files.readAllLines(out.toPath().resolve("e3_corpus.csv"));
+        assertEquals("corpus,file,bytes,h0,huff_bpb,lzw_bpb,huff_enc_mbs,huff_dec_mbs,lzw_enc_mbs,lzw_dec_mbs",
+                e3.get(0));
         assertEquals(1 + 2, e3.size());
         assertTrue(e3.get(1).startsWith("canterbury,a.txt,3600,"));
         assertTrue(e3.get(2).startsWith("canterbury,b_file.txt,4400,"));
 
         String table = Files.readString(out.toPath().resolve("table_corpus.tex"));
         assertTrue(table, table.contains("\\texttt{b\\_file.txt}"));
+        assertEquals("name, size, H0, Huffman, LZW and two speeds", 6, table.lines().findFirst().get().split(" & ").length - 1);
 
         String macros = Files.readString(out.toPath().resolve("macros.tex"));
         assertTrue(macros.contains("\\newcommand{\\resSlopeUniformHuffEnc}"));

@@ -36,5 +36,3 @@ directly in NetBeans (`File > Open Project`, select `code/`).
   to 1), as predicted by their complexity analysis.
 - Huffman decodes more slowly than it encodes; LZW shows the opposite asymmetry.
 - LZW produces smaller output on 24 of the 26 corpus files, but expands incompressible data.
-- DEFLATE, which combines LZ77 and Huffman, beats both, showing that the two ideas are
-  complementary.

@@ -97,11 +97,8 @@ ya captura casi toda la redundancia aprovechable, y las repeticiones largas que 
 demasiado escasas para que un diccionario de $2^{16}$ frases compense los 16~bits de cada
 código. En \texttt{x-ray}, una radiografía, LZW apenas encuentra frases repetidas ---su tasa, 6.67~bpb,
 supera incluso $H_0 = 6.60$---, y en
-\texttt{sao} ---un catálogo binario de estrellas--- ambos algoritmos empatan prácticamente. La
-referencia DEFLATE (\resCorpusDeflateBpb{}~bpb agregados, frente a \resCorpusHuffBpb{} de
-Huffman y \resCorpusLzwBpb{} de LZW) supera a ambos porque combina las dos ideas: un modelo de
-diccionario (LZ77) cuya salida se codifica con Huffman~\cite{rfc1951}. Los dos mecanismos son,
-por lo tanto, complementarios y no excluyentes.
+\texttt{sao} ---un catálogo binario de estrellas--- ambos algoritmos empatan prácticamente. En el
+agregado del corpus, LZW obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman.
 
 \subsection{H4: sensibilidad del tiempo a la entropía}
 \label{sec:disc-h4}
@@ -146,8 +143,7 @@ datos con frases repetidas, pero pierde ---y puede expandir--- en fuentes sin me
 Los datos lo confirman: Huffman queda en $[H_0, H_0 + 1)$ en todos los casos medidos, y LZW
 gana en \resLzwWins{} de los \resCorpusFiles{} archivos del corpus, pero pierde en todas las
 fuentes i.i.d. y expande los bytes uniformes hasta 11.00~bpb. En el agregado del corpus, LZW
-obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman, y DEFLATE, que combina
-ambas ideas, \resCorpusDeflateBpb{}.
+obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman.
 
 \paragraph{RQ3 (tamaño del diccionario).} Un diccionario mayor retiene más frases y reinicia con
 menos frecuencia, pero cada código cuesta más bits; la teoría no fija un óptimo universal, que

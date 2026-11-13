@@ -278,82 +278,56 @@ benchmark:
      [java] E2 k=256 n=8388608 lzw enc=107.11ms dec=42.08ms bpb=10.997
      [java] E3 canterbury/E.coli n=4638690 huffman enc=13.32ms dec=8.32ms bpb=2.000
      [java] E3 canterbury/E.coli n=4638690 lzw enc=33.01ms dec=8.64ms bpb=2.169
-     [java] E3 canterbury/E.coli n=4638690 deflate enc=573.61ms dec=8.09ms bpb=2.314
      [java] E3 canterbury/alice29.txt n=152089 huffman enc=0.68ms dec=1.40ms bpb=4.626
      [java] E3 canterbury/alice29.txt n=152089 lzw enc=1.45ms dec=0.54ms bpb=3.274
-     [java] E3 canterbury/alice29.txt n=152089 deflate enc=4.66ms dec=0.37ms bpb=2.862
      [java] E3 canterbury/asyoulik.txt n=125179 huffman enc=0.55ms dec=1.22ms bpb=4.861
      [java] E3 canterbury/asyoulik.txt n=125179 lzw enc=1.16ms dec=0.47ms bpb=3.515
-     [java] E3 canterbury/asyoulik.txt n=125179 deflate enc=4.29ms dec=0.34ms bpb=3.125
      [java] E3 canterbury/bible.txt n=4047392 huffman enc=17.27ms dec=35.05ms bpb=4.385
      [java] E3 canterbury/bible.txt n=4047392 lzw enc=41.25ms dec=11.61ms bpb=2.780
-     [java] E3 canterbury/bible.txt n=4047392 deflate enc=129.64ms dec=8.17ms bpb=2.356
      [java] E3 canterbury/cp.html n=24603 huffman enc=0.11ms dec=0.21ms bpb=5.353
      [java] E3 canterbury/cp.html n=24603 lzw enc=0.28ms dec=0.14ms bpb=3.681
-     [java] E3 canterbury/cp.html n=24603 deflate enc=0.33ms dec=0.06ms bpb=2.588
      [java] E3 canterbury/fields.c n=11150 huffman enc=0.05ms dec=0.09ms bpb=5.229
      [java] E3 canterbury/fields.c n=11150 lzw enc=0.16ms dec=0.09ms bpb=3.564
-     [java] E3 canterbury/fields.c n=11150 deflate enc=0.14ms dec=0.03ms bpb=2.239
      [java] E3 canterbury/grammar.lsp n=3721 huffman enc=0.02ms dec=0.02ms bpb=5.229
      [java] E3 canterbury/grammar.lsp n=3721 lzw enc=0.12ms dec=0.07ms bpb=3.906
-     [java] E3 canterbury/grammar.lsp n=3721 deflate enc=0.04ms dec=0.01ms bpb=2.623
      [java] E3 canterbury/kennedy.xls n=1029744 huffman enc=3.60ms dec=3.66ms bpb=3.595
      [java] E3 canterbury/kennedy.xls n=1029744 lzw enc=7.26ms dec=1.66ms bpb=2.402
-     [java] E3 canterbury/kennedy.xls n=1029744 deflate enc=16.61ms dec=1.16ms bpb=1.585
      [java] E3 canterbury/lcet10.txt n=426754 huffman enc=1.82ms dec=3.86ms bpb=4.702
      [java] E3 canterbury/lcet10.txt n=426754 lzw enc=4.17ms dec=1.37ms bpb=3.187
-     [java] E3 canterbury/lcet10.txt n=426754 deflate enc=12.71ms dec=0.98ms bpb=2.716
      [java] E3 canterbury/plrabn12.txt n=481861 huffman enc=2.11ms dec=4.71ms bpb=4.580
      [java] E3 canterbury/plrabn12.txt n=481861 lzw enc=4.61ms dec=1.51ms bpb=3.406
-     [java] E3 canterbury/plrabn12.txt n=481861 deflate enc=19.81ms dec=1.25ms bpb=3.242
      [java] E3 canterbury/ptt5 n=513216 huffman enc=2.04ms dec=1.43ms bpb=1.665
      [java] E3 canterbury/ptt5 n=513216 lzw enc=2.53ms dec=0.96ms bpb=0.970
-     [java] E3 canterbury/ptt5 n=513216 deflate enc=5.48ms dec=0.53ms bpb=0.880
      [java] E3 canterbury/sum n=38240 huffman enc=0.21ms dec=0.34ms bpb=5.420
      [java] E3 canterbury/sum n=38240 lzw enc=0.42ms dec=0.20ms bpb=4.206
-     [java] E3 canterbury/sum n=38240 deflate enc=0.95ms dec=0.10ms bpb=2.717
      [java] E3 canterbury/world192.txt n=2473400 huffman enc=12.60ms dec=24.35ms bpb=5.042
      [java] E3 canterbury/world192.txt n=2473400 lzw enc=25.74ms dec=7.70ms bpb=3.258
-     [java] E3 canterbury/world192.txt n=2473400 deflate enc=78.07ms dec=8.69ms bpb=2.345
      [java] E3 canterbury/xargs.1 n=4227 huffman enc=0.05ms dec=0.04ms bpb=5.420
      [java] E3 canterbury/xargs.1 n=4227 lzw enc=0.94ms dec=0.53ms bpb=4.434
-     [java] E3 canterbury/xargs.1 n=4227 deflate enc=0.10ms dec=0.02ms bpb=3.282
      [java] E3 silesia/dickens n=10192446 huffman enc=47.22ms dec=99.46ms bpb=4.573
      [java] E3 silesia/dickens n=10192446 lzw enc=107.48ms dec=33.61ms bpb=3.288
-     [java] E3 silesia/dickens n=10192446 deflate enc=404.93ms dec=26.52ms bpb=3.039
      [java] E3 silesia/mozilla n=51220480 huffman enc=342.28ms dec=645.38ms bpb=6.244
      [java] E3 silesia/mozilla n=51220480 lzw enc=812.10ms dec=263.53ms bpb=4.298
-     [java] E3 silesia/mozilla n=51220480 deflate enc=1277.90ms dec=119.34ms bpb=2.981
      [java] E3 silesia/mr n=9970564 huffman enc=40.57ms dec=46.18ms bpb=3.709
      [java] E3 silesia/mr n=9970564 lzw enc=88.85ms dec=25.68ms bpb=3.014
-     [java] E3 silesia/mr n=9970564 deflate enc=315.79ms dec=22.79ms bpb=2.949
      [java] E3 silesia/nci n=33553445 huffman enc=127.31ms dec=117.74ms bpb=2.438
      [java] E3 silesia/nci n=33553445 lzw enc=245.17ms dec=64.86ms bpb=0.937
-     [java] E3 silesia/nci n=33553445 deflate enc=264.44ms dec=26.09ms bpb=0.763
      [java] E3 silesia/ooffice n=6152192 huffman enc=29.98ms dec=71.00ms bpb=6.664
      [java] E3 silesia/ooffice n=6152192 lzw enc=73.77ms dec=26.00ms bpb=5.288
-     [java] E3 silesia/ooffice n=6152192 deflate enc=192.28ms dec=20.02ms bpb=4.028
      [java] E3 silesia/osdb n=10085684 huffman enc=46.04ms dec=92.05ms bpb=6.617
      [java] E3 silesia/osdb n=10085684 lzw enc=119.83ms dec=35.29ms bpb=4.384
-     [java] E3 silesia/osdb n=10085684 deflate enc=174.19ms dec=20.90ms bpb=2.931
      [java] E3 silesia/reymont n=6627202 huffman enc=30.43ms dec=54.46ms bpb=4.867
      [java] E3 silesia/reymont n=6627202 lzw enc=62.51ms dec=18.25ms bpb=2.461
-     [java] E3 silesia/reymont n=6627202 deflate enc=234.11ms dec=13.19ms bpb=2.246
      [java] E3 silesia/samba n=21606400 huffman enc=102.02ms dec=199.12ms bpb=6.127
      [java] E3 silesia/samba n=21606400 lzw enc=215.89ms dec=60.56ms bpb=3.063
-     [java] E3 silesia/samba n=21606400 deflate enc=333.22ms dec=36.16ms bpb=2.018
      [java] E3 silesia/sao n=7251944 huffman enc=33.94ms dec=88.35ms bpb=7.549
      [java] E3 silesia/sao n=7251944 lzw enc=91.07ms dec=33.69ms bpb=7.535
-     [java] E3 silesia/sao n=7251944 deflate enc=268.06ms dec=21.79ms bpb=5.882
      [java] E3 silesia/webster n=41458703 huffman enc=200.71ms dec=384.03ms bpb=5.003
      [java] E3 silesia/webster n=41458703 lzw enc=434.77ms dec=129.26ms bpb=2.764
-     [java] E3 silesia/webster n=41458703 deflate enc=968.76ms dec=88.02ms bpb=2.357
      [java] E3 silesia/x-ray n=8474240 huffman enc=35.77ms dec=54.85ms bpb=6.629
      [java] E3 silesia/x-ray n=8474240 lzw enc=83.17ms dec=27.05ms bpb=6.666
-     [java] E3 silesia/x-ray n=8474240 deflate enc=209.26ms dec=32.78ms bpb=5.707
      [java] E3 silesia/xml n=5345280 huffman enc=21.68ms dec=41.28ms bpb=5.555
      [java] E3 silesia/xml n=5345280 lzw enc=52.04ms dec=12.24ms bpb=1.655
-     [java] E3 silesia/xml n=5345280 deflate enc=58.64ms dec=5.39ms bpb=1.030
      [java] E4 dickens bits=9 lzw enc=88.39ms dec=51.94ms bpb=6.056
      [java] E4 xml bits=9 lzw enc=44.48ms dec=23.56ms bpb=5.118
      [java] E4 ecoli bits=9 lzw enc=24.74ms dec=14.86ms bpb=3.101

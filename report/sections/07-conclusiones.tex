@@ -40,8 +40,7 @@ la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
       E2: \resEntropyLzwBpbKTwo{} bpb con $k = 2$ y \resEntropyLzwBpbKTwoFiftySix{} bpb con
       $k = 256$; E3: gana en \resLzwWins{} de \resCorpusFiles{} archivos \\
     Corpus completo & Sin predicción universal &
-      Agregado: Huffman \resCorpusHuffBpb{}, LZW \resCorpusLzwBpb{}, DEFLATE
-      \resCorpusDeflateBpb{} bpb \\
+      Agregado: Huffman \resCorpusHuffBpb{}, LZW \resCorpusLzwBpb{} bpb \\
     Decodificación y entropía & Huffman crece con $\Lbar$; LZW casi insensible (H4) &
       E2, decodificación: Huffman \resEntropyHuffDecMsKTwo{} a
       \resEntropyHuffDecMsKTwoFiftySix{} ms; LZW \resEntropyLzwDecMsKTwo{} a
@@ -80,8 +79,7 @@ que decodifica.
         (\texttt{xml}: 1.66~bpb frente a $H_0 = 5.52$), pero pierde frente a Huffman en fuentes
         sin memoria y expande los datos aleatorios. Se recomienda Huffman para datos cercanos a
         una fuente sin memoria con distribución sesgada y LZW para texto, código fuente, registros
-        y formatos estructurados; para uso general, la combinación de ambas ideas, como en
-        DEFLATE, comprime mejor que cualquiera de los dos por separado.
+        y formatos estructurados.
   \item Dentro del rango evaluado (9 a 16 bits), un diccionario mayor siempre mejoró la tasa y
         aceleró la decodificación, con rendimientos decrecientes que dependen del dato: grandes
         en \texttt{xml} y \texttt{dickens}; en \texttt{E.coli}, inferiores a 0.05~bpb por bit
@@ -99,7 +97,7 @@ de complejidad, las constantes de cada operación difieren mucho ---de 3.17 a 14
 el mayor tamaño--- y siguen asimetrías opuestas, de modo que la elección también depende de si importa más comprimir o
 descomprimir rápido. Segundo, el tipo de redundancia decide el ganador con mucha claridad
 ---LZW en \resLzwWins{} de \resCorpusFiles{} archivos, Huffman en todas las fuentes sin
-memoria---, pero la mejor tasa agregada la obtuvo DEFLATE, que combina ambos mecanismos.
+memoria---, de modo que conviene conocer el dato antes de elegir el algoritmo.
 
 \subsection{Limitaciones}
 \label{sec:limitaciones}
@@ -115,9 +113,6 @@ memoria---, pero la mejor tasa agregada la obtuvo DEFLATE, que combina ambos mec
         iteración en lugar de usar tablas de búsqueda, y LZW usa solo la política de reinicio.
   \item Huffman se aplicó con un modelo de orden cero sobre bytes; no se evaluaron modelos con
         contexto ni alfabetos distintos del byte.
-  \item DEFLATE se usó solo como referencia de tasa, mediante una implementación nativa (zlib)
-        optimizada durante décadas y no comparable en tiempo con implementaciones didácticas en
-        Java como las de este trabajo.
 \end{itemize}
 
 \subsection{Trabajo futuro}

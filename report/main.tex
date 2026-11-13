@@ -87,7 +87,6 @@
 \providecommand{\resLzwWins}{\resmissing}
 \providecommand{\resCorpusHuffBpb}{\resmissing}
 \providecommand{\resCorpusLzwBpb}{\resmissing}
-\providecommand{\resCorpusDeflateBpb}{\resmissing}
 \providecommand{\resLzwBitsBestDickens}{\resmissing}
 \providecommand{\resLzwBitsBestXml}{\resmissing}
 \providecommand{\resLzwBitsBestEcoli}{\resmissing}
@@ -258,7 +257,7 @@ codificación canónica de Huffman y LZW de ancho variable de 9 a 16 bits con re
 diccionario, validados con 43 pruebas JUnit. Se derivó la complejidad temporal y espacial de
 cada algoritmo y se contrastó con cuatro experimentos: escalamiento del tiempo con el tamaño
 de la entrada (ajuste log--log), barrido de entropía con alfabetos uniformes, evaluación sobre
-los corpus Canterbury y Silesia con DEFLATE como referencia, y efecto del tamaño máximo del
+los corpus Canterbury y Silesia, y efecto del tamaño máximo del
 diccionario de LZW. Los tiempos se reportan como medianas con intervalos de confianza del
 95\,\% tras el calentamiento del compilador JIT.
 Las pendientes log--log, entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en una
@@ -267,9 +266,8 @@ asimetrías opuestas: Huffman decodifica más despacio de lo que codifica y LZW 
 quedó siempre en $[H_0, H_0 + 1)$, mientras que LZW comprimió mejor en \resLzwWins{} de los
 \resCorpusFiles{} archivos del corpus (\resCorpusLzwBpb{} frente a \resCorpusHuffBpb{}~bits
 por byte en el agregado), pero perdió en todas las fuentes sin memoria y expandió los bytes
-uniformes hasta 11.00~bits por byte. DEFLATE, que combina ambas ideas, obtuvo
-\resCorpusDeflateBpb{}~bits por byte, lo que muestra que los dos mecanismos son
-complementarios.
+uniformes hasta 11.00~bits por byte. El tipo de redundancia del dato decide cuál
+de los dos comprime mejor.
 
 \medskip\noindent\textbf{Palabras clave:} compresión sin pérdida, codificación de Huffman,
 LZW, análisis de complejidad, algoritmia experimental, entropía.
@@ -286,7 +284,7 @@ dictionary method that replaces repeated phrases with codes. Both were implement
 codes from 9 to 16 bits with dictionary reset, and validated with 43 JUnit tests. The time and
 space complexity of each algorithm was derived and contrasted through four experiments:
 time scaling with input size (log--log fit), an entropy sweep over uniform alphabets, an
-evaluation on the Canterbury and Silesia corpora with DEFLATE as a reference, and the effect
+evaluation on the Canterbury and Silesia corpora, and the effect
 of the maximum LZW dictionary size. Times are reported as medians with 95\,\% confidence
 intervals after JIT warm-up.
 Log--log slopes between 0.85 and 1.08 in the main run and between 0.93 and 1.02 in an
@@ -295,8 +293,7 @@ Huffman decodes more slowly than it encodes, and LZW does the reverse. Huffman a
 within $[H_0, H_0 + 1)$, whereas LZW compressed better on \resLzwWins{} of the
 \resCorpusFiles{} corpus files (\resCorpusLzwBpb{} versus \resCorpusHuffBpb{} bits per byte
 overall), but lost on every memoryless source and expanded uniform bytes to 11.00 bits per byte.
-DEFLATE, which combines both ideas, reached \resCorpusDeflateBpb{} bits per byte, showing that
-the two mechanisms are complementary.
+The kind of redundancy in the data decides which of the two compresses better.
 
 \medskip\noindent\textbf{Keywords:} lossless compression, Huffman coding, LZW, complexity
 analysis, experimental algorithmics, entropy.

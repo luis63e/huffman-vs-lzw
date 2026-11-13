@@ -31,7 +31,7 @@ import compression.lzw.LzwCodec;
  * <ul>
  *   <li>E1 scaling: time vs input size for synthetic sources and a real text prefix.</li>
  *   <li>E2 entropy sweep: bits/byte and time vs alphabet size k (entropy log2 k).</li>
- *   <li>E3 corpus: Canterbury and Silesia files, with DEFLATE as a reference.</li>
+ *   <li>E3 corpus: Canterbury and Silesia files.</li>
  *   <li>E4 LZW dictionary size: effect of the maximum code width.</li>
  * </ul>
  */
@@ -211,7 +211,7 @@ public final class BenchmarkRunner {
     private void warmUp() {
         int n = quick ? 1 << 16 : 1 << 22;
         int iterations = quick ? 1 : 3;
-        Codec[] codecs = {new HuffmanCodec(), new LzwCodec(16), new DeflateCodec()};
+        Codec[] codecs = {new HuffmanCodec(), new LzwCodec(16)};
         for (DataGenerator.Source source : DataGenerator.Source.values()) {
             byte[] data = DataGenerator.generate(source, n, SEED);
             for (Codec codec : codecs) {
@@ -374,15 +374,13 @@ public final class BenchmarkRunner {
     private void corpus() throws IOException {
         Codec huffman = new HuffmanCodec();
         Codec lzw = new LzwCodec(16);
-        Codec deflate = new DeflateCodec();
         ResultWriter csv = ResultWriter.csv(outDir.resolve("e3_corpus.csv"),
-                "corpus", "file", "bytes", "h0", "huff_bpb", "lzw_bpb", "deflate_bpb",
-                "huff_enc_mbs", "huff_dec_mbs", "lzw_enc_mbs", "lzw_dec_mbs", "deflate_enc_mbs", "deflate_dec_mbs");
+                "corpus", "file", "bytes", "h0", "huff_bpb", "lzw_bpb",
+                "huff_enc_mbs", "huff_dec_mbs", "lzw_enc_mbs", "lzw_dec_mbs");
         ResultWriter table = ResultWriter.text(outDir.resolve("table_corpus.tex"));
         long totalBytes = 0;
         long huffBytes = 0;
         long lzwBytes = 0;
-        long deflateBytes = 0;
         int files = 0;
         int lzwWins = 0;
         boolean firstGroup = true;
@@ -407,14 +405,11 @@ public final class BenchmarkRunner {
                 progress(prefix, "huffman", h);
                 Measurement l = measure(lzw, data);
                 progress(prefix, "lzw", l);
-                Measurement d = measure(deflate, data);
-                progress(prefix, "deflate", d);
                 double h0 = Stats.entropy(data);
                 csv.row(corpus, name, data.length, ResultWriter.num(h0, 4),
-                        ResultWriter.num(h.bpb(), 4), ResultWriter.num(l.bpb(), 4), ResultWriter.num(d.bpb(), 4),
+                        ResultWriter.num(h.bpb(), 4), ResultWriter.num(l.bpb(), 4),
                         ResultWriter.num(h.encMbs(), 3), ResultWriter.num(h.decMbs(), 3),
-                        ResultWriter.num(l.encMbs(), 3), ResultWriter.num(l.decMbs(), 3),
-                        ResultWriter.num(d.encMbs(), 3), ResultWriter.num(d.decMbs(), 3));
+                        ResultWriter.num(l.encMbs(), 3), ResultWriter.num(l.decMbs(), 3));
                 boolean lzwBetter = l.bpb() < h.bpb();
                 String huffCell = ResultWriter.num(h.bpb(), 2);
                 String lzwCell = ResultWriter.num(l.bpb(), 2);
@@ -422,13 +417,11 @@ public final class BenchmarkRunner {
                         + " & " + ResultWriter.num(h0, 2)
                         + " & " + (lzwBetter ? huffCell : "\\textbf{" + huffCell + "}")
                         + " & " + (lzwBetter ? "\\textbf{" + lzwCell + "}" : lzwCell)
-                        + " & " + ResultWriter.num(d.bpb(), 2)
                         + " & " + ResultWriter.num(h.encMbs(), 0)
                         + " & " + ResultWriter.num(l.encMbs(), 0) + " \\\\");
                 totalBytes += data.length;
                 huffBytes += h.encodedBytes();
                 lzwBytes += l.encodedBytes();
-                deflateBytes += d.encodedBytes();
                 files++;
                 if (lzwBetter) {
                     lzwWins++;
@@ -442,7 +435,6 @@ public final class BenchmarkRunner {
         if (totalBytes > 0) {
             macros.put("resCorpusHuffBpb", ResultWriter.num(8.0 * huffBytes / totalBytes, 2));
             macros.put("resCorpusLzwBpb", ResultWriter.num(8.0 * lzwBytes / totalBytes, 2));
-            macros.put("resCorpusDeflateBpb", ResultWriter.num(8.0 * deflateBytes / totalBytes, 2));
         }
     }
 
@@ -524,7 +516,7 @@ public final class BenchmarkRunner {
                         + " (dickens prefixes up to 2^" + (quick ? 14 : 23) + ")")
                 .line("e1_fit_min_n: " + (quick ? "all points" : "2^16"))
                 .line("e2_n: 2^" + (quick ? 14 : 23) + ", k in " + Arrays.toString(E2_ALPHABETS))
-                .line("e3_codecs: Huffman, LZW(16), DEFLATE level 6 (reference)")
+                .line("e3_codecs: Huffman, LZW(16)")
                 .line("e4_max_bits: " + (quick ? "9,12,16" : "9..16"))
                 .line("corpus: " + corpusDir.toAbsolutePath())
                 .write();

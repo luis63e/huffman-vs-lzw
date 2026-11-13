@@ -338,7 +338,7 @@ esa configuración. La codificación de Huffman es casi insensible a la entropí
 \label{sec:res-e3}
 La \cref{tab:corpus} reporta, para cada archivo, su tamaño, su entropía de orden cero, los bits
 por byte de cada algoritmo y el rendimiento de codificación. En negrita aparece el mejor de los
-dos algoritmos comparados; DEFLATE se muestra solo como referencia.
+dos algoritmos.
 
 \siresultado{table_corpus.tex}{%
 \begin{table}[H]
@@ -348,9 +348,9 @@ dos algoritmos comparados; DEFLATE se muestra solo como referencia.
   \label{tab:corpus}
   \small
   \setlength{\tabcolsep}{5pt}
-  \begin{tabular}{@{}l r r r r r r r@{}}
+  \begin{tabular}{@{}l r r r r r r@{}}
     \toprule
-    Archivo & Tamaño (KiB) & $H_0$ & Huffman & LZW & DEFLATE$^\dagger$ & Huff. MB/s & LZW MB/s \\
+    Archivo & Tamaño (KiB) & $H_0$ & Huffman & LZW & Huff. MB/s & LZW MB/s \\
     \midrule
     % Entrada primitiva: \input (robusto) dentro de tabular impide el \bottomrule siguiente.
     \csname @@input\endcsname results/table_corpus.tex
@@ -358,15 +358,12 @@ dos algoritmos comparados; DEFLATE se muestra solo como referencia.
   \end{tabular}
   \par\smallskip
   \begin{minipage}{0.92\linewidth}
-    \footnotesize $^\dagger$\,DEFLATE (zlib del JDK, nivel 6, LZ77 + Huffman) es solo una
-    referencia externa y no forma parte de la comparación. Las columnas Huffman, LZW y DEFLATE
-    están en bits por byte, incluida la cabecera.
+    \footnotesize Las columnas Huffman y LZW están en bits por byte, incluida la cabecera.
   \end{minipage}
 \end{table}}
 
 En conjunto, sobre los \resCorpusFiles{} archivos, la tasa agregada es de
-\resCorpusHuffBpb{}~bpb para Huffman, \resCorpusLzwBpb{}~bpb para LZW y
-\resCorpusDeflateBpb{}~bpb para DEFLATE; LZW comprime mejor que Huffman en \resLzwWins{} de
+\resCorpusHuffBpb{}~bpb para Huffman y \resCorpusLzwBpb{}~bpb para LZW; LZW comprime mejor que Huffman en \resLzwWins{} de
 los \resCorpusFiles{} archivos.
 
 Huffman queda siempre por encima de $H_0$ y por debajo de $H_0 + 1$. En los archivos de más de
@@ -378,8 +375,7 @@ recurrentes: \texttt{xml} (1.66 frente a 5.55~bpb), \texttt{nci} (0.94 frente a 
 \texttt{samba} (3.06 frente a 6.13) y \texttt{reymont} (2.46 frente a 4.87). Huffman gana en
 \texttt{E.coli} (2.00 frente a 2.17~bpb) y en \texttt{x-ray} (6.63 frente a 6.67), y
 \texttt{sao} es prácticamente un empate (7.55 frente a 7.53). Ningún archivo del corpus lleva a
-LZW por encima de 8~bpb. DEFLATE comprime mejor que ambos en 25 archivos; la excepción es
-\texttt{E.coli}, donde su 2.31~bpb queda detrás de los dos.
+LZW por encima de 8~bpb.
 
 En rendimiento, la codificación de Huffman procesa entre 150 y 348~MB/s en los archivos de más
 de 1~MB, y la de LZW entre 63 y 142~MB/s (203~MB/s en \texttt{ptt5}). En la decodificación el

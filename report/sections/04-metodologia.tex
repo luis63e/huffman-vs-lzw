@@ -65,7 +65,7 @@ compilado para Java~17 y ejecutado con el JDK~21. Todos los algoritmos implement
 \texttt{Codec} (métodos \texttt{name}, \texttt{encode} y \texttt{decode}), que exige que
 \texttt{decode(encode(x))} sea igual a \texttt{x} y que los datos corruptos se rechacen con
 \texttt{IllegalArgumentException}. Gracias a esa interfaz, el arnés de medición trata por igual
-a Huffman, a LZW y a la referencia DEFLATE. La \cref{tab:paquetes} describe los paquetes.
+a Huffman y a LZW. La \cref{tab:paquetes} describe los paquetes.
 
 \begin{table}[H]
   \centering
@@ -80,7 +80,7 @@ a Huffman, a LZW y a la referencia DEFLATE. La \cref{tab:paquetes} describe los 
     \texttt{io} & \texttt{BitWriter}, \texttt{BitReader} & E/S de campos de bits de ancho variable, bit más significativo primero, con acumulador de 64 bits. \\
     \texttt{huffman} & \texttt{HuffmanCodec} & Longitudes con montículo, códigos canónicos y decodificación canónica. \\
     \texttt{lzw} & \texttt{LzwCodec} & Códigos de 9 a 16 bits, diccionario con tabla hash y reinicio con \texttt{CLEAR}. \\
-    \texttt{bench} & \texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}, \texttt{DeflateCodec}, \texttt{ResultWriter} & Experimentos E1--E4, estadística, generación de datos, referencia DEFLATE (\texttt{java.util.zip}, nivel 6) y escritura de CSV y macros \LaTeX. \\
+    \texttt{bench} & \texttt{BenchmarkRunner}, \texttt{Stats}, \texttt{DataGenerator}, \texttt{ResultWriter} & Experimentos E1--E4, estadística, generación de datos y escritura de CSV y macros \LaTeX. \\
     \texttt{app} & \texttt{Main} & Interfaz de línea de comandos (\texttt{compress}, \texttt{decompress}, \texttt{stats}, \texttt{demo}). \\
     \bottomrule
   \end{tabularx}
@@ -234,8 +234,8 @@ al.~\cite{georges2007} identifican en la medición de programas Java ---compilac
 recolección de basura y eliminación de código muerto--- y a las recomendaciones de
 reproducibilidad de Johnson~\cite{johnson2002} y McGeoch~\cite{mcgeoch2012}:
 \begin{enumerate}[leftmargin=*]
-  \item \emph{Calentamiento global:} antes del primer experimento, cada códec (Huffman, LZW de
-        16 bits y DEFLATE) codifica y decodifica tres veces 4~MiB de cada fuente sintética, para
+  \item \emph{Calentamiento global:} antes del primer experimento, cada códec (Huffman y LZW de
+        16 bits) codifica y decodifica tres veces 4~MiB de cada fuente sintética, para
         que los primeros puntos no se midan en el intérprete.
   \item \emph{Preparación de cada configuración:} se invoca \texttt{System.gc()}, se codifica una
         vez, se registra el tamaño comprimido y se verifica la ida y vuelta.
@@ -272,7 +272,7 @@ parámetros fijos, las salidas medidas y la hipótesis que contrasta.
       $n = 2^{23}$; fuente i.i.d. uniforme en $k$ símbolos; LZW con $b = 16$ &
       bpb, tiempos de codificación y decodificación & H2, H4 (y H3) \\
     E3 & Archivo del corpus &
-      Canterbury y Silesia completos; LZW con $b = 16$; DEFLATE nivel 6 como referencia &
+      Canterbury y Silesia completos; LZW con $b = 16$ &
       bpb, MB/s, archivos donde gana LZW & H3 (y H2) \\
     E4 & $b = 9, \dots, 16$ &
       \texttt{dickens} y \texttt{xml} (Silesia), \texttt{E.coli} (Canterbury) &
@@ -322,7 +322,4 @@ automáticamente el arnés (\cref{tab:entorno}).
         concretas (por ejemplo, la decodificación de Huffman bit a bit, sin tablas de búsqueda),
         no el límite de cada algoritmo; las optimizaciones conocidas se discuten en la
         literatura~\cite{moffat1997,moffat2019}.
-  \item \emph{DEFLATE solo como referencia.} Se usa la biblioteca zlib del JDK, implementada en
-        código nativo; sus tiempos no son comparables con implementaciones en Java y solo su
-        tasa de compresión se usa como referencia.
 \end{itemize}

@@ -48,5 +48,5 @@ Silesia corpus (Deorowicz, 2003), verifies their SHA-256 checksums and extracts 
 | `...io` | `BitWriter` / `BitReader`: MSB-first variable-width bit I/O |
 | `...huffman` | `HuffmanCodec`: heap-based code lengths, canonical codes, canonical decoding |
 | `...lzw` | `LzwCodec`: 9-16 bit variable-width codes, hash-table dictionary, CLEAR reset |
-| `...bench` | `BenchmarkRunner`, `Stats`, `DataGenerator`, `DeflateCodec` (reference only) |
+| `...bench` | `BenchmarkRunner`, `Stats`, `DataGenerator` |
 | `...app` | `Main`: command-line interface |
