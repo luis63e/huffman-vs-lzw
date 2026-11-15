@@ -8,7 +8,7 @@
     <script src="assets/hyperframes-slideshow.global.js"></script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { width: 100%; height: 100%; overflow: hidden; background: #0b1020; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #ffffff; }
     </style>
   </head>
   <body>
@@ -21,55 +21,31 @@
   "slides": [
     {
       "sceneId": "portada",
-      "notes": "Presentar el tema en una frase: comparamos dos algoritmos clásicos de compresión sin pérdida, en teoría y con experimentos. No leer la diapositiva."
+      "notes": "Expositor 1 · ~40 s. Buenos días. Somos el grupo y vamos a comparar dos algoritmos clásicos de compresión sin pérdida: Huffman y LZW. Sin pérdida significa que al descomprimir recuperamos exactamente el archivo original. Los comparamos de dos formas: con el análisis teórico y con experimentos sobre 26 archivos reales. La exposición tiene cinco partes y cada uno de nosotros presenta una, como se ve en la barra inferior."
     },
     {
       "sceneId": "problema",
-      "notes": "Idea central: los dos algoritmos buscan redundancias distintas. Huffman mira cada símbolo por separado; LZW mira secuencias. De ahí sale la pregunta del trabajo.",
-      "fragments": [
-        10.5,
-        11,
-        12,
-        13
-      ]
+      "notes": "Expositor 1 · ~50 s. Comprimir es eliminar redundancia, y la palabra abracadabra muestra dos maneras de verla. Huffman mira cada letra por separado: la a aparece 5 de 11 veces, así que conviene escribirla con menos bits. LZW mira frases: abra aparece dos veces, así que conviene reemplazar la frase completa por un código. Nuestra pregunta es cuál de las dos ideas funciona mejor, en tamaño y en velocidad, y si los resultados coinciden con la teoría. Le paso la palabra a quien explica Huffman."
     },
     {
       "sceneId": "huffman",
-      "notes": "Ejemplo abracadabra: la a aparece 5 de 11 veces y recibe 1 bit; las demás, 3 bits. Total 23 bits contra 88 sin comprimir. La construcción usa una cola de prioridad: de ahí el sigma log sigma.",
-      "fragments": [
-        20.5,
-        21,
-        22
-      ]
+      "notes": "Expositor 2 · ~45 s. Huffman le da a cada símbolo un código según su frecuencia: el más frecuente recibe el más corto. En abracadabra, la a aparece cinco veces y recibe un solo bit, el cero. Las otras letras reciben tres bits. Así, el texto pasa de 88 bits a 23. Un detalle importante: ningún código es el comienzo de otro, por eso se puede decodificar sin separadores. Ojo, los 23 bits no incluyen la cabecera con la tabla de códigos, que el archivo real sí guarda."
+    },
+    {
+      "sceneId": "huffman-arbol",
+      "notes": "Expositor 2 · ~45 s. Los códigos salen de un árbol. Se unen siempre los dos nodos menos frecuentes hasta que queda uno solo. Luego, cada camino desde la raíz es un código: izquierda es cero, derecha es uno. Para codificar se recorren los datos dos veces, una para contar y otra para escribir; por eso el tiempo es lineal más sigma log sigma, donde sigma es la cantidad de símbolos distintos. Para decodificar se baja por el árbol bit a bit. Le paso la palabra a quien explica LZW."
     },
     {
       "sceneId": "lzw",
-      "notes": "LZW no necesita conocer las frecuencias: aprende mientras lee. Empieza con los 256 bytes y agrega una frase nueva por cada código que emite. Nuestros códigos crecen de 9 a 16 bits; al llenarse el diccionario se reinicia.",
-      "fragments": [
-        30.5,
-        31,
-        32,
-        33,
-        34
-      ]
+      "notes": "Expositor 3 · ~45 s. LZW no cuenta frecuencias: aprende frases mientras lee. El diccionario empieza con los 256 bytes posibles. En cada paso, busca la frase más larga que ya conoce, emite su código y guarda esa frase más la letra siguiente como una entrada nueva. En nuestra implementación, el código 256 es CLEAR y las frases nuevas empiezan en el 257. Lo interesante es que el diccionario no se envía: el decodificador lo reconstruye igual."
     },
     {
-      "sceneId": "teoria",
-      "notes": "Mensaje: en teoría los dos son lineales. La diferencia no es asintótica sino de constantes y de modelo. Ojo con la decodificación de Huffman: depende de la longitud media del código, porque lee bit a bit.",
-      "fragments": [
-        40.5,
-        41
-      ]
+      "sceneId": "lzw-ejemplo",
+      "notes": "Expositor 3 · ~45 s. Veamos abababa, siete letras. Primero emite a y guarda ab; luego emite b y guarda ba. Después ya conoce ab, emite el 257 y guarda aba. Al final conoce aba completa y emite el 259. Siete letras quedan en cuatro códigos: con códigos de 9 bits, son 36 bits en lugar de 56. Cuanto más se repite una frase, más larga se vuelve la entrada del diccionario. Todo ocurre en una sola pasada. Le paso la palabra a quien presenta los experimentos."
     },
     {
       "sceneId": "metodo",
-      "notes": "Tres experimentos, cada uno responde a una hipótesis. Si preguntan por el rigor de la medición, usar el botón de abajo a la izquierda: abre la diapositiva del protocolo, y Atrás vuelve aquí.",
-      "fragments": [
-        50.5,
-        51,
-        52,
-        53
-      ],
+      "notes": "Expositor 4 · ~45 s. Diseñamos tres experimentos, cada uno con una pregunta. E1 mide si el tiempo crece de forma lineal, con entradas de 16 KiB a 16 MiB. E2 controla la entropía con datos aleatorios, para ver qué pasa cuando no hay frases repetidas. E3 usa 26 archivos reales de los corpus Canterbury y Silesia. Si preguntan cómo medimos el tiempo, el botón de abajo a la izquierda abre el protocolo; la tecla Retroceso vuelve aquí.",
       "hotspots": [
         {
           "id": "h-protocolo",
@@ -85,63 +61,16 @@
       ]
     },
     {
-      "sceneId": "e1",
-      "notes": "El gráfico está en escala log-log: una recta de pendiente 1 significa crecimiento lineal. Las cuatro operaciones dan pendientes entre 0.85 y 1.08, y la réplica entre 0.93 y 1.02. Ninguna se acerca a 2.",
-      "fragments": [
-        60.5,
-        61,
-        62
-      ]
+      "sceneId": "tiempo",
+      "notes": "Expositor 4 · ~50 s. El gráfico usa escala logarítmica en ambos ejes, así que una recta con pendiente 1 significa tiempo lineal: el doble de datos, el doble de tiempo. Las pendientes medidas van de 0.85 a 1.08, y una réplica independiente dio de 0.93 a 1.02. La teoría se confirma. A la derecha, la sorpresa: Huffman codifica más rápido, pero decodifica más lento, porque lee bit a bit. LZW es al revés, porque al codificar consulta una tabla hash por cada byte. Le paso la palabra para los resultados de tamaño."
     },
     {
-      "sceneId": "e3",
-      "notes": "En archivos reales gana LZW casi siempre, porque el texto y los formatos estructurados repiten frases. Las dos excepciones son E.coli, ADN de cuatro letras, y x-ray, una radiografía casi sin repeticiones.",
-      "fragments": [
-        70.5,
-        71,
-        72
-      ]
+      "sceneId": "tamano",
+      "notes": "Expositor 5 · ~50 s. Ahora el tamaño, en bits por byte: menos es mejor y 8 significa sin comprimir. En archivos reales, LZW gana en 24 de 26; en XML baja de 5.55 a 1.66, porque el texto estructurado repite frases. Las dos excepciones son E.coli, que es ADN, y x-ray, una radiografía: casi no repiten frases. Y con bytes aleatorios del experimento E2, LZW llega a 11 bits por byte: agranda el archivo un 37 por ciento."
     },
     {
-      "sceneId": "e2",
-      "notes": "Contracara del resultado anterior: sin frases repetidas LZW pierde siempre, y con bytes aleatorios incluso agranda el archivo. Huffman nunca pasa de la entropía más un bit.",
-      "fragments": [
-        80.5,
-        81,
-        82,
-        83
-      ]
-    },
-    {
-      "sceneId": "velocidad",
-      "notes": "La teoría dice lineal para todo, pero no anticipa las constantes. Huffman decodifica lento porque lee bit a bit; LZW codifica lento porque busca en una tabla hash por cada byte. Las asimetrías son opuestas.",
-      "fragments": [
-        90.5,
-        91,
-        92
-      ]
-    },
-    {
-      "sceneId": "recomendacion",
-      "notes": "Esta tabla es la conclusión práctica y está en el informe, tabla 13. Leer solo la columna del medio: qué algoritmo conviene en cada caso.",
-      "fragments": [
-        100.5,
-        101,
-        102,
-        103,
-        104,
-        105
-      ]
-    },
-    {
-      "sceneId": "cierre",
-      "notes": "Cerrar con las dos ideas: la teoría se confirmó, y el ganador depende del dato. Luego abrir a preguntas.",
-      "fragments": [
-        110.5,
-        111,
-        112,
-        113
-      ]
+      "sceneId": "decision",
+      "notes": "Expositor 5 · ~45 s. La conclusión práctica: el tipo de dato decide. Para texto, código o XML conviene LZW. Para pocos símbolos con frecuencias desiguales y sin frases, Huffman. Para datos aleatorios o ya comprimidos, lo mejor es no comprimir. Y si importa la velocidad, Huffman comprime más rápido y LZW descomprime más rápido. En resumen: ambos son lineales, como predice la teoría, pero gana el que encuentra la redundancia que el dato realmente tiene. Muchas gracias; quedamos atentos a sus preguntas."
     }
   ],
   "slideSequences": [
@@ -151,7 +80,7 @@
       "slides": [
         {
           "sceneId": "protocolo",
-          "notes": "Diapositiva de respaldo. Java compila en caliente, así que la primera ejecución es engañosa: por eso se calienta antes de medir. Se reporta la mediana, que resiste valores atípicos, con su intervalo de confianza."
+          "notes": "Diapositiva de respaldo. Java optimiza el código mientras se ejecuta, así que la primera ejecución es engañosa: por eso calentamos antes de medir. Cada ejecución verifica que descomprimir devuelve la entrada exacta. Reportamos la mediana de 7 a 21 ejecuciones, que resiste valores atípicos, con su intervalo de confianza del 95 %. Retroceso vuelve a la metodología."
         }
       ]
     }
