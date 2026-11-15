@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Huffman frente a LZW</title>
+    <script src="assets/hyperframes-player.global.js"></script>
+    <script src="assets/hyperframes-slideshow.global.js"></script>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #0b1020; }
+    </style>
+  </head>
+  <body>
+    <!-- tabindex lets the component take keyboard focus (arrows, Space, Backspace, P). -->
+    <hyperframes-slideshow tabindex="0" style="display: block; position: relative; width: 100vw; height: 100vh">
+      <hyperframes-player interactive style="position: absolute; inset: 0" src="composition/index.html"></hyperframes-player>
+      <!-- Copy of the block in composition/index.html: the component reads it from here. Keep both in sync. -->
+    <script type="application/hyperframes-slideshow+json">
+{
+  "slides": [
+    {
+      "sceneId": "portada",
+      "notes": "Presentar el tema en una frase: comparamos dos algoritmos clásicos de compresión sin pérdida, en teoría y con experimentos. No leer la diapositiva."
+    },
+    {
+      "sceneId": "problema",
+      "notes": "Idea central: los dos algoritmos buscan redundancias distintas. Huffman mira cada símbolo por separado; LZW mira secuencias. De ahí sale la pregunta del trabajo.",
+      "fragments": [
+        10.5,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "sceneId": "huffman",
+      "notes": "Ejemplo abracadabra: la a aparece 5 de 11 veces y recibe 1 bit; las demás, 3 bits. Total 23 bits contra 88 sin comprimir. La construcción usa una cola de prioridad: de ahí el sigma log sigma.",
+      "fragments": [
+        20.5,
+        21,
+        22
+      ]
+    },
+    {
+      "sceneId": "lzw",
+      "notes": "LZW no necesita conocer las frecuencias: aprende mientras lee. Empieza con los 256 bytes y agrega una frase nueva por cada código que emite. Nuestros códigos crecen de 9 a 16 bits; al llenarse el diccionario se reinicia.",
+      "fragments": [
+        30.5,
+        31,
+        32,
+        33,
+        34
+      ]
+    },
+    {
+      "sceneId": "teoria",
+      "notes": "Mensaje: en teoría los dos son lineales. La diferencia no es asintótica sino de constantes y de modelo. Ojo con la decodificación de Huffman: depende de la longitud media del código, porque lee bit a bit.",
+      "fragments": [
+        40.5,
+        41
+      ]
+    },
+    {
+      "sceneId": "metodo",
+      "notes": "Tres experimentos, cada uno responde a una hipótesis. Si preguntan por el rigor de la medición, usar el botón de abajo a la izquierda: abre la diapositiva del protocolo, y Atrás vuelve aquí.",
+      "fragments": [
+        50.5,
+        51,
+        52,
+        53
+      ],
+      "hotspots": [
+        {
+          "id": "h-protocolo",
+          "label": "¿Cómo se midió el tiempo?",
+          "target": "protocolo",
+          "region": {
+            "x": 6.25,
+            "y": 71,
+            "w": 30,
+            "h": 8
+          }
+        }
+      ]
+    },
+    {
+      "sceneId": "e1",
+      "notes": "El gráfico está en escala log-log: una recta de pendiente 1 significa crecimiento lineal. Las cuatro operaciones dan pendientes entre 0.85 y 1.08, y la réplica entre 0.93 y 1.02. Ninguna se acerca a 2.",
+      "fragments": [
+        60.5,
+        61,
+        62
+      ]
+    },
+    {
+      "sceneId": "e3",
+      "notes": "En archivos reales gana LZW casi siempre, porque el texto y los formatos estructurados repiten frases. Las dos excepciones son E.coli, ADN de cuatro letras, y x-ray, una radiografía casi sin repeticiones.",
+      "fragments": [
+        70.5,
+        71,
+        72
+      ]
+    },
+    {
+      "sceneId": "e2",
+      "notes": "Contracara del resultado anterior: sin frases repetidas LZW pierde siempre, y con bytes aleatorios incluso agranda el archivo. Huffman nunca pasa de la entropía más un bit.",
+      "fragments": [
+        80.5,
+        81,
+        82,
+        83
+      ]
+    },
+    {
+      "sceneId": "velocidad",
+      "notes": "La teoría dice lineal para todo, pero no anticipa las constantes. Huffman decodifica lento porque lee bit a bit; LZW codifica lento porque busca en una tabla hash por cada byte. Las asimetrías son opuestas.",
+      "fragments": [
+        90.5,
+        91,
+        92
+      ]
+    },
+    {
+      "sceneId": "recomendacion",
+      "notes": "Esta tabla es la conclusión práctica y está en el informe, tabla 13. Leer solo la columna del medio: qué algoritmo conviene en cada caso.",
+      "fragments": [
+        100.5,
+        101,
+        102,
+        103,
+        104,
+        105
+      ]
+    },
+    {
+      "sceneId": "cierre",
+      "notes": "Cerrar con las dos ideas: la teoría se confirmó, y el ganador depende del dato. Luego abrir a preguntas.",
+      "fragments": [
+        110.5,
+        111,
+        112,
+        113
+      ]
+    }
+  ],
+  "slideSequences": [
+    {
+      "id": "protocolo",
+      "label": "Protocolo de medición",
+      "slides": [
+        {
+          "sceneId": "protocolo",
+          "notes": "Diapositiva de respaldo. Java compila en caliente, así que la primera ejecución es engañosa: por eso se calienta antes de medir. Se reporta la mediana, que resiste valores atípicos, con su intervalo de confianza."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+    </hyperframes-slideshow>
+    <script>
+      // Keep keyboard focus on the deck: Space and Backspace only work while it is focused,
+      // and a click on a slide or on a button would otherwise move focus away.
+      (function () {
+        var deck = document.querySelector("hyperframes-slideshow");
+        function refocus() {
+          setTimeout(function () {
+            var active = document.activeElement;
+            var typing = active && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
+            if (!typing && active !== deck) deck.focus({ preventScroll: true });
+          }, 0);
+        }
+        window.addEventListener("load", refocus);
+        window.addEventListener("blur", refocus);
+        document.addEventListener("pointerup", refocus, true);
+      })();
+    </script>
+  </body>
+</html>
