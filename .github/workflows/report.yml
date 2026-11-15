@@ -1,0 +1,70 @@
+name: Report PDF
+
+# Rebuilds the report whenever its sources or the benchmark results it reads change on main,
+# and commits the compiled PDF to entrega/.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'report/**'
+      - 'results/**'
+      - '.github/workflows/report.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Only the latest push matters: a newer run replaces an older one still in progress.
+concurrency:
+  group: report-pdf
+  cancel-in-progress: true
+
+env:
+  TECTONIC_VERSION: 0.17.0
+  PDF_PATH: entrega/Informe_Huffman_vs_LZW.pdf
+
+jobs:
+  build:
+    name: Build report and update delivered PDF
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history, to date the PDF by the last commit that changed its inputs
+
+      - name: Cache Tectonic packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/tectonic
+          key: tectonic-${{ env.TECTONIC_VERSION }}-${{ hashFiles('report/main.tex') }}
+          restore-keys: tectonic-${{ env.TECTONIC_VERSION }}-
+
+      # Installed where env.sh (sourced by report/build.sh) expects it.
+      - name: Install Tectonic
+        run: |
+          mkdir -p .tools/tectonic
+          curl -fsSL "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%40${TECTONIC_VERSION}/tectonic-${TECTONIC_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+            | tar -xz -C .tools/tectonic
+          .tools/tectonic/tectonic --version
+
+      # SOURCE_DATE_EPOCH makes the PDF byte-for-byte reproducible, so it only changes when the
+      # report content does.
+      - name: Build the report
+        run: |
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct -- report results)"
+          report/build.sh
+          cp report/build/main.pdf "$PDF_PATH"
+
+      - name: Commit the updated PDF
+        run: |
+          if git diff --quiet -- "$PDF_PATH"; then
+            echo "The delivered PDF is already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$PDF_PATH"
+          git commit -m "docs(report): rebuild delivered PDF"
+          git pull --rebase origin main
+          git push origin HEAD:main

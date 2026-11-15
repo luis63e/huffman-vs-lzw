@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test (JDK ${{ matrix.java }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # 17 is the compilation target (javac.source/target); 21 is the JDK used for the report.
+        java: ['17', '21']
+    defaults:
+      run:
+        working-directory: code
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      # Ant and its JUnit tasks (ant-optional) are preinstalled on the Ubuntu runner.
+      # The NetBeans build fails when any JUnit test fails.
+      - name: Build and run JUnit tests
+        run: ant -noinput jar test
+
+      - name: Smoke-test the CLI jar
+        run: java -jar dist/HuffmanVsLZW.jar > /dev/null

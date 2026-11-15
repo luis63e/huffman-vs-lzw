@@ -1,0 +1,327 @@
+% =====================================================================
+%  Huffman frente a LZW: comparación teórica y experimental
+%  Universidad de Lima — Trabajo de Investigación 2026-2
+%  Compilar con: ./build.sh  (tectonic ejecuta BibTeX automáticamente)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------------------------------------------------------------- idioma y tipografía
+\usepackage{iftex}
+\ifXeTeX
+  % Tectonic compila con XeTeX: Latin Modern en OpenType mediante fontspec, para que
+  % los caracteres UTF-8 (por ejemplo, ¿ y ¡) se rendericen correctamente.
+  \usepackage{fontspec}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{lmodern}
+\fi
+\usepackage[english,spanish,es-noshorthands,es-tabla,es-nodecimaldot,es-lcroman]{babel}
+\usepackage{microtype}
+\usepackage[margin=2.5cm,headheight=14pt]{geometry}
+
+% ---------------------------------------------------------------- matemática, unidades, tablas
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\sisetup{group-separator={\,}, group-minimum-digits=4}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{enumitem}
+
+% ---------------------------------------------------------------- gráficos
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,calc,fit,babel}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=small,labelfont=bf,format=hang}
+
+% ---------------------------------------------------------------- algoritmos y código
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+
+% ---------------------------------------------------------------- encabezados
+\usepackage{fancyhdr}
+
+% ---------------------------------------------------------------- enlaces (al final)
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=green!40!black,
+            urlcolor=blue!60!black,bookmarksnumbered=true]{hyperref}
+\usepackage[spanish,nameinlink]{cleveref}
+
+% Anclas únicas por algoritmo para las líneas de algpseudocode (evita destinos duplicados).
+\makeatletter
+\def\theHALG@line{\thealgorithm.\arabic{ALG@line}}
+\makeatother
+
+% =====================================================================
+%  INTEGRANTES — ÚNICO LUGAR PARA EDITAR LOS NOMBRES
+% =====================================================================
+\newcommand{\integranteA}{Integrante A (Apellido, Nombre)}
+\newcommand{\integranteB}{Integrante B (Apellido, Nombre)}
+\newcommand{\integranteC}{Integrante C (Apellido, Nombre)}
+\newcommand{\integranteD}{Integrante D (Apellido, Nombre)}
+\newcommand{\integranteE}{Integrante E (Apellido, Nombre)}
+\newcommand{\docente}{Docente del curso (Apellido, Nombre)}
+
+% =====================================================================
+%  RESULTADOS GENERADOS (results/ se copia desde ../results en build.sh)
+% =====================================================================
+\newcommand{\resmissing}{\textcolor{red}{\textbf{??}}}
+\IfFileExists{results/macros.tex}{\input{results/macros.tex}}{}
+% Valores de respaldo: solo se usan si el benchmark aún no generó la macro.
+\providecommand{\resJvm}{\resmissing}
+\providecommand{\resCpu}{\resmissing}
+\providecommand{\resCores}{\resmissing}
+\providecommand{\resHeap}{\resmissing}
+\providecommand{\resDate}{\resmissing}
+\providecommand{\resCorpusFiles}{\resmissing}
+\providecommand{\resLzwWins}{\resmissing}
+\providecommand{\resCorpusHuffBpb}{\resmissing}
+\providecommand{\resCorpusLzwBpb}{\resmissing}
+\providecommand{\resSlopeDickensHuffEnc}{\resmissing}
+\providecommand{\resSlopeDickensHuffDec}{\resmissing}
+\providecommand{\resSlopeDickensLzwEnc}{\resmissing}
+\providecommand{\resSlopeDickensLzwDec}{\resmissing}
+\providecommand{\resRtwoDickensHuffEnc}{\resmissing}
+\providecommand{\resRtwoDickensHuffDec}{\resmissing}
+\providecommand{\resRtwoDickensLzwEnc}{\resmissing}
+\providecommand{\resRtwoDickensLzwDec}{\resmissing}
+\providecommand{\resNspbDickensHuffEnc}{\resmissing}
+\providecommand{\resNspbDickensHuffDec}{\resmissing}
+\providecommand{\resNspbDickensLzwEnc}{\resmissing}
+\providecommand{\resNspbDickensLzwDec}{\resmissing}
+\providecommand{\resEntropyHuffBpbKTwo}{\resmissing}
+\providecommand{\resEntropyHuffBpbKTwoFiftySix}{\resmissing}
+\providecommand{\resEntropyLzwBpbKTwo}{\resmissing}
+\providecommand{\resEntropyLzwBpbKTwoFiftySix}{\resmissing}
+\providecommand{\resEntropyHuffDecMsKTwo}{\resmissing}
+\providecommand{\resEntropyHuffDecMsKTwoFiftySix}{\resmissing}
+\providecommand{\resEntropyLzwDecMsKTwo}{\resmissing}
+\providecommand{\resEntropyLzwDecMsKTwoFiftySix}{\resmissing}
+
+% Inserta #2 solo si existe results/#1; si no, deja un aviso visible.
+\newcommand{\siresultado}[2]{%
+  \IfFileExists{results/#1}{#2}{\resultadoausente{Falta el archivo \texttt{results/#1};
+    ejecutar \texttt{ant benchmark}.}}}
+
+% Aviso de resultado ausente (solo aparece si falta un archivo de results/).
+\newcommand{\resultadoausente}[1]{%
+  \par\smallskip\noindent
+  \fcolorbox{red}{red!4}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
+    \color{red!80!black}\small\textbf{Pendiente (resultados):} #1}}\par\smallskip}
+
+% =====================================================================
+%  ESTILOS
+% =====================================================================
+\pgfplotsset{
+  informe/.style={
+    width=\linewidth, height=0.72\linewidth,
+    grid=major, grid style={gray!25},
+    tick label style={font=\scriptsize}, label style={font=\small},
+    legend style={font=\scriptsize, draw=gray!50, fill=white, fill opacity=0.9,
+                  text opacity=1, cells={anchor=west}},
+    legend pos=north west,
+    error bars/error bar style={line width=0.4pt},
+    error bars/error mark options={rotate=90, mark size=1.5pt},
+  },
+  huffenc/.style={blue!70!black, mark=*, mark size=1.3pt, line width=0.7pt},
+  huffdec/.style={blue!70!black, mark=o, mark size=1.5pt, line width=0.7pt, densely dashed},
+  lzwenc/.style={red!70!black, mark=square*, mark size=1.2pt, line width=0.7pt},
+  lzwdec/.style={red!70!black, mark=square, mark size=1.4pt, line width=0.7pt, densely dashed},
+  pendiente/.style={black!60, dashed, line width=0.6pt, mark=none},
+}
+
+\definecolor{codebg}{gray}{0.97}
+\lstdefinestyle{java}{
+  language=Java, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue!60!black},
+  commentstyle=\color{gray!70!black}\itshape, stringstyle=\color{green!40!black},
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=6pt, stepnumber=1,
+  backgroundcolor=\color{codebg}, frame=single, rulecolor=\color{gray!40},
+  breaklines=true, showstringspaces=false, tabsize=4, columns=fullflexible,
+  xleftmargin=1.5em, framexleftmargin=1.5em, captionpos=b,
+}
+\lstset{style=java}
+\renewcommand{\lstlistingname}{Listado}
+\renewcommand{\lstlistlistingname}{Índice de listados}
+
+% Pseudocódigo en español.
+\floatname{algorithm}{Algoritmo}
+\renewcommand{\listalgorithmname}{Índice de algoritmos}
+\algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
+\algrenewcommand\algorithmicensure{\textbf{Salida:}}
+\algrenewcommand\algorithmicfunction{\textbf{función}}
+\algrenewcommand\algorithmicprocedure{\textbf{procedimiento}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicelse{\textbf{si no}}
+\algrenewcommand\algorithmicfor{\textbf{para}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicwhile{\textbf{mientras}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicreturn{\textbf{devolver}}
+
+\crefname{table}{tabla}{tablas}
+\Crefname{table}{Tabla}{Tablas}
+\crefname{figure}{figura}{figuras}
+\Crefname{figure}{Figura}{Figuras}
+\crefname{algorithm}{algoritmo}{algoritmos}
+\Crefname{algorithm}{Algoritmo}{Algoritmos}
+\crefname{lstlisting}{listado}{listados}
+\Crefname{lstlisting}{Listado}{Listados}
+\crefname{section}{sección}{secciones}
+\Crefname{section}{Sección}{Secciones}
+\crefname{subsection}{sección}{secciones}
+\Crefname{subsection}{Sección}{Secciones}
+\crefname{appendix}{anexo}{anexos}
+\Crefname{appendix}{Anexo}{Anexos}
+\crefname{equation}{ecuación}{ecuaciones}
+\Crefname{equation}{Ecuación}{Ecuaciones}
+
+\newcommand{\Lbar}{\bar{L}}
+\newcommand{\bpb}{\mathrm{bpb}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape Huffman frente a LZW}
+\fancyhead[R]{\small\itshape Universidad de Lima}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlist{itemsep=2pt, topsep=4pt}
+\setlength{\emergencystretch}{3em}
+
+% Rutas de archivo en monoespaciado que pueden cortarse en / y en punto.
+\newcommand{\ruta}[1]{\nolinkurl{#1}}
+
+\hypersetup{
+  pdftitle={Huffman frente a LZW: comparación teórica y experimental de algoritmos de compresión sin pérdida},
+  pdfauthor={Universidad de Lima, Trabajo de Investigación 2026-2},
+  pdfkeywords={compresión sin pérdida, codificación de Huffman, LZW, análisis de complejidad, algoritmia experimental, entropía},
+}
+
+% =====================================================================
+\begin{document}
+
+% ---------------------------------------------------------------- portada
+% Numeración propia para la portada: evita un ancla page.1 duplicada en hyperref.
+\pagenumbering{Alph}
+\begin{titlepage}
+  \centering
+  \includegraphics[width=4.2cm]{figures/ulima-logo.jpg}\par\vspace{1.0cm}
+  {\large\scshape Universidad de Lima\par}\vspace{0.2cm}
+  {\normalsize Facultad de Ingeniería — Carrera de Ingeniería de Sistemas\par}\vspace{1.4cm}
+  {\normalsize Trabajo de Investigación — Curso: (Área de Ingeniería de Software)\par}\vspace{1.2cm}
+  \rule{\linewidth}{0.8pt}\par\vspace{0.4cm}
+  {\LARGE\bfseries Huffman frente a LZW:\par}\vspace{0.2cm}
+  {\Large comparación teórica y experimental de algoritmos\\ de compresión sin pérdida\par}
+  \vspace{0.4cm}\rule{\linewidth}{0.8pt}\par\vspace{1.6cm}
+  {\normalsize\bfseries Integrantes\par}\vspace{0.3cm}
+  \begin{tabular}{@{}c@{}}
+    \integranteA\\[2pt]
+    \integranteB\\[2pt]
+    \integranteC\\[2pt]
+    \integranteD\\[2pt]
+    \integranteE\\
+  \end{tabular}\par\vspace{1.2cm}
+  {\normalsize\bfseries Docente\par}\vspace{0.2cm}
+  {\normalsize \docente\par}
+  \vfill
+  {\normalsize Lima, Perú — 2026-2\par}
+\end{titlepage}
+
+\pagenumbering{roman}
+
+% ---------------------------------------------------------------- resumen
+\section*{Resumen}
+\addcontentsline{toc}{section}{Resumen}
+La compresión sin pérdida reduce el costo de almacenar y transmitir datos sin alterar un
+solo bit de la información original. Este trabajo compara dos algoritmos clásicos que
+explotan redundancias de naturaleza distinta: la codificación de Huffman, un código prefijo
+estático que aprovecha la distribución de frecuencias de los símbolos, y el algoritmo
+Lempel--Ziv--Welch (LZW), un método adaptativo de diccionario que reemplaza frases
+repetidas por códigos. Ambos se implementaron en Java (proyecto NetBeans con Ant), con
+codificación canónica de Huffman y LZW de ancho variable de 9 a 16 bits con reinicio del
+diccionario, validados con 43 pruebas JUnit. Se derivó la complejidad temporal y espacial de
+cada algoritmo y se contrastó con tres experimentos: escalamiento del tiempo con el tamaño
+de la entrada (ajuste log--log), barrido de entropía con alfabetos uniformes y evaluación sobre
+los corpus Canterbury y Silesia. Los tiempos se reportan como medianas con intervalos de confianza del
+95\,\% tras el calentamiento del compilador JIT.
+Las pendientes log--log, entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en una
+réplica independiente, confirman el crecimiento lineal de las cuatro operaciones, con
+asimetrías opuestas: Huffman decodifica más despacio de lo que codifica y LZW al revés. Huffman
+quedó siempre en $[H_0, H_0 + 1)$, mientras que LZW comprimió mejor en \resLzwWins{} de los
+\resCorpusFiles{} archivos del corpus (\resCorpusLzwBpb{} frente a \resCorpusHuffBpb{}~bits
+por byte en el agregado), pero perdió en todas las fuentes sin memoria y expandió los bytes
+uniformes hasta 11.00~bits por byte. El tipo de redundancia del dato decide cuál
+de los dos comprime mejor.
+
+\medskip\noindent\textbf{Palabras clave:} compresión sin pérdida, codificación de Huffman,
+LZW, análisis de complejidad, algoritmia experimental, entropía.
+
+\begin{otherlanguage}{english}
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+Lossless compression reduces the cost of storing and transmitting data without altering a
+single bit of the original information. This work compares two classical algorithms that
+exploit different kinds of redundancy: Huffman coding, a static prefix code that exploits
+the symbol frequency distribution, and the Lempel--Ziv--Welch (LZW) algorithm, an adaptive
+dictionary method that replaces repeated phrases with codes. Both were implemented in Java
+(a NetBeans project built with Ant), using canonical Huffman codes and variable-width LZW
+codes from 9 to 16 bits with dictionary reset, and validated with 43 JUnit tests. The time and
+space complexity of each algorithm was derived and contrasted through three experiments:
+time scaling with input size (log--log fit), an entropy sweep over uniform alphabets, and an
+evaluation on the Canterbury and Silesia corpora. Times are reported as medians with 95\,\% confidence
+intervals after JIT warm-up.
+Log--log slopes between 0.85 and 1.08 in the main run and between 0.93 and 1.02 in an
+independent replica confirm linear growth for all four operations, with opposite asymmetries:
+Huffman decodes more slowly than it encodes, and LZW does the reverse. Huffman always stayed
+within $[H_0, H_0 + 1)$, whereas LZW compressed better on \resLzwWins{} of the
+\resCorpusFiles{} corpus files (\resCorpusLzwBpb{} versus \resCorpusHuffBpb{} bits per byte
+overall), but lost on every memoryless source and expanded uniform bytes to 11.00 bits per byte.
+The kind of redundancy in the data decides which of the two compresses better.
+
+\medskip\noindent\textbf{Keywords:} lossless compression, Huffman coding, LZW, complexity
+analysis, experimental algorithmics, entropy.
+\end{otherlanguage}
+
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\listoftables
+\listofalgorithms
+\lstlistoflistings
+\clearpage
+\pagenumbering{arabic}
+
+\input{sections/01-introduccion}
+\input{sections/02-estado-del-arte}
+\input{sections/03-marco-teorico}
+\input{sections/04-metodologia}
+\input{sections/05-resultados}
+\input{sections/06-discusion}
+\input{sections/07-conclusiones}
+
+% ---------------------------------------------------------------- bibliografía
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Referencias}
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+% ---------------------------------------------------------------- anexos
+\clearpage
+\appendix
+\input{sections/08-anexos}
+
+\end{document}

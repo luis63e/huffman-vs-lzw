@@ -1,0 +1,122 @@
+% ---------------------------------------------------------------------
+%  7. Conclusiones
+% ---------------------------------------------------------------------
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+\subsection{Comparación entre el análisis teórico y los resultados experimentales}
+\label{sec:concl-teoria-experimento}
+La \cref{tab:teoria-experimento} reúne, para cada aspecto analizado, la predicción derivada en
+la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
+
+\begin{table}[H]
+  \centering
+  \caption{Predicción teórica frente a evidencia experimental.}
+  \label{tab:teoria-experimento}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}>{\raggedright}p{3.0cm} >{\raggedright}p{5.2cm} >{\raggedright\arraybackslash}p{6.4cm}@{}}
+    \toprule
+    Aspecto & Predicción teórica & Evidencia experimental \\
+    \midrule
+    Tiempo de Huffman & $\Theta(n)$ al codificar; $\Theta(n\Lbar)$ al decodificar (H1) &
+      Pendiente en \texttt{dickens}: \resSlopeDickensHuffEnc{} (cod.), \resSlopeDickensHuffDec{}
+      (decod.); $R^2$: \resRtwoDickensHuffEnc{}, \resRtwoDickensHuffDec{}; resto en la
+      \cref{tab:pendientes} \\
+    Tiempo de LZW & $\Theta(n)$ esperado al codificar; $\Theta(n)$ al decodificar (H1) &
+      Pendiente en \texttt{dickens}: \resSlopeDickensLzwEnc{} (cod.), \resSlopeDickensLzwDec{}
+      (decod.); $R^2$: \resRtwoDickensLzwEnc{}, \resRtwoDickensLzwDec{} \\
+    Costo por byte & Constante en $n$ & En el mayor prefijo de \texttt{dickens}: Huffman
+      \resNspbDickensHuffEnc{} / \resNspbDickensHuffDec{} ns/byte; LZW
+      \resNspbDickensLzwEnc{} / \resNspbDickensLzwDec{} ns/byte (cod. / decod.); decrece con $n$
+      en tamaños pequeños por costos fijos \\
+    Pendientes en todas las series & Cercanas a 1 (H1) &
+      Corrida principal: 0.85--1.08; réplica: 0.93--1.02 ($R^2 \ge 0.997$) \\
+    Tasa de Huffman & $[H_0, H_0 + 1)$; cerca de $H_0$ en fuentes i.i.d. (H2) &
+      E2: \resEntropyHuffBpbKTwo{} bpb con $k = 2$ y \resEntropyHuffBpbKTwoFiftySix{} bpb con
+      $k = 256$ \\
+    Tasa de LZW según el dato & Mejor con frases repetidas; peor en i.i.d.; expansión en
+      bytes uniformes (H3) &
+      E2: \resEntropyLzwBpbKTwo{} bpb con $k = 2$ y \resEntropyLzwBpbKTwoFiftySix{} bpb con
+      $k = 256$; E3: gana en \resLzwWins{} de \resCorpusFiles{} archivos \\
+    Corpus completo & Sin predicción universal &
+      Agregado: Huffman \resCorpusHuffBpb{}, LZW \resCorpusLzwBpb{} bpb \\
+    Decodificación y entropía & Huffman crece con $\Lbar$; LZW casi insensible (H4) &
+      E2, decodificación: Huffman \resEntropyHuffDecMsKTwo{} a
+      \resEntropyHuffDecMsKTwoFiftySix{} ms; LZW \resEntropyLzwDecMsKTwo{} a
+      \resEntropyLzwDecMsKTwoFiftySix{} ms ($k = 2$ a $256$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Las predicciones de complejidad se confirmaron: los cuatro procedimientos escalan linealmente
+con $n$, con pendientes entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en la
+réplica. Las desviaciones respecto de 1 tienen causas identificadas: los costos fijos por
+llamada ---cabecera y construcción del código en Huffman; reserva e inicialización de tablas de
+tamaño $O(2^b)$ en LZW--- reducen la pendiente cuando se amortizan en el rango medido, y los
+efectos de caché y del recolector la elevan en los mayores tamaños. También se confirmaron las
+predicciones de tasa: Huffman quedó dentro de $[H_0, H_0+1)$ en todos los casos, a solo
+0.0002~bpb de $H_0$ en E2, y LZW ganó con frases repetidas, perdió en fuentes i.i.d. y expandió
+los bytes uniformes. La predicción que se cumplió solo parcialmente es la insensibilidad de LZW a
+la entropía: su tiempo de decodificación se multiplicó por 3.2 entre $k = 2$ y $k = 256$, frente al
+factor de 6.7 de Huffman; la causa es el mayor número de códigos por byte cuando las frases
+se acortan. El análisis asintótico tampoco anticipa las constantes, que resultaron decisivas en
+la práctica: la decodificación bit a bit hace que Huffman decodifique más despacio de lo que
+codifica, y la búsqueda en la tabla hash por cada byte hace que LZW codifique más despacio de lo
+que decodifica.
+
+\subsection{Respuestas a las preguntas de investigación}
+\label{sec:concl-rq}
+\begin{enumerate}[label=\textbf{RQ\arabic*.}, leftmargin=*]
+  \item Sí. Ambos algoritmos escalan en $\Theta(n)$, como predice el análisis, tanto al codificar
+        como al decodificar. La longitud media del código, $\Lbar$, no altera el orden de
+        crecimiento de Huffman, pero sí su constante: con $n$ fijo, su tiempo de decodificación
+        crece linealmente con $\log_2 k$. Las constantes difieren entre operaciones: en el mayor tamaño,
+        Huffman codifica a 4.50--6.26~ns/byte y decodifica a 9.14--11.18, mientras que LZW
+        codifica a 10.34--14.72 y decodifica a 3.17--5.11. En la práctica, Huffman es preferible
+        cuando la velocidad de codificación es prioritaria, y LZW cuando lo es la de
+        decodificación.
+  \item Huffman depende solo de la distribución de frecuencias y queda siempre en
+        $[H_0, H_0+1)$; su límite es un bit por símbolo, visible en \texttt{ptt5}. LZW depende
+        de la repetición de frases: puede bajar mucho de $H_0$ en texto y datos estructurados
+        (\texttt{xml}: 1.66~bpb frente a $H_0 = 5.52$), pero pierde frente a Huffman en fuentes
+        sin memoria y expande los datos aleatorios. Se recomienda Huffman para datos cercanos a
+        una fuente sin memoria con distribución sesgada y LZW para texto, código fuente, registros
+        y formatos estructurados.
+\end{enumerate}
+
+La \cref{tab:recomendacion} resume estas respuestas como criterio práctico de elección.
+
+\begin{table}[H]
+  \centering
+  \caption{Algoritmo recomendado según la situación, con la evidencia medida.}
+  \label{tab:recomendacion}
+  \small
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.34\linewidth} l >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Situación & Recomendado & Evidencia \\
+    \midrule
+    Texto, código fuente y formatos estructurados & LZW &
+      \texttt{xml}: 1.66~bpb frente a 5.55 de Huffman \\
+    Datos sin frases repetidas y con frecuencias sesgadas & Huffman &
+      \texttt{skewed}: 4.09~bpb frente a 4.74 de LZW \\
+    Datos aleatorios o ya comprimidos & Huffman &
+      Bytes uniformes: 8.00~bpb; LZW los expande a 11.00 \\
+    Prioridad en la velocidad de compresión & Huffman &
+      4.50--6.26~ns/byte frente a 10.34--14.72 de LZW \\
+    Prioridad en la velocidad de descompresión & LZW &
+      3.17--5.11~ns/byte frente a 9.14--11.18 de Huffman \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+En términos generales, el análisis teórico indica que la elección entre Huffman y LZW no
+depende de su complejidad asintótica, que es lineal en ambos casos, sino de la coincidencia
+entre la redundancia que cada uno explota y la que contienen los datos, en línea con la
+observación de las revisiones del área~\cite{bell1989,jayasankar2021}.
+Los resultados confirman esta conclusión y la matizan en dos aspectos. Primero, a igual orden
+de complejidad, las constantes de cada operación difieren mucho ---de 3.17 a 14.72~ns/byte en
+el mayor tamaño--- y siguen asimetrías opuestas, de modo que la elección también depende de si importa más comprimir o
+descomprimir rápido. Segundo, el tipo de redundancia decide el ganador con mucha claridad
+---LZW en \resLzwWins{} de \resCorpusFiles{} archivos, Huffman en todas las fuentes sin
+memoria---, de modo que conviene conocer el dato antes de elegir el algoritmo.

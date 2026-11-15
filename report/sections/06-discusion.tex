@@ -1,0 +1,126 @@
+% ---------------------------------------------------------------------
+%  6. Discusión
+% ---------------------------------------------------------------------
+\section{Discusión}
+\label{sec:discusion}
+
+Esta sección contrasta cada hipótesis de la \cref{sec:hipotesis} con la evidencia de la
+\cref{sec:resultados}.
+
+\subsection{H1: escalamiento lineal}
+\label{sec:disc-h1}
+\paragraph{Predicción.} Según la \cref{tab:comparacion-teorica}, los cuatro procedimientos son
+lineales en $n$: la codificación de Huffman es $\Theta(n + \sigma\log\sigma)$, su
+decodificación $\Theta(n\Lbar)$ con $\Lbar$ acotado, y ambas operaciones de LZW son
+$\Theta(n)$. En escala log--log, la pendiente esperada es 1.
+
+\paragraph{Desviaciones previsibles.} El análisis asintótico ignora costos fijos que pesan en
+entradas pequeñas: Huffman construye el código y escribe una cabecera de 262 bytes en cada
+llamada, y LZW reserva e inicializa en cada llamada su tabla hash de $2^{17}$ posiciones (dos
+arreglos de enteros) o, al decodificar, cuatro arreglos de $2^{16}$ entradas. Estos costos
+constantes aplanan la curva en los primeros tamaños y tienden a producir pendientes menores
+que 1 si se incluyen en el ajuste; por eso el ajuste usa $n \ge 2^{16}$. En el extremo opuesto,
+cuando los datos y las tablas dejan de caber en la memoria caché, el costo por byte puede
+aumentar ligeramente sin que cambie la complejidad.
+
+\paragraph{Evidencia.} \Cref{fig:e1-tiempo,fig:e1-nspb} y \cref{tab:pendientes}.
+\paragraph{Contraste.} H1 se acepta para las cuatro operaciones. Las pendientes de la corrida
+principal van de 1.00 a 1.08 en las fuentes sintéticas ($R^2 \ge 0.987$) y de 0.85 a 0.95 en
+\texttt{dickens}; la réplica, con el mismo protocolo, las sitúa entre 0.93 y 1.02 con
+$R^2 \ge 0.997$ en todas las series. Ningún valor se aproxima a 2, y el ajuste lineal en escala
+log--log explica casi toda la varianza. Las pendientes menores que 1 de \texttt{dickens} son la
+huella de los costos fijos descritos arriba: el costo por byte cae con $n$ (en la codificación
+LZW, de 87.85~ns/byte con 16~KiB a 10.34~ns/byte con 8~MiB), de modo que el tiempo crece algo
+más despacio que $n$ en el rango medido. Las pendientes algo mayores que 1 de la corrida
+principal en las fuentes sintéticas coinciden con el aumento del costo por byte en los dos
+mayores tamaños, compatible con efectos de caché y de recolección de memoria, y no se repiten
+con la misma magnitud en la réplica. La diferencia entre corridas, de hasta 0.13 en una misma
+serie, es la variabilidad medida del experimento y es mucho menor que la distancia entre un
+crecimiento lineal y uno cuadrático.
+
+\subsection{H2: Huffman frente a la entropía}
+\label{sec:disc-h2}
+\paragraph{Predicción.} La tasa medida incluye la cabecera y el relleno del último byte, por lo
+que
+\begin{equation}
+  \bpb_{\text{Huffman}} = \Lbar + \frac{8 \cdot 262}{n} + \frac{\delta}{n}, \qquad 0 \le \delta < 8,
+  \label{eq:bpb-huffman}
+\end{equation}
+y, por la \cref{eq:cota-huffman}, tiende a un valor en $[H_0, H_0 + 1)$ cuando $n$ crece. En
+E2 con $k$ potencia de dos y $n = 2^{23}$, las frecuencias empíricas son casi iguales, el árbol
+resultante es completo y equilibrado, y cada símbolo recibe $\log_2 k$ bits: la teoría predice
+una tasa prácticamente igual a $H_0$, con un sobrecosto de cabecera de $8\cdot 262/2^{23}$ bpb,
+del orden de $2.5\times10^{-4}$. En la fuente geométrica, en cambio, las probabilidades no son
+potencias de $1/2$ y cabe esperar una distancia positiva, aunque menor que un bit, respecto de
+$H_0$. Sobre texto, Huffman no puede bajar de $H_0$ porque no modela el contexto.
+
+\paragraph{Evidencia.} \Cref{fig:e2-bpb,fig:e1-bpb} y la columna $H_0$ de la \cref{tab:corpus}.
+\paragraph{Contraste.} H2 se acepta. En E2 la tasa es $H_0 + 0.0002$~bpb para todo $k$, tal
+como predice la \cref{eq:bpb-huffman} con un árbol equilibrado. En \texttt{skewed}, cuyas
+probabilidades no son potencias de $1/2$, la distancia con 16~MiB es de 0.027~bpb (4.0923 frente
+a 4.0657), positiva y muy inferior a un bit. En los \resCorpusFiles{} archivos del corpus se
+cumple $\bpb_{\text{Huffman}} < H_0 + 1$. Las distancias mayores tienen dos causas
+identificables. La primera es la cabecera en archivos diminutos: en \texttt{grammar.lsp}
+(3721~bytes) la cabecera aporta $8 \cdot 262 / 3721 \approx 0.56$~bpb de los 0.60~bpb de
+diferencia, y en \texttt{xargs.1} (4227~bytes), 0.50 de 0.52~bpb. La segunda es
+\texttt{ptt5}, una imagen de fax en la que un único valor de byte domina el archivo: su
+entropía es de 1.21~bpb, pero Huffman obtiene 1.66~bpb, porque ningún símbolo puede recibir
+menos de un bit, por probable que sea. Esta es la limitación clásica de los códigos de longitud
+entera que motiva la codificación aritmética~\cite{witten1987}, y no contradice la cota
+$H_0 + 1$.
+
+\subsection{H3: tipo de redundancia y ganador}
+\label{sec:disc-h3}
+\paragraph{Predicción.} LZW solo ahorra espacio cuando sus frases son largas: cada código
+cuesta entre 9 y $b$ bits, así que una frase de longitud media $m$ cuesta del orden de
+$b/m$ bits por byte. En datos con palabras y frases recurrentes, el diccionario captura
+secuencias largas y la tasa puede quedar por debajo de $H_0$, algo imposible para un código de
+orden cero. En datos i.i.d. las frases crecen muy lentamente, porque cada extensión requiere
+que un par (frase, byte) ya haya aparecido; con bytes uniformes, la mayoría de las frases
+tienen uno o dos bytes y cada código de 9 a 16 bits representa poco más de un byte, de modo
+que se espera expansión ($\bpb > 8$). Huffman, por el contrario, nunca supera
+$\Lbar < H_0 + 1$ más la cabecera.
+
+\paragraph{Evidencia.} \Cref{fig:e1-bpb,fig:e2-bpb} y \cref{tab:corpus}.
+\paragraph{Contraste.} H3 se acepta en sus tres partes. En E1, LZW gana con claridad en los
+datos con frases repetidas ---\texttt{synthtext} con 16~MiB: 2.21 frente a 4.00~bpb;
+\texttt{dickens} con 8~MiB: 3.29 frente a 4.58---, pierde en la fuente i.i.d. sesgada
+(\texttt{skewed}: 4.74 frente a 4.09) y expande los bytes uniformes (11.00~bpb, frente a
+8.0001 de Huffman). E2 confirma el patrón en fuentes sin memoria: LZW es peor que Huffman para
+todo $k$, y la brecha crece de 1.13 frente a 1.00~bpb ($k = 2$) a 11.00 frente a 8.00
+($k = 256$). En el corpus, LZW gana en \resLzwWins{} de los \resCorpusFiles{} archivos, con las
+mayores ventajas en texto estructurado y repetitivo (\texttt{xml}, \texttt{nci},
+\texttt{samba}, \texttt{reymont}). Las dos excepciones son coherentes con la hipótesis.
+\texttt{E.coli} es una secuencia de ADN de cuatro letras: su entropía de orden cero (2.00~bpb)
+ya captura casi toda la redundancia aprovechable, y las repeticiones largas que contiene son
+demasiado escasas para que un diccionario de $2^{16}$ frases compense los 16~bits de cada
+código. En \texttt{x-ray}, una radiografía, LZW apenas encuentra frases repetidas ---su tasa, 6.67~bpb,
+supera incluso $H_0 = 6.60$---, y en
+\texttt{sao} ---un catálogo binario de estrellas--- ambos algoritmos empatan prácticamente. En el
+agregado del corpus, LZW obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman.
+
+\subsection{H4: sensibilidad del tiempo a la entropía}
+\label{sec:disc-h4}
+\paragraph{Predicción.} El decodificador canónico ejecuta una iteración por bit leído, $n\Lbar$
+en total; con $\Lbar \approx \log_2 k$ en E2, su tiempo debería crecer aproximadamente de forma
+lineal con $\log_2 k$. El codificador de Huffman escribe un campo por símbolo con
+\texttt{BitWriter}, cuyo costo depende solo débilmente de $\ell_s$, por lo que se espera
+menor sensibilidad. La decodificación de LZW escribe cada byte de salida una vez; la entropía
+solo afecta al número de códigos, que crece cuando las frases se acortan, de modo que se espera
+una dependencia mucho más débil que la de Huffman.
+
+\paragraph{Evidencia.} \Cref{fig:e2-tiempo}.
+\paragraph{Contraste.} La parte de H4 referida a Huffman se acepta: con $n = 2^{23}$ fijo, el
+tiempo de decodificación crece de \resEntropyHuffDecMsKTwo{} a
+\resEntropyHuffDecMsKTwoFiftySix{}~ms y lo hace de forma aproximadamente lineal en
+$\log_2 k$, que en E2 coincide con $\Lbar$ (unos 6.95~ms por bit de longitud media). Es
+exactamente la dependencia $\Theta(n\Lbar)$ del análisis. El rendimiento de decodificación de
+Huffman en el corpus apunta en la misma dirección: 558~MB/s en \texttt{E.coli}
+($H_0 = 2.00$) frente a 79~MB/s en \texttt{mozilla} ($H_0 = 6.22$). Como se predijo, la
+codificación de Huffman casi no varía (entre 23.71 y 30.39~ms). La parte referida a LZW se
+cumple solo en sentido relativo: su decodificación no es insensible a la entropía, pues crece de
+\resEntropyLzwDecMsKTwo{} a \resEntropyLzwDecMsKTwoFiftySix{}~ms, pero lo hace con un factor
+de 3.2 frente al de 6.7 de Huffman y con mayor dispersión. Esa dependencia no proviene de la
+longitud de los códigos sino del número de códigos: al subir la entropía, las frases se acortan
+y hay que resolver más códigos por byte, cada uno con su costo fijo. Lo mismo explica que la
+codificación de LZW pase de 60.60 a 107.11~ms.
