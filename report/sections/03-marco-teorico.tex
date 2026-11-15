@@ -50,7 +50,7 @@ indica expansión.
 \paragraph{Idea.} Huffman~\cite{huffman1952} construye un árbol binario de abajo hacia arriba:
 parte de una hoja por símbolo, ponderada por su frecuencia, y fusiona repetidamente los dos
 árboles de menor peso. La profundidad de cada hoja es la longitud de su código. Se trata de un
-algoritmo voraz cuya elección local ---fusionar los dos símbolos menos frecuentes--- es
+algoritmo voraz cuya elección local (fusionar los dos símbolos menos frecuentes) es
 óptima~\cite{cormen2022}. El \cref{alg:huffman} muestra el cálculo de longitudes tal como lo
 realiza \texttt{HuffmanCodec.codeLengths}, con un montículo binario de mínimos y desempate
 por orden de creación del nodo para que el resultado sea determinista.
@@ -310,7 +310,7 @@ los códigos usan 9 bits: $16 \cdot 9 = 144$ bits frente a $24 \cdot 8 = 192$ bi
     13 & \texttt{TOB} & \texttt{E} & 266 & 269 = \texttt{TOBE} \\
     14 & \texttt{EO}  & \texttt{R} & 260 & 270 = \texttt{EOR} \\
     15 & \texttt{RN}  & \texttt{O} & 262 & 271 = \texttt{RNO} \\
-    16 & \texttt{OT}  & (fin)      & 264 & --- \\
+    16 & \texttt{OT}  & (fin)      & 264 & (ninguna) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -348,8 +348,8 @@ cubre este caso.
 \subsection{Comparación teórica}
 \label{sec:comparacion-teorica}
 La \cref{tab:comparacion-teorica} resume las diferencias estructurales entre ambos
-algoritmos tal como se implementaron. La diferencia esencial no es asintótica ---ambos son
-lineales--- sino de \emph{modelo}: Huffman es estático y de dos pasadas, y explota solo la
+algoritmos tal como se implementaron. La diferencia esencial no es asintótica (ambos son
+lineales), sino de \emph{modelo}: Huffman es estático y de dos pasadas, y explota solo la
 distribución de frecuencias de los bytes; LZW es adaptativo y de una pasada, y explota
 frases repetidas, pero paga al menos 9 bits por código emitido.
 

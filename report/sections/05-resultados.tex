@@ -112,8 +112,8 @@ arbitraria). Las barras de error indican el semiancho superior del intervalo de 
 En las cuatro fuentes, las curvas de las cuatro operaciones son aproximadamente paralelas a la
 recta de pendiente 1 a partir de $n \approx 2^{16}$: duplicar la entrada duplica, en buena
 aproximación, el tiempo. En los tamaños menores la tendencia se rompe y los intervalos se
-ensanchan, porque los costos fijos de cada llamada ---construir el código y escribir la cabecera
-de Huffman, reservar e inicializar las tablas de LZW--- son comparables con el trabajo
+ensanchan, porque los costos fijos de cada llamada (construir el código y escribir la cabecera
+de Huffman, reservar e inicializar las tablas de LZW) son comparables con el trabajo
 proporcional a $n$, y porque mediciones de décimas de milisegundo son más sensibles al ruido
 del JIT y del recolector. El caso extremo es la codificación LZW de \texttt{dickens}: 1.44~ms
 con 16~KiB frente a 0.68~ms con 32~KiB (\texttt{e1\_dickens.csv}), con un semiancho de
@@ -383,7 +383,7 @@ orden se invierte: LZW alcanza entre 194 y 621~MB/s en esos archivos y Huffman e
 558~MB/s, con los valores altos en archivos de entropía baja (\texttt{E.coli}, 558~MB/s;
 \texttt{ptt5}, 360~MB/s) y los bajos en archivos de entropía alta (\texttt{mozilla}, 79~MB/s;
 \texttt{sao}, 82~MB/s) (\texttt{e3\_corpus.csv}). En los archivos diminutos el rendimiento de
-LZW se desploma ---32~MB/s en \texttt{grammar.lsp} y 4.5~MB/s en \texttt{xargs.1}--- porque
+LZW se desploma (32~MB/s en \texttt{grammar.lsp} y 4.5~MB/s en \texttt{xargs.1}) porque
 cada llamada reserva e inicializa tablas de tamaño $O(2^b)$, independiente de $n$, cuyo costo
 domina cuando la entrada tiene unos pocos kilobytes; la diferencia entre ambos archivos, de
 tamaño similar, sugiere además ruido de medición a esa escala.

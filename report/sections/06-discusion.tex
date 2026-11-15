@@ -83,8 +83,8 @@ $\Lbar < H_0 + 1$ más la cabecera.
 
 \paragraph{Evidencia.} \Cref{fig:e1-bpb,fig:e2-bpb} y \cref{tab:corpus}.
 \paragraph{Contraste.} H3 se acepta en sus tres partes. En E1, LZW gana con claridad en los
-datos con frases repetidas ---\texttt{synthtext} con 16~MiB: 2.21 frente a 4.00~bpb;
-\texttt{dickens} con 8~MiB: 3.29 frente a 4.58---, pierde en la fuente i.i.d. sesgada
+datos con frases repetidas (\texttt{synthtext} con 16~MiB: 2.21 frente a 4.00~bpb;
+\texttt{dickens} con 8~MiB: 3.29 frente a 4.58), pierde en la fuente i.i.d. sesgada
 (\texttt{skewed}: 4.74 frente a 4.09) y expande los bytes uniformes (11.00~bpb, frente a
 8.0001 de Huffman). E2 confirma el patrón en fuentes sin memoria: LZW es peor que Huffman para
 todo $k$, y la brecha crece de 1.13 frente a 1.00~bpb ($k = 2$) a 11.00 frente a 8.00
@@ -94,9 +94,9 @@ mayores ventajas en texto estructurado y repetitivo (\texttt{xml}, \texttt{nci},
 \texttt{E.coli} es una secuencia de ADN de cuatro letras: su entropía de orden cero (2.00~bpb)
 ya captura casi toda la redundancia aprovechable, y las repeticiones largas que contiene son
 demasiado escasas para que un diccionario de $2^{16}$ frases compense los 16~bits de cada
-código. En \texttt{x-ray}, una radiografía, LZW apenas encuentra frases repetidas ---su tasa, 6.67~bpb,
-supera incluso $H_0 = 6.60$---, y en
-\texttt{sao} ---un catálogo binario de estrellas--- ambos algoritmos empatan prácticamente. En el
+código. En \texttt{x-ray}, una radiografía, LZW apenas encuentra frases repetidas (su tasa, 6.67~bpb,
+supera incluso $H_0 = 6.60$), y en
+\texttt{sao}, un catálogo binario de estrellas, ambos algoritmos empatan prácticamente. En el
 agregado del corpus, LZW obtiene \resCorpusLzwBpb{}~bpb frente a \resCorpusHuffBpb{} de Huffman.
 
 \subsection{H4: sensibilidad del tiempo a la entropía}

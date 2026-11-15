@@ -52,8 +52,8 @@ la \cref{sec:marco-teorico} y la evidencia experimental correspondiente.
 Las predicciones de complejidad se confirmaron: los cuatro procedimientos escalan linealmente
 con $n$, con pendientes entre 0.85 y 1.08 en la corrida principal y entre 0.93 y 1.02 en la
 réplica. Las desviaciones respecto de 1 tienen causas identificadas: los costos fijos por
-llamada ---cabecera y construcción del código en Huffman; reserva e inicialización de tablas de
-tamaño $O(2^b)$ en LZW--- reducen la pendiente cuando se amortizan en el rango medido, y los
+llamada (cabecera y construcción del código en Huffman; reserva e inicialización de tablas de
+tamaño $O(2^b)$ en LZW) reducen la pendiente cuando se amortizan en el rango medido, y los
 efectos de caché y del recolector la elevan en los mayores tamaños. También se confirmaron las
 predicciones de tasa: Huffman quedó dentro de $[H_0, H_0+1)$ en todos los casos, a solo
 0.0002~bpb de $H_0$ en E2, y LZW ganó con frases repetidas, perdió en fuentes i.i.d. y expandió
@@ -115,8 +115,8 @@ depende de su complejidad asintótica, que es lineal en ambos casos, sino de la 
 entre la redundancia que cada uno explota y la que contienen los datos, en línea con la
 observación de las revisiones del área~\cite{bell1989,jayasankar2021}.
 Los resultados confirman esta conclusión y la matizan en dos aspectos. Primero, a igual orden
-de complejidad, las constantes de cada operación difieren mucho ---de 3.17 a 14.72~ns/byte en
-el mayor tamaño--- y siguen asimetrías opuestas, de modo que la elección también depende de si importa más comprimir o
+de complejidad, las constantes de cada operación difieren mucho (de 3.17 a 14.72~ns/byte en
+el mayor tamaño) y siguen asimetrías opuestas, de modo que la elección también depende de si importa más comprimir o
 descomprimir rápido. Segundo, el tipo de redundancia decide el ganador con mucha claridad
----LZW en \resLzwWins{} de \resCorpusFiles{} archivos, Huffman en todas las fuentes sin
-memoria---, de modo que conviene conocer el dato antes de elegir el algoritmo.
+(LZW en \resLzwWins{} de \resCorpusFiles{} archivos, Huffman en todas las fuentes sin
+memoria), de modo que conviene conocer el dato antes de elegir el algoritmo.
