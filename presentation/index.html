@@ -33,7 +33,7 @@
     },
     {
       "sceneId": "huffman-arbol",
-      "notes": "Expositor 2 · ~45 s. Los códigos salen de un árbol. Se unen siempre los dos nodos menos frecuentes hasta que queda uno solo. Luego, cada camino desde la raíz es un código: izquierda es cero, derecha es uno. Para codificar se recorren los datos dos veces, una para contar y otra para escribir; por eso el tiempo es lineal más sigma log sigma, donde sigma es la cantidad de símbolos distintos. Para decodificar se baja por el árbol bit a bit. Le paso la palabra a quien explica LZW."
+      "notes": "Expositor 2 · ~45 s. Los códigos salen de un árbol. Se unen siempre los dos nodos menos frecuentes hasta que queda uno solo. Aquí primero se unen c y d, luego b y r. Cada camino desde la raíz es un código: izquierda es cero, derecha es uno. Nuestro programa después reordena los códigos en forma canónica, con las mismas longitudes. Para codificar se recorren los datos dos veces, una para contar y otra para escribir; por eso el tiempo es lineal más sigma log sigma, donde sigma es la cantidad de símbolos distintos. Para decodificar se baja por el árbol bit a bit. Le paso la palabra a quien explica LZW."
     },
     {
       "sceneId": "lzw",
